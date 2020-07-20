@@ -1,17 +1,17 @@
 {% set name = "sentencepiece" %}
-{% set version = "0.1.91" %}
+{% set version = "1.0.0" %}
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
 source:
-  url: https://github.com/google/{{ name }}/archive/v{{ version }}.tar.gz
-  sha256: acbc7ea12713cd2a8d64892f8d2033c7fd2bb4faecab39452496120ace9a4b1b
+  url: https://github.com/google/{{ name }}/archive/{{ version }}.tar.gz
+  sha256: db4352d4a46f1a40454c6b4f63370979ab27a895c5f319c61ff0dbaa1fd98ec9
 
 build:
-  number: 1
-  skip: True  # [py<36 or win or osx]
+  number: 0
+  skip: true  # [py<36 or win or osx]
 
 requirements:
   build:
@@ -36,11 +36,11 @@ test:
     - spm_normalize --help
 
 about:
-  home: "https://github.com/google/sentencepiece/"
+  home: https://github.com/google/sentencepiece/
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
-  summary: "SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training."
+  summary: SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training.
 
 extra:
   recipe-maintainers:
