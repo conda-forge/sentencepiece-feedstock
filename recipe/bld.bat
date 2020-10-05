@@ -1,6 +1,8 @@
 mkdir build
 cd build
 
+set CURRENT_PATH=%~dp0
+set LIBRARY_PATH=%CURRENT_PATH%build\root
 set LIBRARY_PATH=%PREFIX%\Library
 set PATH=%LIBRARY_PATH%\mingw-w64\bin;%LIBRARY_PREFIX%\usr\bin;%LIBRARY_BIN%;%PATH%
 set _CL_=/utf-8
