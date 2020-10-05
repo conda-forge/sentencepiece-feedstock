@@ -2,7 +2,7 @@ mkdir build
 cd build
 
 set LIBRARY_PATH=%PREFIX%\Library
-set PATH=%LIBRARY_PATH%\mingw-64\bin;%LIBRARY_PREFIX%\usr\bin;%LIBRARY_BIN%;%PATH%
+set PATH=%LIBRARY_PATH%\mingw-w64\bin;%LIBRARY_PREFIX%\usr\bin;%LIBRARY_BIN%;%PATH%
 set _CL_=/utf-8
 
 cmake .. -DCMAKE_INSTALL_PREFIX:PATH=%LIBRARY_PATH% -DSPM_ENABLE_SHARED=OFF
