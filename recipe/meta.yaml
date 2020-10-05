@@ -23,10 +23,10 @@ requirements:
   host:
     - pip
     - python
-    - gperftools
+    - gperftools  # [unix]
   run:
     - python
-    - gperftools
+    - gperftools  # [unix]
 
 test:
   imports:
