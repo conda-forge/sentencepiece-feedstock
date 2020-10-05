@@ -1,14 +1,11 @@
 mkdir build
 cd build
 
-set LD_LIBRARY_PATH=%PREFIX%\lib
-set CPATH=%PREFIX%\include
-set INCLUDE=%PREFIX%\include
-set LIBRARY_PATH=%PREFIX%\lib
-set PATH=c:\MinGW\bin;%PATH%
+set LIBRARY_PATH=%PREFIX%\Library
+set PATH=%LIBRARY_PATH%\mingw-64\bin;%LIBRARY_PREFIX%\usr\bin;%LIBRARY_BIN%;%PATH%
 set _CL_=/utf-8
 
-cmake .. -DCMAKE_INSTALL_PREFIX=%PREFIX% -DCMAKE_INSTALL_LIBDIR=%PREFIX%\lib -DSPM_ENABLE_SHARED=OFF
+cmake .. -DCMAKE_INSTALL_PREFIX:PATH=%LIBRARY_PATH% -DSPM_ENABLE_SHARED=OFF
 cmake --build . --config Release --target install || goto :error
 
 cd %SRC_DIR%\python
