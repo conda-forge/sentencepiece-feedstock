@@ -2,6 +2,7 @@ mkdir build
 cd build
 
 set INCLUDE=%LIBRARY_INC%;%INCLUDE%;%RECIPE_DIR%
+set CPATH=%PREFIX%\include
 set LIBPATH=%LIBRARY_LIB%;%LIBPATH%
 
 cmake ^
