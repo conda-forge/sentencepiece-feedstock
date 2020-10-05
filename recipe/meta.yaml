@@ -32,8 +32,8 @@ test:
   imports:
     - sentencepiece
   commands:
-    - spm_export_vocab --help
-    - spm_normalize --help
+    - spm_export_vocab --help  # [unix]
+    - spm_normalize --help  # [unix]
 
 about:
   home: "https://github.com/google/sentencepiece/"
