@@ -11,22 +11,22 @@ source:
 
 build:
   number: 1
-  skip: True  # [py<36 or win or osx]
+  skip: True  # [py<36 or osx]
 
 requirements:
   build:
     - cmake
     - {{ compiler('cxx') }}
     - pkg-config
-    - gperftools
+    - gperftools  # [unix]
     - make
   host:
     - pip
     - python
-    - gperftools
+    - gperftools  # [unix]
   run:
     - python
-    - gperftools
+    - gperftools  # [unix]
 
 test:
   imports:
