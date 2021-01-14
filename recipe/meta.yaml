@@ -11,8 +11,7 @@ source:
   sha256: 8dd6e3e110f4c3f85a46e4a2ae1b6f7cf020b907fab50eac22beccf1680e0ea5
 
 build:
-  number: 0
-  noarch: python
+  number: 5
   script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
@@ -26,6 +25,7 @@ test:
   imports:
     - sentencepiece/__init__
     - sentencepiece/sentencepiece_model_pb2
+    - sentencepiece/sentencepiece_pb2
   commands:
     - pip check
   requires:
@@ -33,10 +33,14 @@ test:
 
 about:
   home: https://github.com/google/sentencepiece
-  summary: SentencePiece python wrapper
+  summary: SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training.
   license: Apache-2.0
+  license_family: Apache
   license_file: LICENSE
 
 extra:
   recipe-maintainers:
-    - ADD_YOUR_GITHUB_ID_HERE
+    - setu4993
+    - rluria14
+    - ndmaxar
+    - oblute
