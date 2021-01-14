@@ -1,50 +1,42 @@
 {% set name = "sentencepiece" %}
-{% set version = "0.1.91" %}
+{% set version = "0.1.95" %}
+
 
 package:
-  name: "{{ name|lower }}"
-  version: "{{ version }}"
+  name: {{ name|lower }}
+  version: {{ version }}
 
-source: 
-  url: https://github.com/google/{{ name }}/archive/v{{ version }}.tar.gz
-  sha256: acbc7ea12713cd2a8d64892f8d2033c7fd2bb4faecab39452496120ace9a4b1b
+source:
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/sentencepiece-{{ version }}.tar.gz
+  sha256: 8dd6e3e110f4c3f85a46e4a2ae1b6f7cf020b907fab50eac22beccf1680e0ea5
 
 build:
-  number: 4
-  skip: True  # [py<36 or osx]
+  number: 0
+  noarch: python
+  script: {{ PYTHON }} -m pip install . -vv
 
 requirements:
-  build:
-    - cmake
-    - {{ compiler('cxx') }}
-    - pkg-config
-    - gperftools  # [unix]
-    - make
   host:
     - pip
     - python
-    - gperftools  # [unix]
   run:
     - python
-    - gperftools  # [unix]
 
 test:
   imports:
-    - sentencepiece
+    - sentencepiece/__init__
+    - sentencepiece/sentencepiece_model_pb2
   commands:
-    - spm_export_vocab --help  # [unix]
-    - spm_normalize --help  # [unix]
+    - pip check
+  requires:
+    - pip
 
 about:
-  home: "https://github.com/google/sentencepiece/"
+  home: https://github.com/google/sentencepiece
+  summary: SentencePiece python wrapper
   license: Apache-2.0
-  license_family: Apache
   license_file: LICENSE
-  summary: "SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training."
 
 extra:
   recipe-maintainers:
-    - setu4993
-    - rluria14
-    - ndmaxar
-    - oblute
+    - ADD_YOUR_GITHUB_ID_HERE
