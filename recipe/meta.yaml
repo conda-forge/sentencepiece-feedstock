@@ -24,8 +24,6 @@ requirements:
     - python
   run:
     - python
-    - libgcc-ng
-    - libstdcxx-ng
 
 test:
   imports:
