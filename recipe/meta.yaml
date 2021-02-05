@@ -21,6 +21,7 @@ requirements:
     - gperftools  # [unix]
     - make
   host:
+    - pkg-config
     - pip
     - python
     - gperftools  # [unix]
