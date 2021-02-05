@@ -16,7 +16,14 @@ cmake \
 make -j ${CPU_COUNT}
 make install
 
-ldconfig -v -N
+if [[ "$target_platform" == "linux-64" ]]; then
+     ldconfig -v -N
+fi
+
+if [[ "$target_platform" == "osx-64" ]]; then
+     update_dyld_shared_cache
+fi
+
 cd $SRC_DIR/python
 ${PYTHON} setup.py build
 ${PYTHON} setup.py install
