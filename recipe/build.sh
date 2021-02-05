@@ -11,7 +11,7 @@ cmake \
     -DCMAKE_INSTALL_LIBDIR=$PREFIX/lib \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_TCMALLOC=OFF \
-    -S ..
+    -S .. \
     -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 make -j ${CPU_COUNT}
