@@ -12,6 +12,7 @@ cmake \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_TCMALLOC=OFF \
     -S ..
+    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
 
 make -j ${CPU_COUNT}
 make install
