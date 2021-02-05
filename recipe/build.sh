@@ -12,7 +12,9 @@ cmake \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_TCMALLOC=OFF \
     -S .. \
-    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON
+    -DCMAKE_VERBOSE_MAKEFILE:BOOL=ON \
+    -DSPM_ENABLE_SHARED=OFF \
+    -DSPM_NO_THREADLOCAL=ON \
 
 make -j ${CPU_COUNT}
 make install
