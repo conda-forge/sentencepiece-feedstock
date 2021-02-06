@@ -42,6 +42,7 @@ test:
   source_files:
     - test  # [unix]
     - python/test  # [win]
+    - data  # [win]
 
 about:
   home: "https://github.com/google/sentencepiece/"
