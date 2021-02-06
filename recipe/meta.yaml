@@ -14,15 +14,15 @@ source:
 build:
   number: 0
   skip: True  # [py<36]
-  script: {{ PYTHON }} -m pip install . -vv  # [win]
+  script: {{ PYTHON }} -m pip install . -vv  # [unix]
 
 requirements:
   build:
     - cmake
     - {{ compiler('cxx') }}
-    - pkg-config
-    - make
     - gperftools  # [unix]
+    - make
+    - pkg-config
   host:
     - pip
     - python
