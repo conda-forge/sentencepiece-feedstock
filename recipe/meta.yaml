@@ -34,6 +34,8 @@ test:
     - sentencepiece
   commands:
     - pip check
+    - spm_export_vocab --help  # [unix]
+    - spm_normalize --help  # [unix]
   requires:
     - pip
 
