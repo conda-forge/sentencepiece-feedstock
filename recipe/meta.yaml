@@ -35,7 +35,7 @@ test:
   commands:
     - pip check
     - pytest test  # [unix]
-    - pytest python/test  # [win]
+    - cd python && pytest test  # [win]
   requires:
     - pip
     - pytest
