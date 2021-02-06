@@ -39,7 +39,8 @@ test:
     - pip
     - pytest
   source_files:
-    - test
+    - test  # [unix]
+    - python/test  # [win]
 
 about:
   home: "https://github.com/google/sentencepiece/"
