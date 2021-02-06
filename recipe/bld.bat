@@ -11,6 +11,7 @@ cmake --build . --config Release --target install || goto :error
 
 cd %SRC_DIR%\python
 
+%PYTHON% -m pip install –upgrade pip 
 %PYTHON% -m pip install . -vv
 
 IF %ERRORLEVEL% NEQ 0 exit 1
