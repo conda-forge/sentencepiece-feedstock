@@ -39,7 +39,7 @@ test:
     - pip
     - pytest
   source_files:
-    - tests
+    - test
 
 about:
   home: "https://github.com/google/sentencepiece/"
