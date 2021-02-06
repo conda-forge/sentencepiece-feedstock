@@ -6,13 +6,15 @@ package:
   version: "{{ version }}"
 
 source:
-  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz
-  sha256: 8dd6e3e110f4c3f85a46e4a2ae1b6f7cf020b907fab50eac22beccf1680e0ea5
+  url: https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz # [unix]
+  url: https://github.com/google/{{ name }}/archive/v{{ version }}.tar.gz # [win]
+  sha256: 8dd6e3e110f4c3f85a46e4a2ae1b6f7cf020b907fab50eac22beccf1680e0ea5 # [unix]
+  sha256: 1c0bd83e03f71a10fc934b7ce996e327488b838587f03159fd392c77c7701389 # [win]
 
 build:
   number: 0
   skip: True  # [py<36]
-  script: {{ PYTHON }} -m pip install . -vv
+  script: {{ PYTHON }} -m pip install . -vv # [win]
 
 requirements:
   build:
