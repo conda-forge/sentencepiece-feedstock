@@ -34,7 +34,8 @@ test:
     - sentencepiece
   commands:
     - pip check
-    - pytest test
+    - pytest test  # [unix]
+    - pytest python/test  # [win]
   requires:
     - pip
     - pytest
