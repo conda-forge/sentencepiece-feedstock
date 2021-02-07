@@ -22,5 +22,5 @@ if [[ "${target_platform}" == linux-* ]]; then
     ${PYTHON} setup.py build
     ${PYTHON} setup.py install
 elif [[ "${target_platform}" == osx-* ]]; then
-      {{ PYTHON }} -m pip install python/ -vv
+    ${PYTHON} -m pip install python/ -vv
 fi
