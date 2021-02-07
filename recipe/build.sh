@@ -8,9 +8,6 @@ make install
 if [ "$(uname)" == "Linux" ];
 then
     ldconfig -v -N
-elif [ "$(uname)" == "Darwin" ];
-then
-    update_dyld_shared_cache
 fi
 
 cd ..
