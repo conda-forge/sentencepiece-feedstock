@@ -12,7 +12,7 @@ source:
 build:
   number: 0
   skip: True  # [py<36]
-  script: {{ PYTHON }} -m pip install python/ -vv  # [unix]
+  script: {{ PYTHON }} -m pip install python/ -vv  # [osx]
 
 requirements:
   build:
@@ -33,6 +33,8 @@ test:
   commands:
     - pip check
     - cd python && pytest test
+    - spm_export_vocab --help  # [linux]
+    - spm_normalize --help  # [linux]
   requires:
     - pip
     - pytest
