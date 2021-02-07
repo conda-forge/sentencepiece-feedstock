@@ -12,7 +12,9 @@ source:
 build:
   number: 0
   skip: True  # [py<36]
-  script: {{ PYTHON }} -m pip install python/ -vv  # [osx]
+  script:
+    - {{ PYTHON }} -m pip install python/ -vv  # [osx]
+    - bash build_linux.sh  # [linux]
 
 requirements:
   build:
