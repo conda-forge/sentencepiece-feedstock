@@ -1,22 +1,20 @@
 mkdir build
 cd build
 
-export LD_LIBRARY_PATH=${PREFIX}/lib
-export CPATH=${PREFIX}/include
-export INCLUDE=${PREFIX}/include
-export LIBRARY_PATH=${PREFIX}/lib
-
-cmake \
-    -DCMAKE_INSTALL_PREFIX=$PREFIX \
-    -DCMAKE_INSTALL_LIBDIR=$PREFIX/lib \
-    -DCMAKE_AR="${AR}" \
-    -DSPM_ENABLE_TCMALLOC=OFF \
-    -S ..
-
+cmake .. -DSPM_ENABLE_SHARED=OFF -DCMAKE_INSTALL_PREFIX=../..
 make -j ${CPU_COUNT}
 make install
 
-ldconfig -v -N
-cd $SRC_DIR/python
+if [ "$(uname)" == "Linux" ];
+then
+    ldconfig -v
+elif [ "$(uname)" == "Darwin" ];
+then
+    update_dyld_shared_cache
+fi
+
+cd ..
+cd python
+
 ${PYTHON} setup.py build
 ${PYTHON} setup.py install
