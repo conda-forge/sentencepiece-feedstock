@@ -10,7 +10,7 @@ then
     ldconfig -v -N
 elif [ "$(uname)" == "Darwin" ];
 then
-    sudo update_dyld_shared_cache
+    update_dyld_shared_cache
 fi
 
 cd ..
