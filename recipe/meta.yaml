@@ -32,8 +32,8 @@ test:
   commands:
     - pip check
     - cd python && pytest test
-    - spm_export_vocab --help  # [unix]
-    - spm_normalize --help  # [unix]
+    - spm_export_vocab --help
+    - spm_normalize --help
   requires:
     - pip
     - pytest
