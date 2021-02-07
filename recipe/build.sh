@@ -7,10 +7,10 @@ make install
 
 if [ "$(uname)" == "Linux" ];
 then
-    ldconfig -v
+    ldconfig -v -N
 elif [ "$(uname)" == "Darwin" ];
 then
-    update_dyld_shared_cache
+    sudo update_dyld_shared_cache
 fi
 
 cd ..
