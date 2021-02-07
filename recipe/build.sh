@@ -7,7 +7,7 @@ sudo make install
 
 if [ "$(uname)" == "Linux" ];
 then
-    sudo ldconfig -v -N
+    ldconfig -v -N
 elif [ "$(uname)" == "Darwin" ];
 then
     sudo update_dyld_shared_cache
