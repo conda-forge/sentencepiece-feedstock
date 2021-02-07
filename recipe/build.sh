@@ -1,6 +1,7 @@
+mkdir build
+cd build
+
 if [[ "${target_platform}" == linux-* ]]; then
-    mkdir build
-    cd build
 
     export LD_LIBRARY_PATH=${PREFIX}/lib
     export CPATH=${PREFIX}/include
@@ -14,13 +15,19 @@ if [[ "${target_platform}" == linux-* ]]; then
         -DSPM_ENABLE_TCMALLOC=OFF \
         -S ..
 
-    make -j ${CPU_COUNT}
-    make install
-
-    ldconfig -v -N
-    cd $SRC_DIR/python
-    ${PYTHON} setup.py build
-    ${PYTHON} setup.py install
 elif [[ "${target_platform}" == osx-* ]]; then
-    ${PYTHON} -m pip install python/ -vv
+
+    cmake .. -DSPM_ENABLE_SHARED=OFF -DCMAKE_INSTALL_PREFIX=../..
+    
 fi
+
+make -j ${CPU_COUNT}
+make install
+
+if [[ "${target_platform}" == linux-* ]]; then
+    ldconfig -v -N
+fi
+
+cd $SRC_DIR/python
+${PYTHON} setup.py build
+${PYTHON} setup.py install
