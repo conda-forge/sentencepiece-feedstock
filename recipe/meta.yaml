@@ -30,8 +30,16 @@ test:
   imports:
     - sentencepiece
   commands:
+    - pip check
+    - cd python && pytest test
     - spm_export_vocab --help  # [linux]
     - spm_normalize --help  # [linux]
+  requires:
+    - pip
+    - pytest
+  source_files:
+    - python/test
+    - data
 
 about:
   home: "https://github.com/google/sentencepiece/"
