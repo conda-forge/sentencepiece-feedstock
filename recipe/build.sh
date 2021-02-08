@@ -1,11 +1,6 @@
 mkdir build
 cd build
 
-export LD_LIBRARY_PATH=${PREFIX}/lib
-export CPATH=${PREFIX}/include
-export INCLUDE=${PREFIX}/include
-export LIBRARY_PATH=${PREFIX}/lib
-
 if [[ "${target_platform}" == linux-* ]]; then
 
     export LD_LIBRARY_PATH=${PREFIX}/lib
@@ -30,13 +25,7 @@ make -j ${CPU_COUNT}
 make install
 
 if [[ "${target_platform}" == linux-* ]]; then
-
-  ldconfig -v -N
-
-elif [[ "${target_platform}" == osx-* ]]; then
-
-  sudo update_dyld_shared_cache
-
+    ldconfig -v -N
 fi
 
 cd $SRC_DIR/python
