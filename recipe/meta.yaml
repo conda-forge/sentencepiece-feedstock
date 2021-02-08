@@ -17,16 +17,14 @@ requirements:
   build:
     - cmake
     - {{ compiler('cxx') }}
-    - pkg-config
     - gperftools  # [unix]
     - make
+    - pkg-config
   host:
     - pip
     - python
-    - gperftools  # [unix]
   run:
     - python
-    - gperftools  # [unix]
 
 test:
   imports:
