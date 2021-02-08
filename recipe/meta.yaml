@@ -11,7 +11,7 @@ source:
 
 build:
   number: 0
-  skip: True  # [py<36 or osx]
+  skip: True  # [py<36]
 
 requirements:
   build:
@@ -32,8 +32,8 @@ test:
   imports:
     - sentencepiece
   commands:
-    - spm_export_vocab --help  # [unix]
-    - spm_normalize --help  # [unix]
+    - spm_export_vocab --help  # [linux]
+    - spm_normalize --help  # [linux]
 
 about:
   home: "https://github.com/google/sentencepiece/"
