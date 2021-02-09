@@ -29,17 +29,18 @@ requirements:
 test:
   imports:
     - sentencepiece
-  commands:
-    - pip check
-    - pytest python/test
-    - spm_export_vocab --help  # [linux]
-    - spm_normalize --help  # [linux]
   requires:
     - pip
     - pytest
   source_files:
     - python/test
     - data
+  commands:
+    - pip check
+    - spm_export_vocab --help  # [linux]
+    - spm_normalize --help     # [linux]
+    # upstream test suite expects to be run from PKG_ROOT/python
+    - cd python && pytest test
 
 about:
   home: "https://github.com/google/sentencepiece/"
