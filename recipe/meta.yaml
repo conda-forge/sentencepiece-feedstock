@@ -41,6 +41,12 @@ outputs:
 
     test:
       commands:
+        # binaries
+        - spm_decode --help
+        - spm_encode --help
+        - spm_export_vocab --help
+        - spm_normalize --help
+        - spm_train --help
         # shared
         - test -f $PREFIX/lib/libsentencepiece.so.0                     # [linux]
         - test -f $PREFIX/lib/libsentencepiece_train.so.0               # [linux]
@@ -87,8 +93,6 @@ outputs:
         - data
       commands:
         - pip check
-        - spm_export_vocab --help  # [linux]
-        - spm_normalize --help     # [linux]
         # upstream test suite expects to be run from PKG_ROOT/python
         - cd python && pytest test
 
