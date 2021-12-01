@@ -50,6 +50,12 @@ outputs:
         - if not exist %LIBRARY_BIN%\libsentencepiece_train.dll exit 1  # [win]
         # absence of static libraries
         - test ! -f $PREFIX/lib/libsentencepiece.a                      # [not win]
+        - test ! -f $PREFIX/lib/libsentencepiece_train.a                # [not win]
+        # headers
+        {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
+        - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
+        - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
+        {% endfor %}
 
   - name: sentencepiece
     script: build-pkg.sh   # [not win]
