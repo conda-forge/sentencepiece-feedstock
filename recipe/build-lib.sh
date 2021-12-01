@@ -11,6 +11,8 @@ cmake \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_SHARED=ON \
     -DSPM_ENABLE_TCMALLOC=OFF \
+    -DSPM_USE_EXTERNAL_ABSL=ON \
+    -DSPM_USE_BUILTIN_PROTOBUF=OFF \
     -S ..
 
 make -j ${CPU_COUNT}

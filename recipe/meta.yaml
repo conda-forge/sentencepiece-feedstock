@@ -10,6 +10,8 @@ source:
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
+    # use our own versions of abseil & protobuf
+    - patches/0002-do-not-build-abseil-protobuf.patch
 
 build:
   number: 0
@@ -38,6 +40,9 @@ outputs:
         - gperftools  # [unix]
         - make
         - pkg-config
+      host:
+        - abseil-cpp
+        - libprotobuf
 
     test:
       commands:
