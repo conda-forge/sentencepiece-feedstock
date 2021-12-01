@@ -9,6 +9,7 @@ export LIBRARY_PATH=${PREFIX}/lib
 cmake \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_AR="${AR}" \
+    -DSPM_ENABLE_SHARED=ON \
     -DSPM_ENABLE_TCMALLOC=OFF \
     -S ..
 
