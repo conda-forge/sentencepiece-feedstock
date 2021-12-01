@@ -16,4 +16,8 @@ cmake \
 make -j ${CPU_COUNT}
 make install
 
+# haven't found a way to avoid installing into $PREFIX/lib64;
+# -DCMAKE_INSTALL_LIBDIR is not working as intended
+mv ${PREFIX}/lib64/* ${PREFIX}/lib
+
 ldconfig -v -N
