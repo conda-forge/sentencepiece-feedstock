@@ -12,8 +12,11 @@ source:
     - patches/0001-do-not-mix-static-shared-builds.patch
     # use our own version of protobuf; the partially vendored abseil
     # cannot be replaced because sentencepiece uses abseil in an
-    # unsupported way, in particular it expects absl::Flag to have methods.
-    - patches/0002-do-not-build-protobuf.patch
+    # unsupported way, in particular it expects absl::Flag to have
+    # methods; similarly, sentencepiece uses internal protobuf
+    # symbols which aren't available on windows; on osx-arm, calling
+    # protoc fails due to the wrong CPU in cross-compilation
+    - patches/0002-do-not-build-protobuf.patch  # [not (win or build_platform != target_platform)]
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0003-fix-libdir.patch
