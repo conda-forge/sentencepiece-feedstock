@@ -8,6 +8,7 @@ export LIBRARY_PATH=${PREFIX}/lib
 
 cmake \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
+    -DCMAKE_INSTALL_LIBDIR=$PREFIX/lib \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_SHARED=ON \
     -DSPM_ENABLE_TCMALLOC=OFF \
@@ -16,9 +17,5 @@ cmake \
 
 make -j ${CPU_COUNT}
 make install
-
-# haven't found a way to avoid installing into $PREFIX/lib64;
-# -DCMAKE_INSTALL_LIBDIR is not working as intended
-mv ${PREFIX}/lib64/* ${PREFIX}/lib
 
 ldconfig -v -N

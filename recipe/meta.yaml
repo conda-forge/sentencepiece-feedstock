@@ -14,6 +14,9 @@ source:
     # cannot be replaced because sentencepiece uses abseil in an
     # unsupported way, in particular it expects absl::Flag to have methods.
     - patches/0002-do-not-build-protobuf.patch
+    # without this patch, either linux gets $PREFIX/lib64
+    # or CMAKE_INSTALL_LIBDIR won't work correctly
+    - patches/0003-fix-libdir.patch
 
 build:
   number: 0
