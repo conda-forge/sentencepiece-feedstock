@@ -24,4 +24,6 @@ cmake \
 make -j ${CPU_COUNT}
 make install
 
-ldconfig -v -N
+if [[ "${target_platform}" == linux-* ]]; then
+    ldconfig -v -N
+fi
