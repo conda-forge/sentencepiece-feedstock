@@ -10,8 +10,10 @@ source:
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
-    # use our own versions of abseil & protobuf
-    - patches/0002-do-not-build-abseil-protobuf.patch
+    # use our own version of protobuf; the partially vendored abseil
+    # cannot be replaced because sentencepiece uses abseil in an
+    # unsupported way, in particular it expects absl::Flag to have methods.
+    - patches/0002-do-not-build-protobuf.patch
 
 build:
   number: 0
