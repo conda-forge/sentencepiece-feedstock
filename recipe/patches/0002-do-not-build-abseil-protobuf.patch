@@ -1,18 +1,19 @@
-From 98ed842731efaccb6667c87434be793fb3fd3f8a Mon Sep 17 00:00:00 2001
+From 30950bb7795a7a6206d9d7a4b78168e7ae60dd69 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 10:05:12 +1100
 Subject: [PATCH 2/2] do not build abseil & protobuf
 
+also build third_party before src
 ---
- CMakeLists.txt             | 2 +-
+ CMakeLists.txt             | 4 ++--
  third_party/CMakeLists.txt | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a3870cb..ab634b4 100644
+index a3870cb..012f722 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -104,7 +104,7 @@ if (SPM_BUILD_TEST)
+@@ -104,11 +104,11 @@ if (SPM_BUILD_TEST)
  endif()
  
  if (SPM_USE_EXTERNAL_ABSL)
@@ -20,7 +21,12 @@ index a3870cb..ab634b4 100644
 + find_package(absl REQUIRED)
  endif()
  
- add_subdirectory(src)
+-add_subdirectory(src)
+ add_subdirectory(third_party)
++add_subdirectory(src)
+ 
+ set(CPACK_SOURCE_GENERATOR "TXZ")
+ set(CPACK_GENERATOR "7Z")
 diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
 index d00ecba..7e2e07b 100644
 --- a/third_party/CMakeLists.txt
