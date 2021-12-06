@@ -1,4 +1,4 @@
-From 70d4ad1a571b3d03e6efd21161aa6ed57094aecc Mon Sep 17 00:00:00 2001
+From 98ed842731efaccb6667c87434be793fb3fd3f8a Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 10:05:12 +1100
 Subject: [PATCH 2/2] do not build abseil & protobuf
@@ -22,12 +22,12 @@ index a3870cb..ab634b4 100644
  
  add_subdirectory(src)
 diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
-index d00ecba..5f34616 100644
+index d00ecba..7e2e07b 100644
 --- a/third_party/CMakeLists.txt
 +++ b/third_party/CMakeLists.txt
 @@ -1,4 +1,4 @@
 -include_directories(absl/strings darts_clone esaxx protobuf-lite)
-+include_directories(darts_clone esaxx)
++include_directories(abseil/strings darts_clone esaxx)
  
  
  
