@@ -13,13 +13,14 @@ source:
     # use our own version of protobuf; the partially vendored abseil
     # cannot be replaced because sentencepiece uses abseil in an
     # unsupported way, in particular it expects absl::Flag to have
-    # methods; similarly, sentencepiece uses internal protobuf
-    # symbols which aren't available on windows; on osx-arm, calling
-    # protoc fails due to the wrong CPU in cross-compilation
-    - patches/0002-do-not-build-protobuf.patch  # [not (win or build_platform != target_platform)]
+    # methods; for osx-arm, we cannot even unvendor protobuf, as
+    # calling protoc fails in cross-compilation due to the wrong CPU
+    - patches/0002-do-not-build-protobuf.patch  # [build_platform == target_platform]
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0003-fix-libdir.patch
+    # debug: use protobuf instead of protobuf-lite
+    - patches/0004-use-protobuf-instead-of-protobuf-lite.patch  # [build_platform == target_platform]
 
 build:
   number: 0

@@ -1,0 +1,40 @@
+From 5cbb14222179c1c029e572050c338e2f6f722d30 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Thu, 9 Dec 2021 12:13:23 +1100
+Subject: [PATCH 4/4] use protobuf instead of protobuf-lite
+
+---
+ CMakeLists.txt      | 4 ++--
+ sentencepiece.pc.in | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 281e19c..7946fad 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -53,9 +53,9 @@ endif()
+ set(GNUCXX_STD_SUPPORT_VERSION "4.3")
+ 
+ if (SPM_USE_BUILTIN_PROTOBUF)
+-  set(libprotobuf_lite "")
++  set(libprotobuf "")
+ else()
+-  set(libprotobuf_lite "-lprotobuf-lite")
++  set(libprotobuf "-lprotobuf")
+ endif()
+ 
+ if (MSVC)
+diff --git a/sentencepiece.pc.in b/sentencepiece.pc.in
+index ac7fef6..cc9bf78 100644
+--- a/sentencepiece.pc.in
++++ b/sentencepiece.pc.in
+@@ -6,5 +6,5 @@ includedir=@includedir@
+ Name: @PROJECT_NAME@
+ Description: Unsupervised text tokenizer and detokenizer for Neural Network-based text generation.
+ Version: @PROJECT_VERSION@
+-Libs: -L${libdir} -lsentencepiece -lsentencepiece_train @libprotobuf_lite@ @pkgconfiglibs@
++Libs: -L${libdir} -lsentencepiece -lsentencepiece_train @libprotobuf@ @pkgconfiglibs@
+ Cflags: -I${includedir} @pkgconfigcflags@
+-- 
+2.32.0.windows.2
+
