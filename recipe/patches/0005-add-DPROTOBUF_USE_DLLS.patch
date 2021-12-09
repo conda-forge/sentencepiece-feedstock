@@ -1,22 +1,21 @@
-From a3d9199638b16fb20e57004658254d48f977f6a3 Mon Sep 17 00:00:00 2001
+From dfbad3d5b42e7877076f9c0431cc803f980f5fad Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 9 Dec 2021 20:27:18 +1100
 Subject: [PATCH 5/5] add -DPROTOBUF_USE_DLLS
 
 ---
- src/CMakeLists.txt | 2 ++
- 1 file changed, 2 insertions(+)
+ src/CMakeLists.txt | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 49fcdbb..1778a68 100644
+index 49fcdbb..c654f29 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -70,6 +70,8 @@ if (SPM_USE_BUILTIN_PROTOBUF)
+@@ -70,6 +70,7 @@ if (SPM_USE_BUILTIN_PROTOBUF)
    include_directories(builtin_pb)
  else()
    find_package(Protobuf REQUIRED)
-+  target_compile_definitions(sentencepiece PUBLIC -DPROTOBUF_USE_DLLS)
-+  target_compile_definitions(sentencepiece_model PUBLIC -DPROTOBUF_USE_DLLS)
++  add_definitions("-DPROTOBUF_USE_DLLS")
    include_directories(${Protobuf_INCLUDE_DIRS})
    protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
