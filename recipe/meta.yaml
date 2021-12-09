@@ -21,6 +21,8 @@ source:
     - patches/0003-fix-libdir.patch
     # debug: use protobuf instead of protobuf-lite
     - patches/0004-use-protobuf-instead-of-protobuf-lite.patch  # [build_platform == target_platform]
+    # debug: add -DPROTOBUF_USE_DLLS
+    - patches/0005-add-DPROTOBUF_USE_DLLS.patch                 # [build_platform == target_platform]
 
 build:
   number: 0
