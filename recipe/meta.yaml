@@ -16,6 +16,8 @@ source:
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0003-fix-libdir.patch
+    # debug: retry to unvendor abseil
+    - patches/0004-don-t-build-abseil-either.patch
 
 build:
   number: 0

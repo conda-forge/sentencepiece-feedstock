@@ -1,0 +1,36 @@
+From a4360ed46fd5fa0f0ad599bf83f521d0d682aabc Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Fri, 31 Dec 2021 14:02:04 +1100
+Subject: [PATCH 4/4] don't build abseil either
+
+---
+ CMakeLists.txt             | 2 +-
+ third_party/CMakeLists.txt | 5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7946fad..b097e94 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -104,7 +104,7 @@ if (SPM_BUILD_TEST)
+ endif()
+ 
+ if (SPM_USE_EXTERNAL_ABSL)
+- add_subdirectory(third_party/abseil-cpp)
++ find_package(absl REQUIRED)
+ endif()
+ 
+ add_subdirectory(src)
+diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
+index b355ccc..3096702 100644
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -1,4 +1 @@
+-include_directories(absl/strings darts_clone esaxx)
+-
+-
+-
++include_directories(darts_clone esaxx)
+-- 
+2.32.0.windows.2
+
