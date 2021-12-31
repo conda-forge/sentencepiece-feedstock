@@ -10,10 +10,7 @@ source:
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
-    # use our own version of protobuf; the partially vendored abseil
-    # cannot be replaced because sentencepiece uses abseil in an
-    # unsupported way, in particular it expects absl::Flag to have
-    # methods; for osx-arm, we cannot even unvendor protobuf, as
+    # use our own version of protobuf; for osx-arm, we cannot do that, as
     # calling protoc fails in cross-compilation due to the wrong CPU
     - patches/0002-do-not-build-protobuf.patch  # [build_platform == target_platform]
     # without this patch, either linux gets $PREFIX/lib64
@@ -42,7 +39,6 @@ outputs:
       run_exports:
         # not clear what ABI-compatibility of sentencepiece versions are;
         # for now, use same version at run & build time
-        # additionally, we need to ensure matching proc-type
         - libsentencepiece ={{ version }}
     requirements:
       build:
