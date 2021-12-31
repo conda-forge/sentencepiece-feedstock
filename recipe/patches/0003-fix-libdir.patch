@@ -1,14 +1,14 @@
-From 690d3dd73d875f5d4a5b3357f432190dccbf4522 Mon Sep 17 00:00:00 2001
+From 47d67461a6568a2027db27accf22b2e12aa63a0c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 6 Dec 2021 21:18:54 +1100
-Subject: [PATCH 3/5] fix libdir
+Subject: [PATCH 3/3] fix libdir
 
 ---
  CMakeLists.txt | 4 ++--
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index a3870cb..281e19c 100644
+index 9c2c310..7946fad 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
 @@ -42,8 +42,8 @@ if (UNIX)

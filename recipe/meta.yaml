@@ -12,14 +12,10 @@ source:
     - patches/0001-do-not-mix-static-shared-builds.patch
     # use our own version of protobuf; for osx-arm, we cannot do that, as
     # calling protoc fails in cross-compilation due to the wrong CPU
-    - patches/0002-do-not-build-protobuf.patch  # [build_platform == target_platform]
+    - patches/0002-do-not-build-protobuf-use-external-one.patch  # [build_platform == target_platform]
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0003-fix-libdir.patch
-    # debug: use protobuf instead of protobuf-lite
-    - patches/0004-use-protobuf-instead-of-protobuf-lite.patch  # [build_platform == target_platform]
-    # debug: add -DPROTOBUF_USE_DLLS
-    - patches/0005-add-DPROTOBUF_USE_DLLS.patch                 # [build_platform == target_platform]
 
 build:
   number: 0
