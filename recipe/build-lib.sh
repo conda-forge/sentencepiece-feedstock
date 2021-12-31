@@ -1,3 +1,7 @@
+#!/bin/bash
+
+set -ex
+
 mkdir build
 cd build
 
@@ -8,7 +12,8 @@ export LIBRARY_PATH=${PREFIX}/lib
 
 export CMAKE_EXTRA="-DSPM_USE_BUILTIN_PROTOBUF=OFF"
 if [[ "${target_platform}" == "osx-arm64" ]]; then
-    # build calls protoc, which fails with bad CPU in cross-compilation
+    # building against external protobuf needs to call protoc,
+    # which fails with bad CPU type in cross-compilation
     export CMAKE_EXTRA=""
 fi
 
