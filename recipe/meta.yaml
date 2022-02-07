@@ -1,4 +1,4 @@
-{% set version = "0.1.95" %}
+{% set version = "0.1.96" %}
 
 package:
   name: sentencepiece
@@ -6,10 +6,10 @@ package:
 
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
-  sha256: 1c0bd83e03f71a10fc934b7ce996e327488b838587f03159fd392c77c7701389
+  sha256: 5198f31c3bb25e685e9e68355a3bf67a1db23c9e8bdccc33dc015f496a44df7a
 
 build:
-  number: 1
+  number: 0
 
 requirements:
   build:
@@ -47,7 +47,18 @@ about:
   license: Apache-2.0
   license_family: Apache
   license_file: LICENSE
-  summary: "SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training."
+  summary: Unsupervised text tokenizer for Neural Network-based text generation.
+  description: |
+    SentencePiece is an unsupervised text tokenizer and detokenizer mainly for
+    Neural Network-based text generation systems where the vocabulary size is
+    predetermined prior to the neural model training.
+
+    SentencePiece implements subword units (e.g., byte-pair-encoding (BPE)
+    [[Sennrich et al.](http://www.aclweb.org/anthology/P16-1162)]) and unigram
+    language model [[Kudo](https://arxiv.org/abs/1804.109590)]) with the
+    extension of direct training from raw sentences. SentencePiece allows us to
+    make a purely end-to-end system that does not depend on language-specific
+    pre/postprocessing.
 
 extra:
   recipe-maintainers:
@@ -55,3 +66,4 @@ extra:
     - rluria14
     - ndmaxar
     - oblute
+    - h-vetinari

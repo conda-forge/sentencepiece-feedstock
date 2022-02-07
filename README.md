@@ -7,7 +7,19 @@ Package license: Apache-2.0
 
 Feedstock license: [BSD-3-Clause](https://github.com/conda-forge/sentencepiece-feedstock/blob/master/LICENSE.txt)
 
-Summary: SentencePiece is an unsupervised text tokenizer and detokenizer mainly for Neural Network-based text generation systems where the vocabulary size is predetermined prior to the neural model training.
+Summary: Unsupervised text tokenizer for Neural Network-based text generation.
+
+SentencePiece is an unsupervised text tokenizer and detokenizer mainly for
+Neural Network-based text generation systems where the vocabulary size is
+predetermined prior to the neural model training.
+
+SentencePiece implements subword units (e.g., byte-pair-encoding (BPE)
+[[Sennrich et al.](http://www.aclweb.org/anthology/P16-1162)]) and unigram
+language model [[Kudo](https://arxiv.org/abs/1804.109590)]) with the
+extension of direct training from raw sentences. SentencePiece allows us to
+make a purely end-to-end system that does not depend on language-specific
+pre/postprocessing.
+
 
 Current build status
 ====================
@@ -254,6 +266,7 @@ In order to produce a uniquely identifiable distribution:
 Feedstock Maintainers
 =====================
 
+* [@h-vetinari](https://github.com/h-vetinari/)
 * [@ndmaxar](https://github.com/ndmaxar/)
 * [@oblute](https://github.com/oblute/)
 * [@rluria14](https://github.com/rluria14/)
