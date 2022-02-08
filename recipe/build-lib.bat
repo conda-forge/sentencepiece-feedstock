@@ -1,8 +1,5 @@
 @echo on
 
-:: remove protobuf-lite which somehow gets picked up by build otherwise
-rmdir /S /Q third_party\protobuf-lite
-
 mkdir build
 cd build
 
@@ -16,7 +13,6 @@ cmake ^
     -DCMAKE_INSTALL_PREFIX:PATH=%LIBRARY_PATH% ^
     -DCMAKE_WINDOWS_EXPORT_ALL_SYMBOLS=ON ^
     -DSPM_ENABLE_SHARED=ON ^
-    -DSPM_USE_BUILTIN_PROTOBUF=OFF ^
     ..
 IF %ERRORLEVEL% NEQ 0 exit 1
 
