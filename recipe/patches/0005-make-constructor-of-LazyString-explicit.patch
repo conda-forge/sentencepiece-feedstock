@@ -1,12 +1,12 @@
-From a8c658b9f726658379fb1409253705b913daa4ce Mon Sep 17 00:00:00 2001
+From 96b69bc9740459b491de79731190e3cec2da7583 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 8 Feb 2022 22:03:05 +1100
 Subject: [PATCH 5/5] make constructor of LazyString explicit
 
 ---
  third_party/protobuf-lite/arenastring.cc                | 4 ++--
- third_party/protobuf-lite/google/protobuf/arenastring.h | 6 +++++-
- 2 files changed, 7 insertions(+), 3 deletions(-)
+ third_party/protobuf-lite/google/protobuf/arenastring.h | 8 +++++++-
+ 2 files changed, 9 insertions(+), 3 deletions(-)
 
 diff --git a/third_party/protobuf-lite/arenastring.cc b/third_party/protobuf-lite/arenastring.cc
 index b5f48c5..ad970b9 100644
@@ -24,20 +24,22 @@ index b5f48c5..ad970b9 100644
      inited_.store(res, std::memory_order_release);
    }
 diff --git a/third_party/protobuf-lite/google/protobuf/arenastring.h b/third_party/protobuf-lite/google/protobuf/arenastring.h
-index 60307b2..b18cf65 100644
+index 60307b2..0736324 100644
 --- a/third_party/protobuf-lite/google/protobuf/arenastring.h
 +++ b/third_party/protobuf-lite/google/protobuf/arenastring.h
-@@ -55,6 +55,9 @@ namespace internal {
+@@ -55,6 +55,11 @@ namespace internal {
  // These are initialized on the first call to .get().
  class PROTOBUF_EXPORT LazyString {
   public:
-+  LazyString(const char* ptr, size_t size, std::atomic<const std::string*> init) :
-+   // initializing first member of union by default, which is of type InitValue
-+   myUnion{{ptr, size}}, inited_{init} {}
++  LazyString(const char* ptr, size_t size, std::atomic<const std::string*> init) {
++    // initializing first member of union by default, which is of type InitValue
++    myUnion = {{ptr, size}};
++    inited_ = init;
++  }
    // We explicitly make LazyString an aggregate so that MSVC can do constant
    // initialization on it without marking it `constexpr`.
    // We do not want to use `constexpr` because it makes it harder to have extern
-@@ -65,10 +68,11 @@ class PROTOBUF_EXPORT LazyString {
+@@ -65,10 +70,11 @@ class PROTOBUF_EXPORT LazyString {
    };
    // We keep a union of the initialization value and the std::string to save on
    // space. We don't need the string array after Init() is done.
