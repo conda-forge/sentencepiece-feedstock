@@ -29,9 +29,6 @@ requirements:
     - cross-python_{{ target_platform }}     # [build_platform != target_platform]
     - cmake
     - {{ compiler('cxx') }}
-  host:
-    - abseil-cpp
-    - libprotobuf          # [not (win or build_platform != target_platform)]
 
 outputs:
   - name: libsentencepiece
