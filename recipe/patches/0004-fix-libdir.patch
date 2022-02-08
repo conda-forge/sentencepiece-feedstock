@@ -1,7 +1,7 @@
 From 5935da2a5ccc2bae603ecda826cf9fb189a4d152 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 6 Dec 2021 21:18:54 +1100
-Subject: [PATCH 4/7] fix libdir
+Subject: [PATCH 4/8] fix libdir
 
 ---
  CMakeLists.txt | 4 ++--

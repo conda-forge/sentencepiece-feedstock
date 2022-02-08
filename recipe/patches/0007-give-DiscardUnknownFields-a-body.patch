@@ -1,7 +1,7 @@
 From e954c6980486549edeb1edfd9af9725d57f54bb5 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 9 Feb 2022 02:34:59 +1100
-Subject: [PATCH 7/7] give *::DiscardUnknownFields() a body
+Subject: [PATCH 7/8] give *::DiscardUnknownFields() a body
 
 ---
  src/builtin_pb/sentencepiece_model.pb.h | 12 ++++++------

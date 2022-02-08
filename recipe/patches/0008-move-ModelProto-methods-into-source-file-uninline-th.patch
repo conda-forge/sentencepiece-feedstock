@@ -1,0 +1,785 @@
+From 747666b54eb252e9ee7c33a3e13fb38d07769bdc Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Wed, 9 Feb 2022 10:51:25 +1100
+Subject: [PATCH 8/8] move ModelProto methods into source file & uninline them
+
+---
+ src/builtin_pb/sentencepiece_model.pb.cc | 375 +++++++++++++++++++++++
+ src/builtin_pb/sentencepiece_model.pb.h  | 375 -----------------------
+ 2 files changed, 375 insertions(+), 375 deletions(-)
+
+diff --git a/src/builtin_pb/sentencepiece_model.pb.cc b/src/builtin_pb/sentencepiece_model.pb.cc
+index a3c81d2..76ccd34 100644
+--- a/src/builtin_pb/sentencepiece_model.pb.cc
++++ b/src/builtin_pb/sentencepiece_model.pb.cc
+@@ -3302,6 +3302,381 @@ std::string ModelProto::GetTypeName() const {
+   return "sentencepiece.ModelProto";
+ }
+ 
++// -------------------------------------------------------------------
++
++// ModelProto
++
++// repeated .sentencepiece.ModelProto.SentencePiece pieces = 1;
++int ModelProto::_internal_pieces_size() const {
++  return pieces_.size();
++}
++int ModelProto::pieces_size() const {
++  return _internal_pieces_size();
++}
++void ModelProto::clear_pieces() {
++  pieces_.Clear();
++}
++::sentencepiece::ModelProto_SentencePiece* ModelProto::mutable_pieces(int index) {
++  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.pieces)
++  return pieces_.Mutable(index);
++}
++::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::sentencepiece::ModelProto_SentencePiece >*
++ModelProto::mutable_pieces() {
++  // @@protoc_insertion_point(field_mutable_list:sentencepiece.ModelProto.pieces)
++  return &pieces_;
++}
++const ::sentencepiece::ModelProto_SentencePiece& ModelProto::_internal_pieces(int index) const {
++  return pieces_.Get(index);
++}
++const ::sentencepiece::ModelProto_SentencePiece& ModelProto::pieces(int index) const {
++  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.pieces)
++  return _internal_pieces(index);
++}
++::sentencepiece::ModelProto_SentencePiece* ModelProto::_internal_add_pieces() {
++  return pieces_.Add();
++}
++::sentencepiece::ModelProto_SentencePiece* ModelProto::add_pieces() {
++  // @@protoc_insertion_point(field_add:sentencepiece.ModelProto.pieces)
++  return _internal_add_pieces();
++}
++const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::sentencepiece::ModelProto_SentencePiece >&
++ModelProto::pieces() const {
++  // @@protoc_insertion_point(field_list:sentencepiece.ModelProto.pieces)
++  return pieces_;
++}
++
++// optional .sentencepiece.TrainerSpec trainer_spec = 2;
++bool ModelProto::_internal_has_trainer_spec() const {
++  bool value = (_has_bits_[0] & 0x00000001u) != 0;
++  PROTOBUF_ASSUME(!value || trainer_spec_ != nullptr);
++  return value;
++}
++bool ModelProto::has_trainer_spec() const {
++  return _internal_has_trainer_spec();
++}
++void ModelProto::clear_trainer_spec() {
++  if (trainer_spec_ != nullptr) trainer_spec_->Clear();
++  _has_bits_[0] &= ~0x00000001u;
++}
++const ::sentencepiece::TrainerSpec& ModelProto::_internal_trainer_spec() const {
++  const ::sentencepiece::TrainerSpec* p = trainer_spec_;
++  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::TrainerSpec&>(
++      ::sentencepiece::_TrainerSpec_default_instance_);
++}
++const ::sentencepiece::TrainerSpec& ModelProto::trainer_spec() const {
++  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.trainer_spec)
++  return _internal_trainer_spec();
++}
++void ModelProto::unsafe_arena_set_allocated_trainer_spec(
++    ::sentencepiece::TrainerSpec* trainer_spec) {
++  if (GetArena() == nullptr) {
++    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trainer_spec_);
++  }
++  trainer_spec_ = trainer_spec;
++  if (trainer_spec) {
++    _has_bits_[0] |= 0x00000001u;
++  } else {
++    _has_bits_[0] &= ~0x00000001u;
++  }
++  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.trainer_spec)
++}
++::sentencepiece::TrainerSpec* ModelProto::release_trainer_spec() {
++  _has_bits_[0] &= ~0x00000001u;
++  ::sentencepiece::TrainerSpec* temp = trainer_spec_;
++  trainer_spec_ = nullptr;
++  if (GetArena() != nullptr) {
++    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
++  }
++  return temp;
++}
++::sentencepiece::TrainerSpec* ModelProto::unsafe_arena_release_trainer_spec() {
++  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.trainer_spec)
++  _has_bits_[0] &= ~0x00000001u;
++  ::sentencepiece::TrainerSpec* temp = trainer_spec_;
++  trainer_spec_ = nullptr;
++  return temp;
++}
++::sentencepiece::TrainerSpec* ModelProto::_internal_mutable_trainer_spec() {
++  _has_bits_[0] |= 0x00000001u;
++  if (trainer_spec_ == nullptr) {
++    auto* p = CreateMaybeMessage<::sentencepiece::TrainerSpec>(GetArena());
++    trainer_spec_ = p;
++  }
++  return trainer_spec_;
++}
++::sentencepiece::TrainerSpec* ModelProto::mutable_trainer_spec() {
++  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.trainer_spec)
++  return _internal_mutable_trainer_spec();
++}
++void ModelProto::set_allocated_trainer_spec(::sentencepiece::TrainerSpec* trainer_spec) {
++  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
++  if (message_arena == nullptr) {
++    delete trainer_spec_;
++  }
++  if (trainer_spec) {
++    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
++      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trainer_spec);
++    if (message_arena != submessage_arena) {
++      trainer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
++          message_arena, trainer_spec, submessage_arena);
++    }
++    _has_bits_[0] |= 0x00000001u;
++  } else {
++    _has_bits_[0] &= ~0x00000001u;
++  }
++  trainer_spec_ = trainer_spec;
++  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.trainer_spec)
++}
++
++// optional .sentencepiece.NormalizerSpec normalizer_spec = 3;
++bool ModelProto::_internal_has_normalizer_spec() const {
++  bool value = (_has_bits_[0] & 0x00000002u) != 0;
++  PROTOBUF_ASSUME(!value || normalizer_spec_ != nullptr);
++  return value;
++}
++bool ModelProto::has_normalizer_spec() const {
++  return _internal_has_normalizer_spec();
++}
++void ModelProto::clear_normalizer_spec() {
++  if (normalizer_spec_ != nullptr) normalizer_spec_->Clear();
++  _has_bits_[0] &= ~0x00000002u;
++}
++const ::sentencepiece::NormalizerSpec& ModelProto::_internal_normalizer_spec() const {
++  const ::sentencepiece::NormalizerSpec* p = normalizer_spec_;
++  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::NormalizerSpec&>(
++      ::sentencepiece::_NormalizerSpec_default_instance_);
++}
++const ::sentencepiece::NormalizerSpec& ModelProto::normalizer_spec() const {
++  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.normalizer_spec)
++  return _internal_normalizer_spec();
++}
++void ModelProto::unsafe_arena_set_allocated_normalizer_spec(
++    ::sentencepiece::NormalizerSpec* normalizer_spec) {
++  if (GetArena() == nullptr) {
++    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(normalizer_spec_);
++  }
++  normalizer_spec_ = normalizer_spec;
++  if (normalizer_spec) {
++    _has_bits_[0] |= 0x00000002u;
++  } else {
++    _has_bits_[0] &= ~0x00000002u;
++  }
++  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.normalizer_spec)
++}
++::sentencepiece::NormalizerSpec* ModelProto::release_normalizer_spec() {
++  _has_bits_[0] &= ~0x00000002u;
++  ::sentencepiece::NormalizerSpec* temp = normalizer_spec_;
++  normalizer_spec_ = nullptr;
++  if (GetArena() != nullptr) {
++    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
++  }
++  return temp;
++}
++::sentencepiece::NormalizerSpec* ModelProto::unsafe_arena_release_normalizer_spec() {
++  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.normalizer_spec)
++  _has_bits_[0] &= ~0x00000002u;
++  ::sentencepiece::NormalizerSpec* temp = normalizer_spec_;
++  normalizer_spec_ = nullptr;
++  return temp;
++}
++::sentencepiece::NormalizerSpec* ModelProto::_internal_mutable_normalizer_spec() {
++  _has_bits_[0] |= 0x00000002u;
++  if (normalizer_spec_ == nullptr) {
++    auto* p = CreateMaybeMessage<::sentencepiece::NormalizerSpec>(GetArena());
++    normalizer_spec_ = p;
++  }
++  return normalizer_spec_;
++}
++::sentencepiece::NormalizerSpec* ModelProto::mutable_normalizer_spec() {
++  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.normalizer_spec)
++  return _internal_mutable_normalizer_spec();
++}
++void ModelProto::set_allocated_normalizer_spec(::sentencepiece::NormalizerSpec* normalizer_spec) {
++  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
++  if (message_arena == nullptr) {
++    delete normalizer_spec_;
++  }
++  if (normalizer_spec) {
++    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
++      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(normalizer_spec);
++    if (message_arena != submessage_arena) {
++      normalizer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
++          message_arena, normalizer_spec, submessage_arena);
++    }
++    _has_bits_[0] |= 0x00000002u;
++  } else {
++    _has_bits_[0] &= ~0x00000002u;
++  }
++  normalizer_spec_ = normalizer_spec;
++  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.normalizer_spec)
++}
++
++// optional .sentencepiece.SelfTestData self_test_data = 4;
++bool ModelProto::_internal_has_self_test_data() const {
++  bool value = (_has_bits_[0] & 0x00000004u) != 0;
++  PROTOBUF_ASSUME(!value || self_test_data_ != nullptr);
++  return value;
++}
++bool ModelProto::has_self_test_data() const {
++  return _internal_has_self_test_data();
++}
++void ModelProto::clear_self_test_data() {
++  if (self_test_data_ != nullptr) self_test_data_->Clear();
++  _has_bits_[0] &= ~0x00000004u;
++}
++const ::sentencepiece::SelfTestData& ModelProto::_internal_self_test_data() const {
++  const ::sentencepiece::SelfTestData* p = self_test_data_;
++  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::SelfTestData&>(
++      ::sentencepiece::_SelfTestData_default_instance_);
++}
++const ::sentencepiece::SelfTestData& ModelProto::self_test_data() const {
++  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.self_test_data)
++  return _internal_self_test_data();
++}
++void ModelProto::unsafe_arena_set_allocated_self_test_data(
++    ::sentencepiece::SelfTestData* self_test_data) {
++  if (GetArena() == nullptr) {
++    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(self_test_data_);
++  }
++  self_test_data_ = self_test_data;
++  if (self_test_data) {
++    _has_bits_[0] |= 0x00000004u;
++  } else {
++    _has_bits_[0] &= ~0x00000004u;
++  }
++  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.self_test_data)
++}
++::sentencepiece::SelfTestData* ModelProto::release_self_test_data() {
++  _has_bits_[0] &= ~0x00000004u;
++  ::sentencepiece::SelfTestData* temp = self_test_data_;
++  self_test_data_ = nullptr;
++  if (GetArena() != nullptr) {
++    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
++  }
++  return temp;
++}
++::sentencepiece::SelfTestData* ModelProto::unsafe_arena_release_self_test_data() {
++  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.self_test_data)
++  _has_bits_[0] &= ~0x00000004u;
++  ::sentencepiece::SelfTestData* temp = self_test_data_;
++  self_test_data_ = nullptr;
++  return temp;
++}
++::sentencepiece::SelfTestData* ModelProto::_internal_mutable_self_test_data() {
++  _has_bits_[0] |= 0x00000004u;
++  if (self_test_data_ == nullptr) {
++    auto* p = CreateMaybeMessage<::sentencepiece::SelfTestData>(GetArena());
++    self_test_data_ = p;
++  }
++  return self_test_data_;
++}
++::sentencepiece::SelfTestData* ModelProto::mutable_self_test_data() {
++  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.self_test_data)
++  return _internal_mutable_self_test_data();
++}
++void ModelProto::set_allocated_self_test_data(::sentencepiece::SelfTestData* self_test_data) {
++  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
++  if (message_arena == nullptr) {
++    delete self_test_data_;
++  }
++  if (self_test_data) {
++    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
++      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(self_test_data);
++    if (message_arena != submessage_arena) {
++      self_test_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
++          message_arena, self_test_data, submessage_arena);
++    }
++    _has_bits_[0] |= 0x00000004u;
++  } else {
++    _has_bits_[0] &= ~0x00000004u;
++  }
++  self_test_data_ = self_test_data;
++  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.self_test_data)
++}
++
++// optional .sentencepiece.NormalizerSpec denormalizer_spec = 5;
++bool ModelProto::_internal_has_denormalizer_spec() const {
++  bool value = (_has_bits_[0] & 0x00000008u) != 0;
++  PROTOBUF_ASSUME(!value || denormalizer_spec_ != nullptr);
++  return value;
++}
++bool ModelProto::has_denormalizer_spec() const {
++  return _internal_has_denormalizer_spec();
++}
++void ModelProto::clear_denormalizer_spec() {
++  if (denormalizer_spec_ != nullptr) denormalizer_spec_->Clear();
++  _has_bits_[0] &= ~0x00000008u;
++}
++const ::sentencepiece::NormalizerSpec& ModelProto::_internal_denormalizer_spec() const {
++  const ::sentencepiece::NormalizerSpec* p = denormalizer_spec_;
++  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::NormalizerSpec&>(
++      ::sentencepiece::_NormalizerSpec_default_instance_);
++}
++const ::sentencepiece::NormalizerSpec& ModelProto::denormalizer_spec() const {
++  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.denormalizer_spec)
++  return _internal_denormalizer_spec();
++}
++void ModelProto::unsafe_arena_set_allocated_denormalizer_spec(
++    ::sentencepiece::NormalizerSpec* denormalizer_spec) {
++  if (GetArena() == nullptr) {
++    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(denormalizer_spec_);
++  }
++  denormalizer_spec_ = denormalizer_spec;
++  if (denormalizer_spec) {
++    _has_bits_[0] |= 0x00000008u;
++  } else {
++    _has_bits_[0] &= ~0x00000008u;
++  }
++  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.denormalizer_spec)
++}
++::sentencepiece::NormalizerSpec* ModelProto::release_denormalizer_spec() {
++  _has_bits_[0] &= ~0x00000008u;
++  ::sentencepiece::NormalizerSpec* temp = denormalizer_spec_;
++  denormalizer_spec_ = nullptr;
++  if (GetArena() != nullptr) {
++    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
++  }
++  return temp;
++}
++::sentencepiece::NormalizerSpec* ModelProto::unsafe_arena_release_denormalizer_spec() {
++  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.denormalizer_spec)
++  _has_bits_[0] &= ~0x00000008u;
++  ::sentencepiece::NormalizerSpec* temp = denormalizer_spec_;
++  denormalizer_spec_ = nullptr;
++  return temp;
++}
++::sentencepiece::NormalizerSpec* ModelProto::_internal_mutable_denormalizer_spec() {
++  _has_bits_[0] |= 0x00000008u;
++  if (denormalizer_spec_ == nullptr) {
++    auto* p = CreateMaybeMessage<::sentencepiece::NormalizerSpec>(GetArena());
++    denormalizer_spec_ = p;
++  }
++  return denormalizer_spec_;
++}
++::sentencepiece::NormalizerSpec* ModelProto::mutable_denormalizer_spec() {
++  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.denormalizer_spec)
++  return _internal_mutable_denormalizer_spec();
++}
++void ModelProto::set_allocated_denormalizer_spec(::sentencepiece::NormalizerSpec* denormalizer_spec) {
++  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
++  if (message_arena == nullptr) {
++    delete denormalizer_spec_;
++  }
++  if (denormalizer_spec) {
++    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
++      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(denormalizer_spec);
++    if (message_arena != submessage_arena) {
++      denormalizer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
++          message_arena, denormalizer_spec, submessage_arena);
++    }
++    _has_bits_[0] |= 0x00000008u;
++  } else {
++    _has_bits_[0] &= ~0x00000008u;
++  }
++  denormalizer_spec_ = denormalizer_spec;
++  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.denormalizer_spec)
++}
++
+ 
+ // @@protoc_insertion_point(namespace_scope)
+ }  // namespace sentencepiece
+diff --git a/src/builtin_pb/sentencepiece_model.pb.h b/src/builtin_pb/sentencepiece_model.pb.h
+index e6a6491..9ac459f 100644
+--- a/src/builtin_pb/sentencepiece_model.pb.h
++++ b/src/builtin_pb/sentencepiece_model.pb.h
+@@ -4305,381 +4305,6 @@ inline void ModelProto_SentencePiece::set_type(::sentencepiece::ModelProto_Sente
+   // @@protoc_insertion_point(field_set:sentencepiece.ModelProto.SentencePiece.type)
+ }
+ 
+-// -------------------------------------------------------------------
+-
+-// ModelProto
+-
+-// repeated .sentencepiece.ModelProto.SentencePiece pieces = 1;
+-inline int ModelProto::_internal_pieces_size() const {
+-  return pieces_.size();
+-}
+-inline int ModelProto::pieces_size() const {
+-  return _internal_pieces_size();
+-}
+-inline void ModelProto::clear_pieces() {
+-  pieces_.Clear();
+-}
+-inline ::sentencepiece::ModelProto_SentencePiece* ModelProto::mutable_pieces(int index) {
+-  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.pieces)
+-  return pieces_.Mutable(index);
+-}
+-inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::sentencepiece::ModelProto_SentencePiece >*
+-ModelProto::mutable_pieces() {
+-  // @@protoc_insertion_point(field_mutable_list:sentencepiece.ModelProto.pieces)
+-  return &pieces_;
+-}
+-inline const ::sentencepiece::ModelProto_SentencePiece& ModelProto::_internal_pieces(int index) const {
+-  return pieces_.Get(index);
+-}
+-inline const ::sentencepiece::ModelProto_SentencePiece& ModelProto::pieces(int index) const {
+-  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.pieces)
+-  return _internal_pieces(index);
+-}
+-inline ::sentencepiece::ModelProto_SentencePiece* ModelProto::_internal_add_pieces() {
+-  return pieces_.Add();
+-}
+-inline ::sentencepiece::ModelProto_SentencePiece* ModelProto::add_pieces() {
+-  // @@protoc_insertion_point(field_add:sentencepiece.ModelProto.pieces)
+-  return _internal_add_pieces();
+-}
+-inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::sentencepiece::ModelProto_SentencePiece >&
+-ModelProto::pieces() const {
+-  // @@protoc_insertion_point(field_list:sentencepiece.ModelProto.pieces)
+-  return pieces_;
+-}
+-
+-// optional .sentencepiece.TrainerSpec trainer_spec = 2;
+-inline bool ModelProto::_internal_has_trainer_spec() const {
+-  bool value = (_has_bits_[0] & 0x00000001u) != 0;
+-  PROTOBUF_ASSUME(!value || trainer_spec_ != nullptr);
+-  return value;
+-}
+-inline bool ModelProto::has_trainer_spec() const {
+-  return _internal_has_trainer_spec();
+-}
+-inline void ModelProto::clear_trainer_spec() {
+-  if (trainer_spec_ != nullptr) trainer_spec_->Clear();
+-  _has_bits_[0] &= ~0x00000001u;
+-}
+-inline const ::sentencepiece::TrainerSpec& ModelProto::_internal_trainer_spec() const {
+-  const ::sentencepiece::TrainerSpec* p = trainer_spec_;
+-  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::TrainerSpec&>(
+-      ::sentencepiece::_TrainerSpec_default_instance_);
+-}
+-inline const ::sentencepiece::TrainerSpec& ModelProto::trainer_spec() const {
+-  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.trainer_spec)
+-  return _internal_trainer_spec();
+-}
+-inline void ModelProto::unsafe_arena_set_allocated_trainer_spec(
+-    ::sentencepiece::TrainerSpec* trainer_spec) {
+-  if (GetArena() == nullptr) {
+-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(trainer_spec_);
+-  }
+-  trainer_spec_ = trainer_spec;
+-  if (trainer_spec) {
+-    _has_bits_[0] |= 0x00000001u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000001u;
+-  }
+-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.trainer_spec)
+-}
+-inline ::sentencepiece::TrainerSpec* ModelProto::release_trainer_spec() {
+-  _has_bits_[0] &= ~0x00000001u;
+-  ::sentencepiece::TrainerSpec* temp = trainer_spec_;
+-  trainer_spec_ = nullptr;
+-  if (GetArena() != nullptr) {
+-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+-  }
+-  return temp;
+-}
+-inline ::sentencepiece::TrainerSpec* ModelProto::unsafe_arena_release_trainer_spec() {
+-  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.trainer_spec)
+-  _has_bits_[0] &= ~0x00000001u;
+-  ::sentencepiece::TrainerSpec* temp = trainer_spec_;
+-  trainer_spec_ = nullptr;
+-  return temp;
+-}
+-inline ::sentencepiece::TrainerSpec* ModelProto::_internal_mutable_trainer_spec() {
+-  _has_bits_[0] |= 0x00000001u;
+-  if (trainer_spec_ == nullptr) {
+-    auto* p = CreateMaybeMessage<::sentencepiece::TrainerSpec>(GetArena());
+-    trainer_spec_ = p;
+-  }
+-  return trainer_spec_;
+-}
+-inline ::sentencepiece::TrainerSpec* ModelProto::mutable_trainer_spec() {
+-  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.trainer_spec)
+-  return _internal_mutable_trainer_spec();
+-}
+-inline void ModelProto::set_allocated_trainer_spec(::sentencepiece::TrainerSpec* trainer_spec) {
+-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+-  if (message_arena == nullptr) {
+-    delete trainer_spec_;
+-  }
+-  if (trainer_spec) {
+-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(trainer_spec);
+-    if (message_arena != submessage_arena) {
+-      trainer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+-          message_arena, trainer_spec, submessage_arena);
+-    }
+-    _has_bits_[0] |= 0x00000001u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000001u;
+-  }
+-  trainer_spec_ = trainer_spec;
+-  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.trainer_spec)
+-}
+-
+-// optional .sentencepiece.NormalizerSpec normalizer_spec = 3;
+-inline bool ModelProto::_internal_has_normalizer_spec() const {
+-  bool value = (_has_bits_[0] & 0x00000002u) != 0;
+-  PROTOBUF_ASSUME(!value || normalizer_spec_ != nullptr);
+-  return value;
+-}
+-inline bool ModelProto::has_normalizer_spec() const {
+-  return _internal_has_normalizer_spec();
+-}
+-inline void ModelProto::clear_normalizer_spec() {
+-  if (normalizer_spec_ != nullptr) normalizer_spec_->Clear();
+-  _has_bits_[0] &= ~0x00000002u;
+-}
+-inline const ::sentencepiece::NormalizerSpec& ModelProto::_internal_normalizer_spec() const {
+-  const ::sentencepiece::NormalizerSpec* p = normalizer_spec_;
+-  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::NormalizerSpec&>(
+-      ::sentencepiece::_NormalizerSpec_default_instance_);
+-}
+-inline const ::sentencepiece::NormalizerSpec& ModelProto::normalizer_spec() const {
+-  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.normalizer_spec)
+-  return _internal_normalizer_spec();
+-}
+-inline void ModelProto::unsafe_arena_set_allocated_normalizer_spec(
+-    ::sentencepiece::NormalizerSpec* normalizer_spec) {
+-  if (GetArena() == nullptr) {
+-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(normalizer_spec_);
+-  }
+-  normalizer_spec_ = normalizer_spec;
+-  if (normalizer_spec) {
+-    _has_bits_[0] |= 0x00000002u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000002u;
+-  }
+-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.normalizer_spec)
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::release_normalizer_spec() {
+-  _has_bits_[0] &= ~0x00000002u;
+-  ::sentencepiece::NormalizerSpec* temp = normalizer_spec_;
+-  normalizer_spec_ = nullptr;
+-  if (GetArena() != nullptr) {
+-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+-  }
+-  return temp;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::unsafe_arena_release_normalizer_spec() {
+-  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.normalizer_spec)
+-  _has_bits_[0] &= ~0x00000002u;
+-  ::sentencepiece::NormalizerSpec* temp = normalizer_spec_;
+-  normalizer_spec_ = nullptr;
+-  return temp;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::_internal_mutable_normalizer_spec() {
+-  _has_bits_[0] |= 0x00000002u;
+-  if (normalizer_spec_ == nullptr) {
+-    auto* p = CreateMaybeMessage<::sentencepiece::NormalizerSpec>(GetArena());
+-    normalizer_spec_ = p;
+-  }
+-  return normalizer_spec_;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::mutable_normalizer_spec() {
+-  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.normalizer_spec)
+-  return _internal_mutable_normalizer_spec();
+-}
+-inline void ModelProto::set_allocated_normalizer_spec(::sentencepiece::NormalizerSpec* normalizer_spec) {
+-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+-  if (message_arena == nullptr) {
+-    delete normalizer_spec_;
+-  }
+-  if (normalizer_spec) {
+-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(normalizer_spec);
+-    if (message_arena != submessage_arena) {
+-      normalizer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+-          message_arena, normalizer_spec, submessage_arena);
+-    }
+-    _has_bits_[0] |= 0x00000002u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000002u;
+-  }
+-  normalizer_spec_ = normalizer_spec;
+-  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.normalizer_spec)
+-}
+-
+-// optional .sentencepiece.SelfTestData self_test_data = 4;
+-inline bool ModelProto::_internal_has_self_test_data() const {
+-  bool value = (_has_bits_[0] & 0x00000004u) != 0;
+-  PROTOBUF_ASSUME(!value || self_test_data_ != nullptr);
+-  return value;
+-}
+-inline bool ModelProto::has_self_test_data() const {
+-  return _internal_has_self_test_data();
+-}
+-inline void ModelProto::clear_self_test_data() {
+-  if (self_test_data_ != nullptr) self_test_data_->Clear();
+-  _has_bits_[0] &= ~0x00000004u;
+-}
+-inline const ::sentencepiece::SelfTestData& ModelProto::_internal_self_test_data() const {
+-  const ::sentencepiece::SelfTestData* p = self_test_data_;
+-  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::SelfTestData&>(
+-      ::sentencepiece::_SelfTestData_default_instance_);
+-}
+-inline const ::sentencepiece::SelfTestData& ModelProto::self_test_data() const {
+-  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.self_test_data)
+-  return _internal_self_test_data();
+-}
+-inline void ModelProto::unsafe_arena_set_allocated_self_test_data(
+-    ::sentencepiece::SelfTestData* self_test_data) {
+-  if (GetArena() == nullptr) {
+-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(self_test_data_);
+-  }
+-  self_test_data_ = self_test_data;
+-  if (self_test_data) {
+-    _has_bits_[0] |= 0x00000004u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000004u;
+-  }
+-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.self_test_data)
+-}
+-inline ::sentencepiece::SelfTestData* ModelProto::release_self_test_data() {
+-  _has_bits_[0] &= ~0x00000004u;
+-  ::sentencepiece::SelfTestData* temp = self_test_data_;
+-  self_test_data_ = nullptr;
+-  if (GetArena() != nullptr) {
+-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+-  }
+-  return temp;
+-}
+-inline ::sentencepiece::SelfTestData* ModelProto::unsafe_arena_release_self_test_data() {
+-  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.self_test_data)
+-  _has_bits_[0] &= ~0x00000004u;
+-  ::sentencepiece::SelfTestData* temp = self_test_data_;
+-  self_test_data_ = nullptr;
+-  return temp;
+-}
+-inline ::sentencepiece::SelfTestData* ModelProto::_internal_mutable_self_test_data() {
+-  _has_bits_[0] |= 0x00000004u;
+-  if (self_test_data_ == nullptr) {
+-    auto* p = CreateMaybeMessage<::sentencepiece::SelfTestData>(GetArena());
+-    self_test_data_ = p;
+-  }
+-  return self_test_data_;
+-}
+-inline ::sentencepiece::SelfTestData* ModelProto::mutable_self_test_data() {
+-  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.self_test_data)
+-  return _internal_mutable_self_test_data();
+-}
+-inline void ModelProto::set_allocated_self_test_data(::sentencepiece::SelfTestData* self_test_data) {
+-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+-  if (message_arena == nullptr) {
+-    delete self_test_data_;
+-  }
+-  if (self_test_data) {
+-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(self_test_data);
+-    if (message_arena != submessage_arena) {
+-      self_test_data = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+-          message_arena, self_test_data, submessage_arena);
+-    }
+-    _has_bits_[0] |= 0x00000004u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000004u;
+-  }
+-  self_test_data_ = self_test_data;
+-  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.self_test_data)
+-}
+-
+-// optional .sentencepiece.NormalizerSpec denormalizer_spec = 5;
+-inline bool ModelProto::_internal_has_denormalizer_spec() const {
+-  bool value = (_has_bits_[0] & 0x00000008u) != 0;
+-  PROTOBUF_ASSUME(!value || denormalizer_spec_ != nullptr);
+-  return value;
+-}
+-inline bool ModelProto::has_denormalizer_spec() const {
+-  return _internal_has_denormalizer_spec();
+-}
+-inline void ModelProto::clear_denormalizer_spec() {
+-  if (denormalizer_spec_ != nullptr) denormalizer_spec_->Clear();
+-  _has_bits_[0] &= ~0x00000008u;
+-}
+-inline const ::sentencepiece::NormalizerSpec& ModelProto::_internal_denormalizer_spec() const {
+-  const ::sentencepiece::NormalizerSpec* p = denormalizer_spec_;
+-  return p != nullptr ? *p : reinterpret_cast<const ::sentencepiece::NormalizerSpec&>(
+-      ::sentencepiece::_NormalizerSpec_default_instance_);
+-}
+-inline const ::sentencepiece::NormalizerSpec& ModelProto::denormalizer_spec() const {
+-  // @@protoc_insertion_point(field_get:sentencepiece.ModelProto.denormalizer_spec)
+-  return _internal_denormalizer_spec();
+-}
+-inline void ModelProto::unsafe_arena_set_allocated_denormalizer_spec(
+-    ::sentencepiece::NormalizerSpec* denormalizer_spec) {
+-  if (GetArena() == nullptr) {
+-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(denormalizer_spec_);
+-  }
+-  denormalizer_spec_ = denormalizer_spec;
+-  if (denormalizer_spec) {
+-    _has_bits_[0] |= 0x00000008u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000008u;
+-  }
+-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:sentencepiece.ModelProto.denormalizer_spec)
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::release_denormalizer_spec() {
+-  _has_bits_[0] &= ~0x00000008u;
+-  ::sentencepiece::NormalizerSpec* temp = denormalizer_spec_;
+-  denormalizer_spec_ = nullptr;
+-  if (GetArena() != nullptr) {
+-    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+-  }
+-  return temp;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::unsafe_arena_release_denormalizer_spec() {
+-  // @@protoc_insertion_point(field_release:sentencepiece.ModelProto.denormalizer_spec)
+-  _has_bits_[0] &= ~0x00000008u;
+-  ::sentencepiece::NormalizerSpec* temp = denormalizer_spec_;
+-  denormalizer_spec_ = nullptr;
+-  return temp;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::_internal_mutable_denormalizer_spec() {
+-  _has_bits_[0] |= 0x00000008u;
+-  if (denormalizer_spec_ == nullptr) {
+-    auto* p = CreateMaybeMessage<::sentencepiece::NormalizerSpec>(GetArena());
+-    denormalizer_spec_ = p;
+-  }
+-  return denormalizer_spec_;
+-}
+-inline ::sentencepiece::NormalizerSpec* ModelProto::mutable_denormalizer_spec() {
+-  // @@protoc_insertion_point(field_mutable:sentencepiece.ModelProto.denormalizer_spec)
+-  return _internal_mutable_denormalizer_spec();
+-}
+-inline void ModelProto::set_allocated_denormalizer_spec(::sentencepiece::NormalizerSpec* denormalizer_spec) {
+-  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArena();
+-  if (message_arena == nullptr) {
+-    delete denormalizer_spec_;
+-  }
+-  if (denormalizer_spec) {
+-    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+-      ::PROTOBUF_NAMESPACE_ID::Arena::GetArena(denormalizer_spec);
+-    if (message_arena != submessage_arena) {
+-      denormalizer_spec = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+-          message_arena, denormalizer_spec, submessage_arena);
+-    }
+-    _has_bits_[0] |= 0x00000008u;
+-  } else {
+-    _has_bits_[0] &= ~0x00000008u;
+-  }
+-  denormalizer_spec_ = denormalizer_spec;
+-  // @@protoc_insertion_point(field_set_allocated:sentencepiece.ModelProto.denormalizer_spec)
+-}
+-
+ #ifdef __GNUC__
+   #pragma GCC diagnostic pop
+ #endif  // __GNUC__
+-- 
+2.32.0.windows.2
+
