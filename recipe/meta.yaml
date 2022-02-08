@@ -10,13 +10,15 @@ source:
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
+    # unvendor abseil
+    - patches/0002-do-not-build-vendored-abseil.patch
     # use our own version of protobuf; for osx-arm, we cannot do that, as
     # calling protoc fails in cross-compilation due to the wrong CPU;
     # windows fails to build due in ways that have proven very hard to track down
-    - patches/0002-do-not-build-protobuf-use-external-one.patch  # [not (win or build_platform != target_platform)]
+    - patches/0003-do-not-build-vendored-libprotobuf-lite.patch  # [not (win or build_platform != target_platform)]
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
-    - patches/0003-fix-libdir.patch
+    - patches/0004-fix-libdir.patch
 
 build:
   number: 0
@@ -29,7 +31,7 @@ requirements:
     - {{ compiler('cxx') }}
   host:
     - abseil-cpp
-    - libprotobuf
+    - libprotobuf          # [not (win or build_platform != target_platform)]
 
 outputs:
   - name: libsentencepiece
@@ -44,12 +46,12 @@ outputs:
       build:
         - cmake
         - {{ compiler('cxx') }}
-        - gperftools  # [unix]
+        - gperftools   # [unix]
         - make
         - pkg-config
       host:
         - abseil-cpp
-        - libprotobuf
+        - libprotobuf  # [not (win or build_platform != target_platform)]
 
     test:
       commands:
