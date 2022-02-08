@@ -20,7 +20,7 @@ source:
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0004-fix-libdir.patch
     # debug
-    - patches/0005-make-constructor-of-LazyString-explicit.patch
+    - patches/0005-move-initialization-of-static-const-LazyString-to-he.patch
 
 build:
   number: 0
