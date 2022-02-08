@@ -1,0 +1,55 @@
+From a8c658b9f726658379fb1409253705b913daa4ce Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Tue, 8 Feb 2022 22:03:05 +1100
+Subject: [PATCH 5/5] make constructor of LazyString explicit
+
+---
+ third_party/protobuf-lite/arenastring.cc                | 4 ++--
+ third_party/protobuf-lite/google/protobuf/arenastring.h | 6 +++++-
+ 2 files changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/third_party/protobuf-lite/arenastring.cc b/third_party/protobuf-lite/arenastring.cc
+index b5f48c5..ad970b9 100644
+--- a/third_party/protobuf-lite/arenastring.cc
++++ b/third_party/protobuf-lite/arenastring.cc
+@@ -52,8 +52,8 @@ const std::string& LazyString::Init() const {
+   mu.Lock();
+   const std::string* res = inited_.load(std::memory_order_acquire);
+   if (res == nullptr) {
+-    auto init_value = init_value_;
+-    res = ::new (static_cast<void*>(string_buf_))
++    auto init_value = myUnion.init_value_;
++    res = ::new (static_cast<void*>(myUnion.string_buf_))
+         std::string(init_value.ptr, init_value.size);
+     inited_.store(res, std::memory_order_release);
+   }
+diff --git a/third_party/protobuf-lite/google/protobuf/arenastring.h b/third_party/protobuf-lite/google/protobuf/arenastring.h
+index 60307b2..b18cf65 100644
+--- a/third_party/protobuf-lite/google/protobuf/arenastring.h
++++ b/third_party/protobuf-lite/google/protobuf/arenastring.h
+@@ -55,6 +55,9 @@ namespace internal {
+ // These are initialized on the first call to .get().
+ class PROTOBUF_EXPORT LazyString {
+  public:
++  LazyString(const char* ptr, size_t size, std::atomic<const std::string*> init) :
++   // initializing first member of union by default, which is of type InitValue
++   myUnion{{ptr, size}}, inited_{init} {}
+   // We explicitly make LazyString an aggregate so that MSVC can do constant
+   // initialization on it without marking it `constexpr`.
+   // We do not want to use `constexpr` because it makes it harder to have extern
+@@ -65,10 +68,11 @@ class PROTOBUF_EXPORT LazyString {
+   };
+   // We keep a union of the initialization value and the std::string to save on
+   // space. We don't need the string array after Init() is done.
+-  union {
++  union MayYourUnionBeNamed {
+     mutable InitValue init_value_;
+     alignas(std::string) mutable char string_buf_[sizeof(std::string)];
+   };
++  MayYourUnionBeNamed myUnion;
+   mutable std::atomic<const std::string*> inited_;
+ 
+   const std::string& get() const {
+-- 
+2.32.0.windows.2
+

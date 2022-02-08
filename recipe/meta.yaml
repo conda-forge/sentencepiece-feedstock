@@ -19,6 +19,8 @@ source:
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0004-fix-libdir.patch
+    # debug
+    - patches/0005-make-constructor-of-LazyString-explicit.patch
 
 build:
   number: 0
