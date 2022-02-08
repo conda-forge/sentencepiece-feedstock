@@ -1,8 +1,9 @@
-From 4265b6ff7a3d904be8474f2513e0d33c6a6edc37 Mon Sep 17 00:00:00 2001
+From a2b4fef15ff0fdf1046b78dae0c5a63fc12a7f67 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 8 Feb 2022 23:29:01 +1100
 Subject: [PATCH 5/5] move initialization of static const LazyString to header
 
+... and make it constexpr
 ---
  src/builtin_pb/sentencepiece_model.pb.cc |  5 -----
  src/builtin_pb/sentencepiece_model.pb.h  | 10 +++++-----
@@ -25,7 +26,7 @@ index e913731..a3c81d2 100644
    : ::PROTOBUF_NAMESPACE_ID::MessageLite(arena),
    _extensions_(arena),
 diff --git a/src/builtin_pb/sentencepiece_model.pb.h b/src/builtin_pb/sentencepiece_model.pb.h
-index f527aa7..d89d165 100644
+index f527aa7..addce33 100644
 --- a/src/builtin_pb/sentencepiece_model.pb.h
 +++ b/src/builtin_pb/sentencepiece_model.pb.h
 @@ -955,15 +955,15 @@ class TrainerSpec PROTOBUF_FINAL :
@@ -33,19 +34,19 @@ index f527aa7..d89d165 100644
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr input_format_;
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr required_chars_;
 -  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_surface_;
-+  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_surface_{{{" \342\201\207 ", 5}}, {nullptr}};
++  static constexpr ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_surface_{{{" \342\201\207 ", 5}}, {nullptr}};
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unk_surface_;
 -  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_piece_;
-+  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_piece_{{{"<unk>", 5}}, {nullptr}};
++  static constexpr ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_unk_piece_{{{"<unk>", 5}}, {nullptr}};
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unk_piece_;
 -  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_bos_piece_;
-+  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_bos_piece_{{{"<s>", 3}}, {nullptr}};
++  static constexpr ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_bos_piece_{{{"<s>", 3}}, {nullptr}};
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr bos_piece_;
 -  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_eos_piece_;
-+  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_eos_piece_{{{"</s>", 4}}, {nullptr}};
++  static constexpr ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_eos_piece_{{{"</s>", 4}}, {nullptr}};
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr eos_piece_;
 -  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_pad_piece_;
-+  static const ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_pad_piece_{{{"<pad>", 5}}, {nullptr}};
++  static constexpr ::PROTOBUF_NAMESPACE_ID::internal::LazyString _i_give_permission_to_break_this_code_default_pad_piece_{{{"<pad>", 5}}, {nullptr}};
    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr pad_piece_;
    ::PROTOBUF_NAMESPACE_ID::int32 self_test_sample_size_;
    ::PROTOBUF_NAMESPACE_ID::int32 mining_sentence_size_;
