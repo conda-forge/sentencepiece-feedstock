@@ -4,3 +4,7 @@ cxx_compiler:                  # [win]
   - vs2019                     # [win]
 libprotobuf:
   - '3.19'
+channel_targets:
+  - conda-forge sentencepiece_dev
+channel_sources:
+  - conda-forge/label/libprotobuf_dev,conda-forge
