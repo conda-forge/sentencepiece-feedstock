@@ -1,6 +1,0 @@
-channel_targets:                                   # [win]
-  - conda-forge sentencepiece_dev                  # [win]
-channel_sources:                                   # [win]
-  - conda-forge/label/libprotobuf_dev,conda-forge  # [win]
-libprotobuf:                                       # [win]
-  - '3.14'                                         # [win]
