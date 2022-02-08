@@ -22,7 +22,7 @@ source:
     # debug
     - patches/0005-use-C-17.patch
     - patches/0006-move-initialization-of-static-const-LazyString-to-he.patch  # [win]
-    - patches/0007-give-the-virtual-dtors-a-body.patch                         # [win]
+    - patches/0007-give-DiscardUnknownFields-a-body.patch                      # [win]
 
 build:
   number: 0
