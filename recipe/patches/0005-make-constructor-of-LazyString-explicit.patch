@@ -1,13 +1,35 @@
-From e0000d1925b0b0fa554f51d1e670a26840fca898 Mon Sep 17 00:00:00 2001
+From 0f00847a2a3da1179b995d5fc9ff8193cc66ef50 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 8 Feb 2022 22:03:05 +1100
 Subject: [PATCH 5/5] make constructor of LazyString explicit
 
 ---
- third_party/protobuf-lite/arenastring.cc                | 4 ++--
- third_party/protobuf-lite/google/protobuf/arenastring.h | 8 +++++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ src/builtin_pb/sentencepiece_model.pb.cc               | 10 +++++-----
+ third_party/protobuf-lite/arenastring.cc               |  4 ++--
+ .../protobuf-lite/google/protobuf/arenastring.h        |  8 +++++++-
+ 3 files changed, 14 insertions(+), 8 deletions(-)
 
+diff --git a/src/builtin_pb/sentencepiece_model.pb.cc b/src/builtin_pb/sentencepiece_model.pb.cc
+index e913731..6e01e70 100644
+--- a/src/builtin_pb/sentencepiece_model.pb.cc
++++ b/src/builtin_pb/sentencepiece_model.pb.cc
+@@ -391,11 +391,11 @@ class TrainerSpec::_Internal {
+   }
+ };
+ 
+-const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_unk_piece_{{{"<unk>", 5}}, {nullptr}};
+-const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_bos_piece_{{{"<s>", 3}}, {nullptr}};
+-const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_eos_piece_{{{"</s>", 4}}, {nullptr}};
+-const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_pad_piece_{{{"<pad>", 5}}, {nullptr}};
+-const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_unk_surface_{{{" \342\201\207 ", 5}}, {nullptr}};
++const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_unk_piece_("<unk>", 5, nullptr);
++const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_bos_piece_("<s>", 3, nullptr);
++const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_eos_piece_("</s>", 4, nullptr);
++const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_pad_piece_("<pad>", 5, nullptr);
++const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_unk_surface_(" \342\201\207 ", 5, nullptr);
+ TrainerSpec::TrainerSpec(::PROTOBUF_NAMESPACE_ID::Arena* arena)
+   : ::PROTOBUF_NAMESPACE_ID::MessageLite(arena),
+   _extensions_(arena),
 diff --git a/third_party/protobuf-lite/arenastring.cc b/third_party/protobuf-lite/arenastring.cc
 index b5f48c5..ad970b9 100644
 --- a/third_party/protobuf-lite/arenastring.cc
