@@ -1,7 +1,7 @@
 From c835922bcbb9879a2f98bee26798072d02f38dcd Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 8 Feb 2022 23:29:01 +1100
-Subject: [PATCH 6/6] move initialization of static const LazyString to header
+Subject: [PATCH 6/7] move initialization of static const LazyString to header
 
 ... and make it constexpr
 ---
