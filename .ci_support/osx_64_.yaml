@@ -1,5 +1,7 @@
 MACOSX_DEPLOYMENT_TARGET:
 - '10.9'
+abseil_cpp:
+- '20210324.2'
 channel_sources:
 - conda-forge
 channel_targets:
@@ -8,6 +10,8 @@ cxx_compiler:
 - clangxx
 cxx_compiler_version:
 - '11'
+libprotobuf:
+- '3.18'
 macos_machine:
 - x86_64-apple-darwin13.4.0
 pin_run_as_build:
