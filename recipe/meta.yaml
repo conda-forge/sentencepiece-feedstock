@@ -21,6 +21,7 @@ source:
     - patches/0004-fix-libdir.patch
     # debug
     - patches/0005-use-C-17.patch
+    - patches/0006-make-problematic-members-constexpr.patch  # [win]
 
 build:
   number: 0
