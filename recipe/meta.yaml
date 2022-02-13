@@ -13,9 +13,8 @@ source:
     # unvendor abseil
     - patches/0002-do-not-build-vendored-abseil.patch
     # use our own version of protobuf; for osx-arm, we cannot do that, as
-    # calling protoc fails in cross-compilation due to the wrong CPU;
-    # windows fails to build due in ways that have proven very hard to track down
-    - patches/0003-do-not-build-vendored-libprotobuf-lite.patch  # [not (win or build_platform != target_platform)]
+    # calling protoc fails in cross-compilation due to the wrong CPU
+    - patches/0003-do-not-build-vendored-libprotobuf-lite.patch  # [build_platform == target_platform]
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0004-fix-libdir.patch
@@ -23,7 +22,7 @@ source:
     - patches/0005-use-C-17.patch
     - patches/0006-move-initialization-of-static-const-LazyString-to-he.patch  # [win]
     - patches/0007-give-DiscardUnknownFields-a-body.patch                      # [win]
-    - patches/0008-move-ModelProto-methods-into-source-file-uninline-th.patch  # [win]
+    # - patches/0008-move-ModelProto-methods-into-source-file-uninline-th.patch  # [win]
 
 build:
   number: 0
@@ -53,7 +52,7 @@ outputs:
         - pkg-config
       host:
         - abseil-cpp
-        - libprotobuf  # [not (win or build_platform != target_platform)]
+        - libprotobuf  # [build_platform == target_platform]
 
     test:
       commands:
