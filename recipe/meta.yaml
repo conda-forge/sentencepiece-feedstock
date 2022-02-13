@@ -20,9 +20,8 @@ source:
     - patches/0004-fix-libdir.patch
     # debug
     - patches/0005-use-C-17.patch
-    - patches/0006-move-initialization-of-static-const-LazyString-to-he.patch  # [win]
-    - patches/0007-give-DiscardUnknownFields-a-body.patch                      # [win]
-    # - patches/0008-move-ModelProto-methods-into-source-file-uninline-th.patch  # [win]
+    - patches/0006-give-DiscardUnknownFields-a-body.patch                      # [win]
+    - patches/0007-patch-generated-protobuf-sources.patch                      # [win]
 
 build:
   number: 0
