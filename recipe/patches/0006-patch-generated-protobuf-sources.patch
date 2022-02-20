@@ -1,7 +1,7 @@
 From d85fc30deb8941fae9a8db86453785b313b0558d Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
-Subject: [PATCH 6/6] patch generated protobuf sources
+Subject: [PATCH 6/7] patch generated protobuf sources
 
 ---
  src/CMakeLists.txt | 16 ++++++++++++++++

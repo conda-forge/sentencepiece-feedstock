@@ -22,7 +22,9 @@ source:
     - patches/0005-use-C-17.patch
     # patch CMakelists to patch generated protobuf-sources,
     # using $RECIPE_DIR/patch_generated_proto.patch
-    - patches/0006-patch-generated-protobuf-sources.patch        # [win]
+    - patches/0006-patch-generated-protobuf-sources.patch
+    # upstream sources still directly include third_party/absl...
+    - patches/0007-ACTUALLY-use-external-absl.patch
 
 build:
   number: 0
