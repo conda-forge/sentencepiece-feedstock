@@ -1,23 +1,26 @@
-From d402490f8eb8c50ea357a674a77d343c54a37921 Mon Sep 17 00:00:00 2001
+From e9015e1e5b94a347ea95489eeeaeeb0341cb9786 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 7/7] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 4 ++++
- 1 file changed, 4 insertions(+)
+ src/CMakeLists.txt | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index c654f29..1b67265 100644
+index c654f29..9559bae 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -76,6 +76,10 @@ else()
+@@ -76,6 +76,13 @@ else()
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
    set(PROTOBUF_LITE_SRCS "")
    include_directories(${PROTOBUF_INCLUDE_DIR})
 +  if (MSVC)
++    # debug
++    execute_process(COMMAND dir .)
++    execute_process(COMMAND dir $ENV{SRC_DIR})
 +    # apply patch so that windows can compile
-+    execute_process(COMMAND patch -Np1 -i "$ENV{RECIPE_DIR}\\patch_generated_proto.patch" --binary)
++    execute_process(COMMAND patch -Np1 -i "$ENV{RECIPE_DIR}\\patch_generated_proto.patch" --binary $ENV{SRC_DIR})
 +  endif()
  endif()
  
