@@ -1,4 +1,4 @@
-From c835922bcbb9879a2f98bee26798072d02f38dcd Mon Sep 17 00:00:00 2001
+From 6347fd5a0283b20489a3789ddc857954b02577c6 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 8 Feb 2022 23:29:01 +1100
 Subject: [PATCH] move initialization of static const LazyString to header
@@ -10,10 +10,10 @@ Subject: [PATCH] move initialization of static const LazyString to header
  2 files changed, 5 insertions(+), 10 deletions(-)
 
 diff --git a/sentencepiece_model.pb.cc b/sentencepiece_model.pb.cc
-index e913731..a3c81d2 100644
+index 2a64e9f..7ee2241 100644
 --- a/sentencepiece_model.pb.cc
 +++ b/sentencepiece_model.pb.cc
-@@ -391,11 +391,6 @@ class TrainerSpec::_Internal {
+@@ -407,11 +407,6 @@ class TrainerSpec::_Internal {
    }
  };
  
@@ -22,11 +22,11 @@ index e913731..a3c81d2 100644
 -const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_eos_piece_{{{"</s>", 4}}, {nullptr}};
 -const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_pad_piece_{{{"<pad>", 5}}, {nullptr}};
 -const ::PROTOBUF_NAMESPACE_ID::internal::LazyString TrainerSpec::_i_give_permission_to_break_this_code_default_unk_surface_{{{" \342\201\207 ", 5}}, {nullptr}};
- TrainerSpec::TrainerSpec(::PROTOBUF_NAMESPACE_ID::Arena* arena)
-   : ::PROTOBUF_NAMESPACE_ID::MessageLite(arena),
-   _extensions_(arena),
+ TrainerSpec::TrainerSpec(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                          bool is_message_owned)
+   : ::PROTOBUF_NAMESPACE_ID::MessageLite(arena, is_message_owned),
 diff --git a/sentencepiece_model.pb.h b/sentencepiece_model.pb.h
-index f527aa7..addce33 100644
+index 7e40b34..e6a6491 100644
 --- a/sentencepiece_model.pb.h
 +++ b/sentencepiece_model.pb.h
 @@ -955,15 +955,15 @@ class TrainerSpec PROTOBUF_FINAL :
