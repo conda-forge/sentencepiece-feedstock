@@ -1,9 +1,9 @@
 abseil_cpp:
 - '20210324.2'
 channel_sources:
-- conda-forge
+- conda-forge/label/libprotobuf_dev,conda-forge
 channel_targets:
-- conda-forge main
+- conda-forge sentencepiece_dev
 cxx_compiler:
 - vs2019
 libprotobuf:
