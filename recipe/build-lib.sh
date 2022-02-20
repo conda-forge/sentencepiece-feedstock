@@ -2,6 +2,18 @@
 
 set -ex
 
+# we're trying to avoid the third_party sources, and not building them;
+# to avoid weird errors if those sources got picked up nevertheless, delete them
+rm -rf third_party/absl
+if [[ "${target_platform}" != "osx-arm64" ]]; then
+    rm -rf third_party/protobuf-lite
+    export CMAKE_EXTRA="-DSPM_USE_BUILTIN_PROTOBUF=OFF"
+else
+    # building against external protobuf needs to call protoc,
+    # which fails with bad CPU type in cross-compilation
+    export CMAKE_EXTRA=""
+fi
+
 mkdir build
 cd build
 
@@ -9,13 +21,6 @@ export LD_LIBRARY_PATH=${PREFIX}/lib
 export CPATH=${PREFIX}/include
 export INCLUDE=${PREFIX}/include
 export LIBRARY_PATH=${PREFIX}/lib
-
-export CMAKE_EXTRA="-DSPM_USE_BUILTIN_PROTOBUF=OFF"
-if [[ "${target_platform}" == "osx-arm64" ]]; then
-    # building against external protobuf needs to call protoc,
-    # which fails with bad CPU type in cross-compilation
-    export CMAKE_EXTRA=""
-fi
 
 cmake \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
