@@ -23,6 +23,7 @@ cmake \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_SHARED=ON \
     -DSPM_ENABLE_TCMALLOC=OFF \
+    -DSPM_USE_EXTERNAL_ABSL=ON \
     $CMAKE_EXTRA \
     -S ..
 
