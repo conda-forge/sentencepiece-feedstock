@@ -1,4 +1,4 @@
-From c373ab021356c57d7ea84b828401ec294d86664f Mon Sep 17 00:00:00 2001
+From e42e244783063211a1d54403ae7faeba1f80b100 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
@@ -7,12 +7,12 @@ Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
  src/CMakeLists.txt                            |  4 ++-
  src/error.cc                                  |  9 -------
  src/init.h                                    |  6 ++---
- .../absl/flags/flag.cc => src/parse.cc        | 18 +++++--------
- third_party/absl/flags/flag.h => src/parse.h  | 23 ++++++++++-------
+ .../absl/flags/flag.cc => src/parse.cc        | 13 +++++-----
+ third_party/absl/flags/flag.h => src/parse.h  | 15 +++++------
  third_party/absl/flags/parse.h                | 25 -------------------
- 6 files changed, 25 insertions(+), 60 deletions(-)
- rename third_party/absl/flags/flag.cc => src/parse.cc (93%)
- rename third_party/absl/flags/flag.h => src/parse.h (74%)
+ 6 files changed, 18 insertions(+), 54 deletions(-)
+ rename third_party/absl/flags/flag.cc => src/parse.cc (97%)
+ rename third_party/absl/flags/flag.h => src/parse.h (80%)
  delete mode 100644 third_party/absl/flags/parse.h
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
@@ -73,13 +73,13 @@ index acfda8a..c520c2b 100644
    if (remove_arg) {
      char **argv_val = *argv;
 diff --git a/third_party/absl/flags/flag.cc b/src/parse.cc
-similarity index 93%
+similarity index 97%
 rename from third_party/absl/flags/flag.cc
 rename to src/parse.cc
-index e7ac841..377305a 100644
+index e7ac841..b729691 100644
 --- a/third_party/absl/flags/flag.cc
 +++ b/src/parse.cc
-@@ -12,25 +12,19 @@
+@@ -12,17 +12,18 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
  
@@ -91,39 +91,40 @@ index e7ac841..377305a 100644
  #include <sstream>
  #include <string>
  
--#include "config.h"
++#include "parse.h"
++
+ #include "config.h"
 -#include "src/common.h"
 -#include "src/util.h"
-+#include "parse.h"
- 
--ABSL_FLAG(bool, help, false, "show help");
--ABSL_FLAG(bool, version, false, "show version");
--ABSL_FLAG(int, minloglevel, 0,
--          "Messages logged at a lower level than this don't actually get "
--          "logged anywhere");
-+#include "config.h"
 +#include "common.h"
 +#include "util.h"
++#include "absl/flags/flag.h"
+ 
+ ABSL_FLAG(bool, help, false, "show help");
+ ABSL_FLAG(bool, version, false, "show version");
+@@ -30,7 +31,7 @@ ABSL_FLAG(int, minloglevel, 0,
+           "Messages logged at a lower level than this don't actually get "
+           "logged anywhere");
  
 -namespace absl {
 +namespace sentencepiece {
  namespace internal {
  namespace {
  template <typename T>
-@@ -218,4 +212,4 @@ std::vector<char *> ParseCommandLine(int argc, char *argv[]) {
+@@ -218,4 +219,4 @@ std::vector<char *> ParseCommandLine(int argc, char *argv[]) {
  
    return output_args;
  }
 -}  // namespace absl
 +}  // namespace sentencepiece
 diff --git a/third_party/absl/flags/flag.h b/src/parse.h
-similarity index 74%
+similarity index 80%
 rename from third_party/absl/flags/flag.h
 rename to src/parse.h
-index e540edf..b3ddb53 100644
+index e540edf..832e9b3 100644
 --- a/third_party/absl/flags/flag.h
 +++ b/src/parse.h
-@@ -12,15 +12,23 @@
+@@ -12,15 +12,15 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
  
@@ -138,31 +139,23 @@ index e540edf..b3ddb53 100644
  #include <vector>
  
 -namespace absl {
-+#include "absl/flags/flag.h"
-+
-+ABSL_FLAG(bool, help, false, "show help");
-+ABSL_FLAG(bool, version, false, "show version");
-+ABSL_FLAG(int, minloglevel, 0,
-+          "Messages logged at a lower level than this don't actually get "
-+          "logged anywhere");
-+
 +namespace sentencepiece {
  namespace internal {
  struct FlagFunc;
  
-@@ -52,11 +60,8 @@ void SetFlag(Flag<T> *flag, const V &v) {
+@@ -52,11 +52,8 @@ void SetFlag(Flag<T> *flag, const V &v) {
    const T value(v);
    flag->set_value(value);
  }
 -}  // namespace absl
--
+ 
 -#define ABSL_FLAG(Type, name, defautl_value, help) \
 -  absl::Flag<Type> FLAGS_##name(#name, #Type, help, defautl_value);
- 
--#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
 +std::vector<char *> ParseCommandLine(int argc, char *argv[]);
 +}  // namespace sentencepiece
  
+-#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
+-
 -#endif  // ABSL_FLAGS_FLAG_H_
 +#endif  // SENTENCEPIECE_FLAG_H_
 diff --git a/third_party/absl/flags/parse.h b/third_party/absl/flags/parse.h
