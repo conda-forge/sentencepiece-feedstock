@@ -2,7 +2,7 @@
 
 set -ex
 
-if [[ "${target_platform}" == "osx-*" ]]; then
+if [[ "${target_platform}" == osx-* ]]; then
     # for some reason, patches with file rename
     # don't work on osx; do the rename manually
     mv third_party/absl/flags/flag.h src/parse.h
