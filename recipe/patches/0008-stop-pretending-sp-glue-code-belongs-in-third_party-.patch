@@ -1,16 +1,16 @@
-From e42e244783063211a1d54403ae7faeba1f80b100 Mon Sep 17 00:00:00 2001
+From f399bc85a0057fb25e806ca0b555aba075289a0c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
 
 ---
  src/CMakeLists.txt                            |  4 ++-
- src/error.cc                                  |  9 -------
- src/init.h                                    |  6 ++---
+ src/error.cc                                  |  9 +------
+ src/init.h                                    |  4 +--
  .../absl/flags/flag.cc => src/parse.cc        | 13 +++++-----
  third_party/absl/flags/flag.h => src/parse.h  | 15 +++++------
  third_party/absl/flags/parse.h                | 25 -------------------
- 6 files changed, 18 insertions(+), 54 deletions(-)
+ 6 files changed, 19 insertions(+), 51 deletions(-)
  rename third_party/absl/flags/flag.cc => src/parse.cc (97%)
  rename third_party/absl/flags/flag.h => src/parse.h (80%)
  delete mode 100644 third_party/absl/flags/parse.h
@@ -31,10 +31,10 @@ index 3b31507..dba8780 100644
    list(APPEND SPM_LIBS absl::strings)
    list(APPEND SPM_LIBS absl::flags)
 diff --git a/src/error.cc b/src/error.cc
-index ab4675d..16eb68c 100644
+index ab4675d..e9acded 100644
 --- a/src/error.cc
 +++ b/src/error.cc
-@@ -17,15 +17,6 @@
+@@ -17,14 +17,7 @@
  #include "common.h"
  #include "sentencepiece_processor.h"
  
@@ -46,23 +46,23 @@ index ab4675d..16eb68c 100644
 -ABSL_FLAG(int32, minloglevel, 0,
 -          "Messages logged at a lower level than this don't actually.");
 -#endif
--
++ABSL_DECLARE_FLAG(int32, minloglevel);
+ 
  namespace sentencepiece {
  namespace error {
- int gTestCounter = 0;
 diff --git a/src/init.h b/src/init.h
-index acfda8a..c520c2b 100644
+index acfda8a..c06bc9f 100644
 --- a/src/init.h
 +++ b/src/init.h
-@@ -16,15 +16,13 @@
+@@ -16,15 +16,15 @@
  #define INIT_H_
  
  #include "common.h"
 +#include "parse.h"
  #include "absl/flags/flag.h"
 -#include "absl/flags/parse.h"
--
--ABSL_DECLARE_FLAG(int32, minloglevel);
+ 
+ ABSL_DECLARE_FLAG(int32, minloglevel);
  
  namespace sentencepiece {
  inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
