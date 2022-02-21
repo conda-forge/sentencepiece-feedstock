@@ -1,0 +1,201 @@
+From c373ab021356c57d7ea84b828401ec294d86664f Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 21 Feb 2022 12:50:47 +1100
+Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
+
+---
+ src/CMakeLists.txt                            |  4 ++-
+ src/error.cc                                  |  9 -------
+ src/init.h                                    |  6 ++---
+ .../absl/flags/flag.cc => src/parse.cc        | 18 +++++--------
+ third_party/absl/flags/flag.h => src/parse.h  | 23 ++++++++++-------
+ third_party/absl/flags/parse.h                | 25 -------------------
+ 6 files changed, 25 insertions(+), 60 deletions(-)
+ rename third_party/absl/flags/flag.cc => src/parse.cc (93%)
+ rename third_party/absl/flags/flag.h => src/parse.h (74%)
+ delete mode 100644 third_party/absl/flags/parse.h
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 3b31507..dba8780 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -13,7 +13,9 @@
+ # limitations under the License.!
+ 
+ if (SPM_USE_EXTERNAL_ABSL)
+-  set(ABSL_FLAGS_SRCS "")
++  # originally part of third_party/absl, but actually
++  # only relevant for sentencepiece; now moved.
++  set(ABSL_FLAGS_SRCS "parse.cc")
+   set(ABSL_STRINGS_SRCS "")
+   list(APPEND SPM_LIBS absl::strings)
+   list(APPEND SPM_LIBS absl::flags)
+diff --git a/src/error.cc b/src/error.cc
+index ab4675d..16eb68c 100644
+--- a/src/error.cc
++++ b/src/error.cc
+@@ -17,15 +17,6 @@
+ #include "common.h"
+ #include "sentencepiece_processor.h"
+ 
+-#ifdef _USE_EXTERNAL_ABSL
+-// Naive workaround to define minloglevel on external absl package.
+-// We want to define them in other cc file.
+-#include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
+-ABSL_FLAG(int32, minloglevel, 0,
+-          "Messages logged at a lower level than this don't actually.");
+-#endif
+-
+ namespace sentencepiece {
+ namespace error {
+ int gTestCounter = 0;
+diff --git a/src/init.h b/src/init.h
+index acfda8a..c520c2b 100644
+--- a/src/init.h
++++ b/src/init.h
+@@ -16,15 +16,13 @@
+ #define INIT_H_
+ 
+ #include "common.h"
++#include "parse.h"
+ #include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
+-
+-ABSL_DECLARE_FLAG(int32, minloglevel);
+ 
+ namespace sentencepiece {
+ inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
+                                   bool remove_arg = true) {
+-  const auto unused_args = absl::ParseCommandLine(*argc, *argv);
++  const auto unused_args = sentencepiece::ParseCommandLine(*argc, *argv);
+ 
+   if (remove_arg) {
+     char **argv_val = *argv;
+diff --git a/third_party/absl/flags/flag.cc b/src/parse.cc
+similarity index 93%
+rename from third_party/absl/flags/flag.cc
+rename to src/parse.cc
+index e7ac841..377305a 100644
+--- a/third_party/absl/flags/flag.cc
++++ b/src/parse.cc
+@@ -12,25 +12,19 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#include "third_party/absl/flags/flag.h"
+-
+ #include <algorithm>
+ #include <iostream>
+ #include <map>
+ #include <sstream>
+ #include <string>
+ 
+-#include "config.h"
+-#include "src/common.h"
+-#include "src/util.h"
++#include "parse.h"
+ 
+-ABSL_FLAG(bool, help, false, "show help");
+-ABSL_FLAG(bool, version, false, "show version");
+-ABSL_FLAG(int, minloglevel, 0,
+-          "Messages logged at a lower level than this don't actually get "
+-          "logged anywhere");
++#include "config.h"
++#include "common.h"
++#include "util.h"
+ 
+-namespace absl {
++namespace sentencepiece {
+ namespace internal {
+ namespace {
+ template <typename T>
+@@ -218,4 +212,4 @@ std::vector<char *> ParseCommandLine(int argc, char *argv[]) {
+ 
+   return output_args;
+ }
+-}  // namespace absl
++}  // namespace sentencepiece
+diff --git a/third_party/absl/flags/flag.h b/src/parse.h
+similarity index 74%
+rename from third_party/absl/flags/flag.h
+rename to src/parse.h
+index e540edf..b3ddb53 100644
+--- a/third_party/absl/flags/flag.h
++++ b/src/parse.h
+@@ -12,15 +12,23 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#ifndef ABSL_FLAGS_FLAG_H_
+-#define ABSL_FLAGS_FLAG_H_
++#ifndef SENTENCEPIECE_FLAG_H_
++#define SENTENCEPIECE_FLAG_H_
+ 
+ #include <functional>
+ #include <memory>
+ #include <string>
+ #include <vector>
+ 
+-namespace absl {
++#include "absl/flags/flag.h"
++
++ABSL_FLAG(bool, help, false, "show help");
++ABSL_FLAG(bool, version, false, "show version");
++ABSL_FLAG(int, minloglevel, 0,
++          "Messages logged at a lower level than this don't actually get "
++          "logged anywhere");
++
++namespace sentencepiece {
+ namespace internal {
+ struct FlagFunc;
+ 
+@@ -52,11 +60,8 @@ void SetFlag(Flag<T> *flag, const V &v) {
+   const T value(v);
+   flag->set_value(value);
+ }
+-}  // namespace absl
+-
+-#define ABSL_FLAG(Type, name, defautl_value, help) \
+-  absl::Flag<Type> FLAGS_##name(#name, #Type, help, defautl_value);
+ 
+-#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
++std::vector<char *> ParseCommandLine(int argc, char *argv[]);
++}  // namespace sentencepiece
+ 
+-#endif  // ABSL_FLAGS_FLAG_H_
++#endif  // SENTENCEPIECE_FLAG_H_
+diff --git a/third_party/absl/flags/parse.h b/third_party/absl/flags/parse.h
+deleted file mode 100644
+index 6a06e63..0000000
+--- a/third_party/absl/flags/parse.h
++++ /dev/null
+@@ -1,25 +0,0 @@
+-// Copyright 2016 Google Inc.
+-//
+-// Licensed under the Apache License, Version 2.0 (the "License");
+-// you may not use this file except in compliance with the License.
+-// You may obtain a copy of the License at
+-//
+-//     http://www.apache.org/licenses/LICENSE-2.0
+-//
+-// Unless required by applicable law or agreed to in writing, software
+-// distributed under the License is distributed on an "AS IS" BASIS,
+-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+-// See the License for the specific language governing permissions and
+-// limitations under the License.!
+-
+-#ifndef ABSL_FLAGS_PARSE_H_
+-#define ABSL_FLAGS_PARSE_H_
+-
+-#include <vector>
+-
+-namespace absl {
+-
+-std::vector<char *> ParseCommandLine(int argc, char *argv[]);
+-}  // namespace absl
+-
+-#endif  // ABSL_FLAGS_PARSE_H_
+-- 
+2.32.0.windows.2
+
