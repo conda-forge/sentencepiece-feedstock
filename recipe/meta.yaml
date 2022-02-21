@@ -57,7 +57,8 @@ outputs:
         - pkg-config
       host:
         - abseil-cpp
-        - libprotobuf  # [build_platform == target_platform]
+        - libprotobuf     # [build_platform == target_platform]
+        - pthreads-win32  # [win]
 
     test:
       commands:
