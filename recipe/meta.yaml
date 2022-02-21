@@ -33,6 +33,8 @@ source:
 
 build:
   number: 0
+  # debug: disable temporarily for faster builds
+  skip: true  # [aarch64 or ppc64le]
 
 requirements:
   build:
