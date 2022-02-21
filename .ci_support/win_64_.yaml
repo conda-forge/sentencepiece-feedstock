@@ -1,5 +1,5 @@
 abseil_cpp:
-- '20210324.2'
+- '20211102.0'
 channel_sources:
 - conda-forge
 channel_targets:
