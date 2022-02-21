@@ -1,17 +1,17 @@
-From 6b9fb3f830d93a536907058f45c9f4b0549c428f Mon Sep 17 00:00:00 2001
+From 0b568ee20eaaa59b42b0b2d8263b83fa727e394a Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/8] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/CMakeLists.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..7e0e618 100644
+index 418b963..7de5e32 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -80,6 +80,22 @@ else()
+@@ -80,6 +80,25 @@ else()
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
    set(PROTOBUF_LITE_SRCS "")
    include_directories(${PROTOBUF_INCLUDE_DIR})
@@ -26,6 +26,9 @@ index 418b963..7e0e618 100644
 +                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
 +                               && type sentencepiece_model.pb.cc
 +                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
++                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
++                               && type sentencepiece.vcxproj
++                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
 +                               && patch -Np1 -i "$ENV{RECIPE_DIR}\\patch_generated_proto.patch" --binary
 +                               && move sentencepiece_model.pb.cc sentencepiece_model_patched.pb.cc)
 +    # update name so that correct build order is maintained; don't change header name
