@@ -1,11 +1,12 @@
-From a617789bfda815f3ed36c0c00a5be4cda08105a1 Mon Sep 17 00:00:00 2001
+From 2350d69425c49605ef64c73bc372f5d669abc04e Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 9 Feb 2022 00:42:22 +1100
 Subject: [PATCH 5/7] use C++17
 
 ---
- CMakeLists.txt | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ CMakeLists.txt  | 2 +-
+ python/setup.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
 index b097e94..6c614e5 100644
@@ -20,6 +21,19 @@ index b097e94..6c614e5 100644
  set(CMAKE_CXX_STANDARD_REQUIRED ON)
  
  if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
+diff --git a/python/setup.py b/python/setup.py
+index 79f2691..8e17c67 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -69,7 +69,7 @@ class build_ext(_build_ext):
+       subprocess.check_call(['./build_bundled.sh', version()])
+       pkg_config_path = './bundled/lib/pkgconfig:./bundled/lib64/pkgconfig'
+ 
+-    cflags = ['-std=c++11']
++    cflags = ['-std=c++17']
+     # Fix compile on some versions of Mac OSX
+     # See: https://github.com/neulab/xnmt/issues/199
+     if sys.platform == 'darwin':
 -- 
 2.32.0.windows.2
 
