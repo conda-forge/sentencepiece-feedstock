@@ -5,8 +5,9 @@ set -ex
 if [[ "${target_platform}" == osx-* ]]; then
     # for some reason, patches with file rename
     # don't work on osx; do the rename manually
-    mv third_party/absl/flags/flag.h src/parse.h
-    mv third_party/absl/flags/flag.cc src/parse.cc
+    mv third_party/absl/flags/flag.h src/flag.h
+    mv third_party/absl/flags/flag.cc src/flag.cc
+    mv third_party/absl/flags/parse.h src/parse.h
 fi
 
 # we're trying to avoid the third_party sources, and not building them;
