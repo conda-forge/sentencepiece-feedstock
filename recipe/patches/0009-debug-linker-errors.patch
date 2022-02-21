@@ -1,4 +1,4 @@
-From b83869d562c6d01c7d908cba8c83c6ba279953b6 Mon Sep 17 00:00:00 2001
+From 58b5a19640d3320d20a5647e9ab1725265a8ddab Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 16:07:24 +1100
 Subject: [PATCH 9/9] debug linker errors
@@ -8,15 +8,15 @@ Subject: [PATCH 9/9] debug linker errors
  1 file changed, 2 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index b88173c..7497029 100644
+index b88173c..235d9ff 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -248,6 +248,8 @@ if (SPM_ENABLE_SHARED)
    if (MSVC)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX "_import.lib")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX "_import.lib")
-+    target_link_options(sentencepiece PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib")
-+    target_link_options(sentencepiece_train PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib")
++    target_link_options(sentencepiece PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
++    target_link_options(sentencepiece_train PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
    elseif (MINGW)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX ".dll.a")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX ".dll.a")
