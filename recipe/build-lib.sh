@@ -2,11 +2,12 @@
 
 set -ex
 
-# debug for osx
-ls -l src/
-ls -l third_party/absl/flags || true
-mv third_party/absl/flags/flag.h src/parse.h || true
-mv third_party/absl/flags/flag.cc src/parse.cc || true
+if [[ "${target_platform}" == "osx-*" ]]; then
+    # for some reason, patches with file rename
+    # don't work on osx; do the rename manually
+    mv third_party/absl/flags/flag.h src/parse.h
+    mv third_party/absl/flags/flag.cc src/parse.cc
+fi
 
 # we're trying to avoid the third_party sources, and not building them;
 # to avoid weird errors if those sources got picked up nevertheless, delete them
