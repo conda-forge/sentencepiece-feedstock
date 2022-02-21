@@ -1,4 +1,4 @@
-From bd01f18ffbf7e7922866d62575cb852e1c659c7d Mon Sep 17 00:00:00 2001
+From c316e3a6c889ac551bed2325d8bd7e2907179d09 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
@@ -32,7 +32,7 @@ Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
  src/util_test.cc                        |   7 +-
  src/word_model_trainer_test.cc          |   9 +-
  27 files changed, 300 insertions(+), 294 deletions(-)
- rename {third_party/absl/flags => src}/flag.cc (93%)
+ rename {third_party/absl/flags => src}/flag.cc (94%)
  rename {third_party/absl/flags => src}/flag.h (78%)
  rename {third_party/absl/flags => src}/parse.h (79%)
 
@@ -316,10 +316,10 @@ index 39ece99..cd2eff0 100644
      for (size_t i = 0; i < kData.size(); ++i) {
        EXPECT_TRUE(input->ReadLine(&line));
 diff --git a/third_party/absl/flags/flag.cc b/src/flag.cc
-similarity index 93%
+similarity index 94%
 rename from third_party/absl/flags/flag.cc
 rename to src/flag.cc
-index e7ac841..a181a70 100644
+index e7ac841..bc2f181 100644
 --- a/third_party/absl/flags/flag.cc
 +++ b/src/flag.cc
 @@ -12,25 +12,25 @@
@@ -361,11 +361,11 @@ index e7ac841..a181a70 100644
    }
  
 -  if (absl::GetFlag(FLAGS_help)) {
-+  if (sentencepiece::GetFlagGetFlag(FLAGS_help)) {
++  if (sentencepiece::GetFlag(FLAGS_help)) {
      std::cout << internal::PrintHelp(argv[0]);
      sentencepiece::error::Exit(0);
 -  } else if (absl::GetFlag(FLAGS_version)) {
-+  } else if (sentencepiece::GetFlagGetFlag(FLAGS_version)) {
++  } else if (sentencepiece::GetFlag(FLAGS_version)) {
      std::cout << PACKAGE_STRING << " " << VERSION << std::endl;
      sentencepiece::error::Exit(0);
    }
