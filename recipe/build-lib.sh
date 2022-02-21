@@ -2,6 +2,12 @@
 
 set -ex
 
+# debug for osx
+ls -l src/
+ls -l third_party/absl/flags || true
+mv third_party/absl/flags/flag.h src/parse.h || true
+mv third_party/absl/flags/flag.cc src/parse.cc || true
+
 # we're trying to avoid the third_party sources, and not building them;
 # to avoid weird errors if those sources got picked up nevertheless, delete them
 rm -rf third_party/absl
