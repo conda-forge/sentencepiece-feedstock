@@ -28,6 +28,8 @@ source:
     # upstream carries its own glue code under third_party/absl/flags;
     # move it to the sentencepiece sources
     - patches/0008-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
+    # debug windows linker errors
+    - patches/0009-debug-linker-errors.patch
 
 build:
   number: 0
