@@ -1,16 +1,18 @@
-From 91a47ebf898bf05440e30752dc116df6387ac6dd Mon Sep 17 00:00:00 2001
+From 82645b329bfe3f64d72c5716e3836904aeccf751 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
 
 ---
  src/CMakeLists.txt                            |  4 ++-
- src/error.cc                                  |  9 -------
+ src/error.cc                                  |  6 ++---
  src/init.h                                    |  4 +--
+ src/init_test.cc                              |  1 +
  .../absl/flags/flag.cc => src/parse.cc        | 13 +++++-----
- third_party/absl/flags/flag.h => src/parse.h  | 15 +++++------
+ third_party/absl/flags/flag.h => src/parse.h  | 19 +++++++-------
+ src/testharness.h                             |  2 +-
  third_party/absl/flags/parse.h                | 25 -------------------
- 6 files changed, 18 insertions(+), 52 deletions(-)
+ 8 files changed, 27 insertions(+), 47 deletions(-)
  rename third_party/absl/flags/flag.cc => src/parse.cc (97%)
  rename third_party/absl/flags/flag.h => src/parse.h (80%)
  delete mode 100644 third_party/absl/flags/parse.h
@@ -31,25 +33,22 @@ index e446b49..05cc51d 100644
    list(APPEND SPM_LIBS absl::strings)
    list(APPEND SPM_LIBS absl::flags)
 diff --git a/src/error.cc b/src/error.cc
-index ab4675d..16eb68c 100644
+index ab4675d..6d30f87 100644
 --- a/src/error.cc
 +++ b/src/error.cc
-@@ -17,15 +17,6 @@
- #include "common.h"
- #include "sentencepiece_processor.h"
- 
--#ifdef _USE_EXTERNAL_ABSL
--// Naive workaround to define minloglevel on external absl package.
--// We want to define them in other cc file.
--#include "absl/flags/flag.h"
+@@ -21,9 +21,9 @@
+ // Naive workaround to define minloglevel on external absl package.
+ // We want to define them in other cc file.
+ #include "absl/flags/flag.h"
 -#include "absl/flags/parse.h"
 -ABSL_FLAG(int32, minloglevel, 0,
 -          "Messages logged at a lower level than this don't actually.");
--#endif
--
++ABSL_FLAG(int, minloglevel, 0,
++          "Messages logged at a lower level than this don't actually get "
++          "logged anywhere");
+ #endif
+ 
  namespace sentencepiece {
- namespace error {
- int gTestCounter = 0;
 diff --git a/src/init.h b/src/init.h
 index acfda8a..c06bc9f 100644
 --- a/src/init.h
@@ -72,6 +71,18 @@ index acfda8a..c06bc9f 100644
  
    if (remove_arg) {
      char **argv_val = *argv;
+diff --git a/src/init_test.cc b/src/init_test.cc
+index e5cd2e4..951b389 100644
+--- a/src/init_test.cc
++++ b/src/init_test.cc
+@@ -16,6 +16,7 @@
+ 
+ #include "common.h"
+ #include "testharness.h"
++#include "absl/flags/flag.h"
+ 
+ ABSL_FLAG(int32, int32_f, 10, "int32_flags");
+ ABSL_FLAG(bool, bool_f, false, "bool_flags");
 diff --git a/third_party/absl/flags/flag.cc b/src/parse.cc
 similarity index 97%
 rename from third_party/absl/flags/flag.cc
@@ -121,10 +132,10 @@ diff --git a/third_party/absl/flags/flag.h b/src/parse.h
 similarity index 80%
 rename from third_party/absl/flags/flag.h
 rename to src/parse.h
-index e540edf..832e9b3 100644
+index e540edf..95e1b87 100644
 --- a/third_party/absl/flags/flag.h
 +++ b/src/parse.h
-@@ -12,15 +12,15 @@
+@@ -12,15 +12,19 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
  
@@ -139,25 +150,43 @@ index e540edf..832e9b3 100644
  #include <vector>
  
 -namespace absl {
++ABSL_DECLARE_FLAG(bool, help);
++ABSL_DECLARE_FLAG(bool, version);
++ABSL_DECLARE_FLAG(minloglevel, minloglevel);
++
 +namespace sentencepiece {
  namespace internal {
  struct FlagFunc;
  
-@@ -52,11 +52,8 @@ void SetFlag(Flag<T> *flag, const V &v) {
+@@ -52,11 +56,8 @@ void SetFlag(Flag<T> *flag, const V &v) {
    const T value(v);
    flag->set_value(value);
  }
 -}  // namespace absl
- 
+-
 -#define ABSL_FLAG(Type, name, defautl_value, help) \
 -  absl::Flag<Type> FLAGS_##name(#name, #Type, help, defautl_value);
+ 
+-#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
 +std::vector<char *> ParseCommandLine(int argc, char *argv[]);
 +}  // namespace sentencepiece
  
--#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
--
 -#endif  // ABSL_FLAGS_FLAG_H_
 +#endif  // SENTENCEPIECE_FLAG_H_
+diff --git a/src/testharness.h b/src/testharness.h
+index 98317ad..8619bfa 100644
+--- a/src/testharness.h
++++ b/src/testharness.h
+@@ -21,8 +21,8 @@
+ #include <string>
+ 
+ #include "common.h"
++#include "parse.h"
+ #include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
+ #include "absl/strings/string_view.h"
+ 
+ ABSL_DECLARE_FLAG(std::string, test_tmpdir);
 diff --git a/third_party/absl/flags/parse.h b/third_party/absl/flags/parse.h
 deleted file mode 100644
 index 6a06e63..0000000
