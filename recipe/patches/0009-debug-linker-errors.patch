@@ -1,17 +1,22 @@
-From 06003d6f99a83feadd6ee0e8b3e5778803a996f0 Mon Sep 17 00:00:00 2001
+From 0882455c75ce454dab01fd353e594780afae83e2 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 16:07:24 +1100
 Subject: [PATCH 9/9] debug linker errors
 
 ---
- src/CMakeLists.txt | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ src/CMakeLists.txt | 17 +++++++++++++++--
+ 1 file changed, 15 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index b88173c..f393717 100644
+index b88173c..e99f56f 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -248,6 +248,21 @@ if (SPM_ENABLE_SHARED)
+@@ -243,11 +243,24 @@ if (SPM_ENABLE_SHARED)
+   endif()
+   set(SPM_INSTALLTARGETS sentencepiece sentencepiece_train)
+   set_target_properties(sentencepiece sentencepiece_train PROPERTIES SOVERSION 0 VERSION 0.0.0)
+-  set_target_properties(sentencepiece PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
+-  set_target_properties(sentencepiece_train PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
    if (MSVC)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX "_import.lib")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX "_import.lib")
