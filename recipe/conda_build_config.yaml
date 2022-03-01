@@ -4,3 +4,9 @@ cxx_compiler:                  # [win]
   - vs2019                     # [win]
 abseil_cpp:                    # [win or osx]
  - '20211102.0'                # [win or osx]
+
+channel_targets:
+  - conda-forge sentencepiece_dev
+
+channel_sources:
+  - conda-forge/label/abseil_dev,conda-forge
