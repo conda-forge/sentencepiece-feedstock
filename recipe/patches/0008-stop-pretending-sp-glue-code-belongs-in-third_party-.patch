@@ -1,4 +1,4 @@
-From c316e3a6c889ac551bed2325d8bd7e2907179d09 Mon Sep 17 00:00:00 2001
+From ae50db72b0a3bc568dcae4b8192e48bf90ec9222 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
@@ -1695,5 +1695,5 @@ index 366810f..da522e4 100644
      auto output = filesystem::NewWritableFile(input_file);
      for (const auto &line : input) {
 -- 
-2.32.0.windows.2
+2.35.1.windows.2
 

@@ -1,4 +1,4 @@
-From b56e6aa714968cc6d4116e9fef929894b4391981 Mon Sep 17 00:00:00 2001
+From 565690b66580734af7de6f69f64b0bb90932262c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 10:05:39 +1100
 Subject: [PATCH 7/9] ACTUALLY use external absl
@@ -880,5 +880,5 @@ index c4a8bc6..366810f 100644
  #include "word_model_trainer.h"
  
 -- 
-2.32.0.windows.2
+2.35.1.windows.2
 
