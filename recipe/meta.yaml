@@ -18,6 +18,8 @@ source:
     # without this patch, either linux gets $PREFIX/lib64
     # or CMAKE_INSTALL_LIBDIR won't work correctly
     - patches/0004-fix-libdir.patch
+    # use C++17; needs to match standard with which abseil-cpp was compiled
+    - patches/0005-use-C-17.patch
     # patch CMakelists to patch generated protobuf-sources,
     # using $RECIPE_DIR/patch_generated_proto.patch
     - patches/0006-patch-generated-protobuf-sources.patch

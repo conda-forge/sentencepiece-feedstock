@@ -1,4 +1,4 @@
-From ae50db72b0a3bc568dcae4b8192e48bf90ec9222 Mon Sep 17 00:00:00 2001
+From 48fef1538197749b36e592cd7aa843972a16d8be Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
