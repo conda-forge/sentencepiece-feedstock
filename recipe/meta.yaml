@@ -30,6 +30,8 @@ source:
     - patches/0008-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
     # debug windows linker errors
     - patches/0009-debug-linker-errors.patch
+    # missing headers?!
+    - patches/0010-make-sure-relevant-abseil-headers-are-included.patch
 
 build:
   number: 0

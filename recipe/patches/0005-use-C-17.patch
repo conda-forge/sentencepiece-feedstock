@@ -1,7 +1,7 @@
 From 550028cdaef3caba61b9057c37ec7af3f5ae8b53 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 9 Feb 2022 00:42:22 +1100
-Subject: [PATCH 5/9] use C++17
+Subject: [PATCH 05/10] use C++17
 
 ---
  CMakeLists.txt  | 2 +-

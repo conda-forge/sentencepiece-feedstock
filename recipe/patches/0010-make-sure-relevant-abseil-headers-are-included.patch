@@ -1,0 +1,25 @@
+From 1d2c6e4a7c12bb2efcc9bff7b254595d50ae8152 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Tue, 8 Mar 2022 10:24:16 +1100
+Subject: [PATCH 10/10] make sure relevant abseil-headers are included
+
+---
+ src/model_interface.h | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/model_interface.h b/src/model_interface.h
+index 66ca91e..690699d 100644
+--- a/src/model_interface.h
++++ b/src/model_interface.h
+@@ -25,6 +25,8 @@
+ #include "normalizer.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_processor.h"
++#include "absl/base/attributes.h"
++#include "absl/base/config.h"
+ #include "absl/container/flat_hash_map.h"
+ #include "absl/strings/string_view.h"
+ #include "third_party/darts_clone/darts.h"
+-- 
+2.35.1.windows.2
+
