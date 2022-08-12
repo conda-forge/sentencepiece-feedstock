@@ -1,7 +1,7 @@
 From 746a6268e82d978645e6e29e7cf91013798e6a46 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
-Subject: [PATCH 8/8] stop pretending sp glue code belongs in third_party/absl
+Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
 
 ---
  src/CMakeLists.txt                      |   4 +-
