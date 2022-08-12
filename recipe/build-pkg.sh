@@ -3,5 +3,4 @@
 set -ex
 
 cd $SRC_DIR/python
-${PYTHON} setup.py build
-${PYTHON} setup.py install
+$PYTHON -m pip install --no-deps --ignore-installed -v .
