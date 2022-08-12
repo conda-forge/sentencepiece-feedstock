@@ -42,10 +42,10 @@ outputs:
         - libsentencepiece ={{ version }}
     requirements:
       build:
-        - cmake
         - {{ compiler('cxx') }}
+        - cmake
         - gperftools   # [unix]
-        - make
+        - ninja
         - pkg-config
       host:
         - libabseil
