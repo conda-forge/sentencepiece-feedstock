@@ -1,7 +1,7 @@
 {% set version = "0.1.96" %}
 
 package:
-  name: sentencepiece
+  name: sentencepiece-split
   version: {{ version }}
 
 source:
@@ -13,34 +13,59 @@ build:
 
 requirements:
   build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - cmake
     - {{ compiler('cxx') }}
-    - gperftools  # [unix]
-    - make
-    - pkg-config
-  host:
-    - pip
-    - python
-  run:
-    - python
 
-test:
-  imports:
-    - sentencepiece
-  requires:
-    - pip
-    - pytest
-  source_files:
-    - python/test
-    - data
-  commands:
-    - pip check
-    - spm_export_vocab --help  # [linux]
-    - spm_normalize --help     # [linux]
-    # upstream test suite expects to be run from PKG_ROOT/python
-    - cd python && pytest test
+outputs:
+  - name: libsentencepiece
+    script: build-lib.sh   # [unix]
+    script: build-lib.bat  # [win]
+    requirements:
+      build:
+        - cmake
+        - {{ compiler('cxx') }}
+        - gperftools  # [unix]
+        - make
+        - pkg-config
+      host:
+        - abseil-cpp
+        - libprotobuf
+        - pthreads-win32  # [win]
+
+  - name: sentencepiece
+    script: build-pkg.sh   # [unix]
+    script: build-pkg.bat  # [win]
+    requirements:
+      build:
+        - python                                 # [build_platform != target_platform]
+        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+        - cmake
+        - {{ compiler('cxx') }}
+        - gperftools  # [unix]
+        - make
+        - pkg-config
+      host:
+        - pip
+        - python
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+      run:
+        - python
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+
+    test:
+      imports:
+        - sentencepiece
+      requires:
+        - pip
+        - pytest
+      source_files:
+        - python/test
+        - data
+      commands:
+        - pip check
+        - spm_export_vocab --help  # [linux]
+        - spm_normalize --help     # [linux]
+        # upstream test suite expects to be run from PKG_ROOT/python
+        - cd python && pytest test
 
 about:
   home: "https://github.com/google/sentencepiece/"
@@ -67,3 +92,4 @@ extra:
     - ndmaxar
     - oblute
     - h-vetinari
+  feedstock-name: sentencepiece
