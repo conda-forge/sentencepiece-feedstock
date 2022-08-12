@@ -7,6 +7,20 @@ package:
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
   sha256: 5198f31c3bb25e685e9e68355a3bf67a1db23c9e8bdccc33dc015f496a44df7a
+  patches:
+    # trying to build both static & shared build seems to break on OSX
+    - patches/0001-do-not-mix-static-shared-builds.patch
+    # unvendor abseil & protobuf-lite
+    - patches/0002-do-not-build-vendored-abseil-libprotobuf-lite.patch
+    # avoid installing into $PREFIX/lib64; make sure pkg-config template is filled correctly
+    - patches/0003-consistently-use-absolute-paths-for-CMAKE_INSTALL_-D.patch
+    # use C++17; needs to match standard with which libabseil was compiled
+    - patches/0004-use-C-17.patch
+    # upstream sources still directly include third_party/absl...
+    - patches/0005-ACTUALLY-use-external-absl.patch
+    # upstream carries its own glue code under third_party/absl/flags;
+    # move it to the sentencepiece sources
+    - patches/0006-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
 
 build:
   number: 1

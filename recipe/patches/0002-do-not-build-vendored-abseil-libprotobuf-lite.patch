@@ -1,0 +1,77 @@
+From 2debcc7d06e8e1c1a0f0d584089745427c051fe8 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Thu, 2 Dec 2021 10:05:12 +1100
+Subject: [PATCH 2/6] do not build vendored abseil & libprotobuf-lite
+
+---
+ CMakeLists.txt             | 6 +++---
+ sentencepiece.pc.in        | 2 +-
+ src/CMakeLists.txt         | 5 +++++
+ third_party/CMakeLists.txt | 5 +----
+ 4 files changed, 10 insertions(+), 8 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a3870cb..62c3b09 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -53,9 +53,9 @@ endif()
+ set(GNUCXX_STD_SUPPORT_VERSION "4.3")
+ 
+ if (SPM_USE_BUILTIN_PROTOBUF)
+-  set(libprotobuf_lite "")
++  set(libprotobuf "")
+ else()
+-  set(libprotobuf_lite "-lprotobuf-lite")
++  set(libprotobuf "-lprotobuf")
+ endif()
+ 
+ if (MSVC)
+@@ -104,7 +104,7 @@ if (SPM_BUILD_TEST)
+ endif()
+ 
+ if (SPM_USE_EXTERNAL_ABSL)
+- add_subdirectory(third_party/abseil-cpp)
++ find_package(absl REQUIRED)
+ endif()
+ 
+ add_subdirectory(src)
+diff --git a/sentencepiece.pc.in b/sentencepiece.pc.in
+index ac7fef6..cc9bf78 100644
+--- a/sentencepiece.pc.in
++++ b/sentencepiece.pc.in
+@@ -6,5 +6,5 @@ includedir=@includedir@
+ Name: @PROJECT_NAME@
+ Description: Unsupervised text tokenizer and detokenizer for Neural Network-based text generation.
+ Version: @PROJECT_VERSION@
+-Libs: -L${libdir} -lsentencepiece -lsentencepiece_train @libprotobuf_lite@ @pkgconfiglibs@
++Libs: -L${libdir} -lsentencepiece -lsentencepiece_train @libprotobuf@ @pkgconfiglibs@
+ Cflags: -I${includedir} @pkgconfigcflags@
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 49fcdbb..418b963 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -70,6 +70,11 @@ if (SPM_USE_BUILTIN_PROTOBUF)
+   include_directories(builtin_pb)
+ else()
+   find_package(Protobuf REQUIRED)
++  if (MSVC)
++   add_definitions("/DPROTOBUF_USE_DLLS")
++  else()
++   add_definitions("-DPROTOBUF_USE_DLLS")
++  endif()
+   include_directories(${Protobuf_INCLUDE_DIRS})
+   protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
+   protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
+diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
+index d00ecba..3096702 100644
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -1,4 +1 @@
+-include_directories(absl/strings darts_clone esaxx protobuf-lite)
+-
+-
+-
++include_directories(darts_clone esaxx)
+-- 
+2.38.1.windows.1
+
