@@ -26,11 +26,9 @@ outputs:
         - libsentencepiece ={{ version }}
     requirements:
       build:
-        - cmake
         - {{ compiler('cxx') }}
-        - gperftools  # [unix]
-        - make
-        - pkg-config
+        - cmake
+        - ninja
       host:
         - libabseil
         - libprotobuf
