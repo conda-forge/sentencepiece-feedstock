@@ -35,7 +35,7 @@ outputs:
         - make
         - pkg-config
       host:
-        - abseil-cpp
+        - libabseil
         - libprotobuf     # [build_platform == target_platform]
         - pthreads-win32  # [win]
 
