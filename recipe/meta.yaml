@@ -7,6 +7,19 @@ package:
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
   sha256: 5198f31c3bb25e685e9e68355a3bf67a1db23c9e8bdccc33dc015f496a44df7a
+  patches:
+    # trying to build both static & shared build seems to break on OSX
+    - patches/0001-do-not-mix-static-shared-builds.patch
+    # unvendor abseil
+    - patches/0002-do-not-build-vendored-abseil.patch
+    # use our own version of protobuf; for osx-arm, we cannot do that, as
+    # calling protoc fails in cross-compilation due to the wrong CPU
+    - patches/0003-do-not-build-vendored-libprotobuf-lite.patch  # [build_platform == target_platform]
+    # without this patch, either linux gets $PREFIX/lib64
+    # or CMAKE_INSTALL_LIBDIR won't work correctly
+    - patches/0004-fix-libdir.patch
+    # use C++17; needs to match standard with which libabseil was compiled
+    - patches/0005-use-C-17.patch
 
 build:
   number: 2
