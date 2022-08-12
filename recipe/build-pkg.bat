@@ -1,7 +1,5 @@
 @echo on
 
 cd %SRC_DIR%\python
-%PYTHON% setup.py build
-IF %ERRORLEVEL% NEQ 0 exit 1
-%PYTHON% setup.py install
+%PYTHON% -m pip install --no-deps --ignore-installed -v .
 IF %ERRORLEVEL% NEQ 0 exit 1
