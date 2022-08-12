@@ -32,7 +32,7 @@ outputs:
         - make
         - pkg-config
       host:
-        - abseil-cpp
+        - libabseil
         - libprotobuf
         - pthreads-win32  # [win]
 
