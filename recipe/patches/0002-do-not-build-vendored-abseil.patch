@@ -1,0 +1,36 @@
+From fa34b0a54f70e4d3832e67c7d080789fe16de698 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Fri, 31 Dec 2021 14:02:04 +1100
+Subject: [PATCH 2/5] do not build vendored abseil
+
+---
+ CMakeLists.txt             | 2 +-
+ third_party/CMakeLists.txt | 5 +----
+ 2 files changed, 2 insertions(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index a3870cb..ab634b4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -104,7 +104,7 @@ if (SPM_BUILD_TEST)
+ endif()
+ 
+ if (SPM_USE_EXTERNAL_ABSL)
+- add_subdirectory(third_party/abseil-cpp)
++ find_package(absl REQUIRED)
+ endif()
+ 
+ add_subdirectory(src)
+diff --git a/third_party/CMakeLists.txt b/third_party/CMakeLists.txt
+index d00ecba..39b27b9 100644
+--- a/third_party/CMakeLists.txt
++++ b/third_party/CMakeLists.txt
+@@ -1,4 +1 @@
+-include_directories(absl/strings darts_clone esaxx protobuf-lite)
+-
+-
+-
++include_directories(darts_clone esaxx protobuf-lite)
+-- 
+2.37.0.windows.1
+
