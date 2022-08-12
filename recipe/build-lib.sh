@@ -27,7 +27,3 @@ make install
 if [[ "${target_platform}" == linux-* ]]; then
     ldconfig -v -N
 fi
-
-cd $SRC_DIR/python
-${PYTHON} setup.py build
-${PYTHON} setup.py install
