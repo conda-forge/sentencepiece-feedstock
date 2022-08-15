@@ -15,6 +15,8 @@ index 82f23ec..b9be8c2 100644
    if (MSVC)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX "_import.lib")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX "_import.lib")
++    target_link_options(sentencepiece PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
++    target_link_options(sentencepiece_train PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
 +    set(MSVC_C_CXX_FLAGS
 +      CMAKE_C_FLAGS_DEBUG
 +      CMAKE_C_FLAGS_MINSIZEREL
