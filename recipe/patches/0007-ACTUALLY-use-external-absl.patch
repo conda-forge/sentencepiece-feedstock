@@ -1,4 +1,4 @@
-From a156d32299adf6613ba69a70612e34e6e0d5ee60 Mon Sep 17 00:00:00 2001
+From b5b81df21d8bd9ddc0ee68143aab8e3745c1f66d Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 10:05:39 +1100
 Subject: [PATCH 7/9] ACTUALLY use external absl
@@ -60,10 +60,10 @@ Subject: [PATCH 7/9] ACTUALLY use external absl
  53 files changed, 103 insertions(+), 133 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index ce82588..1c5f8d5 100644
+index 75c60f7..296e278 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -112,12 +112,6 @@ endif()
+@@ -114,12 +114,6 @@ endif()
  include_directories(${CMAKE_CURRENT_BINARY_DIR})
  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third_party)
  

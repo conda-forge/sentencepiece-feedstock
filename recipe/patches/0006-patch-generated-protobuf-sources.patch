@@ -1,17 +1,17 @@
-From 88ffb4f4097b7409560aaa3e45c8943e6720c386 Mon Sep 17 00:00:00 2001
+From c4d167d0dd6b6ef3d959f9f89eb168d2ea07571a Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/9] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 27 +++++++++++++++++++++++++++
- 1 file changed, 27 insertions(+)
+ src/CMakeLists.txt | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..ce82588 100644
+index 418b963..75c60f7 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -78,8 +78,35 @@ else()
+@@ -78,8 +78,37 @@ else()
    include_directories(${Protobuf_INCLUDE_DIRS})
    protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
@@ -35,7 +35,9 @@ index 418b963..ce82588 100644
 +                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
 +                               && type sentencepiece_model.pb.cc
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.cc"
++                               && dir .
 +                               && dir CMakeFiles
++                               && dir CMakeFiles\sentencepiece.dir
 +                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
 +                               && type sentencepiece.vcxproj
 +                               && echo "conda-forge build debug: end sentencepiece.vcxproj"
