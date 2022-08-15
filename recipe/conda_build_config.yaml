@@ -1,5 +1,7 @@
 libabseil:
   - '20220623.0'
+libprotobuf:
+  - '3.19'
 channel_targets:
   - conda-forge sentencepiece_dev
 channel_sources:
