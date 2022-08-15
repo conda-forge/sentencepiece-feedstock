@@ -1,17 +1,17 @@
-From 2057fa0338edd08f5dc8b1464a8ce0b87a1120fe Mon Sep 17 00:00:00 2001
+From 2d3355912cb6a5bb8337916954995bc6b0c95aff Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/9] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+ src/CMakeLists.txt | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..1af1aaf 100644
+index 418b963..28dfc7f 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -78,8 +78,33 @@ else()
+@@ -78,8 +78,34 @@ else()
    include_directories(${Protobuf_INCLUDE_DIRS})
    protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
@@ -27,7 +27,8 @@ index 418b963..1af1aaf 100644
 +    # as that's when protobuf_generate_cpp actually produces the sources;
 +    # use DEPENDS to ensure we run afer protobuf
 +    add_custom_command(OUTPUT sentencepiece_model_patched.pb.cc
-+                       DEPENDS sentencepiece_model.pb.h sentencepiece_model.pb.cc
++                       DEPENDS sentencepiece.vcxproj
++                               sentencepiece_model.pb.h sentencepiece_model.pb.cc
 +                       COMMAND echo "conda-forge build debug: begin sentencepiece_model.pb.h"
 +                               && type sentencepiece_model.pb.h
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.h"
