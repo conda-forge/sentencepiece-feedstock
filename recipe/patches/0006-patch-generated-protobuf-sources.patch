@@ -1,4 +1,4 @@
-From c4d167d0dd6b6ef3d959f9f89eb168d2ea07571a Mon Sep 17 00:00:00 2001
+From a5e6c739438f4cb97c04272b90f5bfcf33529aca Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/9] patch generated protobuf sources
@@ -8,7 +8,7 @@ Subject: [PATCH 6/9] patch generated protobuf sources
  1 file changed, 29 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..75c60f7 100644
+index 418b963..c7b66b7 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -78,8 +78,37 @@ else()
@@ -37,7 +37,7 @@ index 418b963..75c60f7 100644
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.cc"
 +                               && dir .
 +                               && dir CMakeFiles
-+                               && dir CMakeFiles\sentencepiece.dir
++                               && dir CMakeFiles\\sentencepiece.dir
 +                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
 +                               && type sentencepiece.vcxproj
 +                               && echo "conda-forge build debug: end sentencepiece.vcxproj"
