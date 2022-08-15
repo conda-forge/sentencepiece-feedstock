@@ -1,21 +1,22 @@
-From e7fd2e0d28cbcd9d95184c9a9c3a9e61cb0dcd99 Mon Sep 17 00:00:00 2001
+From 2057fa0338edd08f5dc8b1464a8ce0b87a1120fe Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/9] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+ src/CMakeLists.txt | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..7d975d3 100644
+index 418b963..1af1aaf 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -78,8 +78,29 @@ else()
+@@ -78,8 +78,33 @@ else()
    include_directories(${Protobuf_INCLUDE_DIRS})
    protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
-+  set_source_files_properties(sentencepiece_model.pb.h
++  set_source_files_properties(sentencepiece.vcxproj
++                              sentencepiece_model.pb.h
 +                              sentencepiece_model.pb.cc
 +                              PROPERTIES GENERATED TRUE)
    set(PROTOBUF_LITE_SRCS "")
@@ -32,7 +33,10 @@ index 418b963..7d975d3 100644
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.h"
 +                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
 +                               && type sentencepiece_model.pb.cc
-+                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
++                               && echo "conda-forge build debug: end sentencepiece_model.pb.cc"
++                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
++                               && type sentencepiece.vcxproj
++                               && echo "conda-forge build debug: end sentencepiece.vcxproj"
 +                               && patch -Np1 -i "$ENV{RECIPE_DIR}\\patch_generated_proto.patch" --binary
 +                               && move sentencepiece_model.pb.cc sentencepiece_model_patched.pb.cc)
 +    # update name so that correct build order is maintained; don't change header name
