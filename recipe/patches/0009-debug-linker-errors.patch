@@ -1,4 +1,4 @@
-From 44411db727ca610d3c4d863f57036ded48e28023 Mon Sep 17 00:00:00 2001
+From a9d4cda89f8eb9a13e37a8e2a74908d615c23c29 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 16:07:24 +1100
 Subject: [PATCH 9/9] debug linker errors
@@ -8,7 +8,7 @@ Subject: [PATCH 9/9] debug linker errors
  1 file changed, 17 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 1658da7..3c6e853 100644
+index 0ed702e..818dfa9 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -256,6 +256,23 @@ if (SPM_ENABLE_SHARED)

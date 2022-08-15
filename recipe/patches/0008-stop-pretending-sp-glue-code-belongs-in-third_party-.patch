@@ -1,4 +1,4 @@
-From 2205ab669aeb42af7f4da153b0bfd56014fb51a5 Mon Sep 17 00:00:00 2001
+From f9083e23768e9f54c426cf806eec90d295e3436b Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
@@ -37,7 +37,7 @@ Subject: [PATCH 8/9] stop pretending sp glue code belongs in third_party/absl
  rename {third_party/absl/flags => src}/parse.h (79%)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 5df4957..1658da7 100644
+index 1c5f8d5..0ed702e 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -13,7 +13,9 @@
