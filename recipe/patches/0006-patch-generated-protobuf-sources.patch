@@ -1,22 +1,21 @@
-From a5e6c739438f4cb97c04272b90f5bfcf33529aca Mon Sep 17 00:00:00 2001
+From ef744740c0421163e134e576be7a261a385d3c1c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 13 Feb 2022 15:45:51 +1100
 Subject: [PATCH 6/9] patch generated protobuf sources
 
 ---
- src/CMakeLists.txt | 29 +++++++++++++++++++++++++++++
- 1 file changed, 29 insertions(+)
+ src/CMakeLists.txt | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 418b963..c7b66b7 100644
+index 418b963..043f9c0 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -78,8 +78,37 @@ else()
+@@ -78,8 +78,29 @@ else()
    include_directories(${Protobuf_INCLUDE_DIRS})
    protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS sentencepiece.proto)
    protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS sentencepiece_model.proto)
-+  set_source_files_properties(sentencepiece.vcxproj
-+                              sentencepiece_model.pb.h
++  set_source_files_properties(sentencepiece_model.pb.h
 +                              sentencepiece_model.pb.cc
 +                              PROPERTIES GENERATED TRUE)
    set(PROTOBUF_LITE_SRCS "")
@@ -27,20 +26,13 @@ index 418b963..c7b66b7 100644
 +    # as that's when protobuf_generate_cpp actually produces the sources;
 +    # use DEPENDS to ensure we run afer protobuf
 +    add_custom_command(OUTPUT sentencepiece_model_patched.pb.cc
-+                       DEPENDS sentencepiece.vcxproj
-+                               sentencepiece_model.pb.h sentencepiece_model.pb.cc
++                       DEPENDS sentencepiece_model.pb.h sentencepiece_model.pb.cc
 +                       COMMAND echo "conda-forge build debug: begin sentencepiece_model.pb.h"
 +                               && type sentencepiece_model.pb.h
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.h"
 +                               && echo "conda-forge build debug: begin sentencepiece_model.pb.cc"
 +                               && type sentencepiece_model.pb.cc
 +                               && echo "conda-forge build debug: end sentencepiece_model.pb.cc"
-+                               && dir .
-+                               && dir CMakeFiles
-+                               && dir CMakeFiles\\sentencepiece.dir
-+                               && echo "conda-forge build debug: begin sentencepiece.vcxproj"
-+                               && type sentencepiece.vcxproj
-+                               && echo "conda-forge build debug: end sentencepiece.vcxproj"
 +                               && patch -Np1 -i "$ENV{RECIPE_DIR}\\patch_generated_proto.patch" --binary
 +                               && move sentencepiece_model.pb.cc sentencepiece_model_patched.pb.cc)
 +    # update name so that correct build order is maintained; don't change header name
