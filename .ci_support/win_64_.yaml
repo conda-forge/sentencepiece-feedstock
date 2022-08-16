@@ -3,7 +3,7 @@ channel_sources:
 channel_targets:
 - conda-forge sentencepiece_dev
 cxx_compiler:
-- vs2017
+- vs2019
 libabseil:
 - '20220623.0'
 libprotobuf:
