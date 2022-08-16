@@ -1,17 +1,17 @@
-From ea760d7b473f73d4efaf7b8834cdff3320f1e295 Mon Sep 17 00:00:00 2001
+From de8cd81cceadf0e2d6e9e81bcedd01f63bd2bb29 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 16:07:24 +1100
 Subject: [PATCH 9/9] debug linker errors
 
 ---
- src/CMakeLists.txt | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
+ src/CMakeLists.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 626215d..0da87d4 100644
+index 626215d..eb8b319 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -250,6 +250,23 @@ if (SPM_ENABLE_SHARED)
+@@ -250,6 +250,25 @@ if (SPM_ENABLE_SHARED)
    if (MSVC)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX "_import.lib")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX "_import.lib")
@@ -30,6 +30,8 @@ index 626215d..0da87d4 100644
 +    foreach(flag ${MSVC_C_CXX_FLAGS})
 +      if(${flag} MATCHES "/MT")
 +        string(REGEX REPLACE "/MT" "/MD" ${flag} "${${flag}}")
++        # also replace possible debug flags
++        string(REGEX REPLACE "/MDd" "/MD" ${flag} "${${flag}}")
 +      endif()
 +    endforeach()
    elseif (MINGW)
