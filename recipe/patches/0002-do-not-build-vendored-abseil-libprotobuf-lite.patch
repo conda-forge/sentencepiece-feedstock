@@ -1,7 +1,7 @@
 From 2debcc7d06e8e1c1a0f0d584089745427c051fe8 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 10:05:12 +1100
-Subject: [PATCH 2/6] do not build vendored abseil & libprotobuf-lite
+Subject: [PATCH 2/7] do not build vendored abseil & libprotobuf-lite
 
 ---
  CMakeLists.txt             | 6 +++---

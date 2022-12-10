@@ -21,6 +21,8 @@ source:
     # upstream carries its own glue code under third_party/absl/flags;
     # move it to the sentencepiece sources
     - patches/0006-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
+    # ensure python bindings link to correct libs on windows
+    - patches/0007-point-to-our-libs-headers-for-windows-in-setup.py.patch
 
 build:
   number: 1
@@ -88,6 +90,8 @@ outputs:
         - python
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - libprotobuf
+        # host deps of static libsentencepiece leak to consumers
+        - libabseil    # [win]
       run:
         - python
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
