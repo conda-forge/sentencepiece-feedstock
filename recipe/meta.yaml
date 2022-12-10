@@ -60,7 +60,7 @@ outputs:
         - ninja
       host:
         - libabseil
-        - libprotobuf
+        - libprotobuf     # [build_platform == target_platform]
         - pthreads-win32  # [win]
 
     test:
