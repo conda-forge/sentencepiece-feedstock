@@ -20,6 +20,8 @@ source:
     - patches/0004-fix-libdir.patch
     # use C++17; needs to match standard with which libabseil was compiled
     - patches/0005-use-C-17.patch
+    # upstream sources still directly include third_party/absl...
+    - patches/0007-ACTUALLY-use-external-absl.patch
 
 build:
   number: 2
