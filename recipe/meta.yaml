@@ -93,6 +93,7 @@ outputs:
         - python
         - pip
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        - libprotobuf
       run:
         - python
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
