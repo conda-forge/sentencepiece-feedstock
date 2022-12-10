@@ -20,6 +20,9 @@ source:
     - patches/0004-fix-libdir.patch
     # use C++17; needs to match standard with which libabseil was compiled
     - patches/0005-use-C-17.patch
+    # patch CMakelists to patch generated protobuf-sources,
+    # using $RECIPE_DIR/patch_generated_proto.patch
+    - patches/0006-patch-generated-protobuf-sources.patch
     # upstream sources still directly include third_party/absl...
     - patches/0007-ACTUALLY-use-external-absl.patch
     # upstream carries its own glue code under third_party/absl/flags;
