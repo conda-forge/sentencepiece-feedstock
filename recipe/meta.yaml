@@ -40,6 +40,7 @@ outputs:
         - libsentencepiece ={{ version }}
     requirements:
       build:
+        - libprotobuf     # [build_platform != target_platform]
         - {{ compiler('cxx') }}
         - cmake
         - ninja
