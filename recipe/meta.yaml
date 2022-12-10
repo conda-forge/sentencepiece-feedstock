@@ -55,13 +55,12 @@ outputs:
     requirements:
       build:
         - {{ compiler('cxx') }}
+        - libprotobuf     # [build_platform != target_platform]
         - cmake
-        - gperftools   # [unix]
         - ninja
-        - pkg-config
       host:
         - libabseil
-        - libprotobuf     # [build_platform == target_platform]
+        - libprotobuf
         - pthreads-win32  # [win]
 
     test:

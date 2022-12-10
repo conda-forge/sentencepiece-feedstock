@@ -4,14 +4,7 @@ set -ex
 # we're trying to avoid the third_party sources, and not building them;
 # to avoid weird errors if those sources got picked up nevertheless, delete them
 rm -rf third_party/absl
-if [[ "${target_platform}" != "osx-arm64" ]]; then
-    rm -rf third_party/protobuf-lite
-    export CMAKE_EXTRA="-DSPM_USE_BUILTIN_PROTOBUF=OFF"
-else
-    # building against external protobuf needs to call protoc,
-    # which fails with bad CPU type in cross-compilation
-    export CMAKE_EXTRA=""
-fi
+rm -rf third_party/protobuf-lite
 
 mkdir build
 cd build
@@ -28,7 +21,7 @@ cmake -G "Ninja" \
     -DSPM_ENABLE_SHARED=ON \
     -DSPM_ENABLE_TCMALLOC=OFF \
     -DSPM_USE_EXTERNAL_ABSL=ON \
-    $CMAKE_EXTRA \
+    -DSPM_USE_BUILTIN_PROTOBUF=OFF \
     ..
 
 cmake --build .
