@@ -98,7 +98,7 @@ outputs:
         - python
         - pip
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
-        - libprotobuf
+        - libprotobuf  # [linux]
       run:
         - python
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
