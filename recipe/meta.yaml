@@ -22,6 +22,8 @@ source:
     - patches/0005-use-C-17.patch
     # upstream sources still directly include third_party/absl...
     - patches/0007-ACTUALLY-use-external-absl.patch
+    # unequivocally point to shared runtime library
+    - patches/0009-debug-linker-errors.patch
 
 build:
   number: 2

@@ -1,7 +1,7 @@
-From 471416a80b357ef7d42ff10207e904c64db63d44 Mon Sep 17 00:00:00 2001
+From d4a8f06785846a67f79098c1821f9dde51107c00 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 10:05:39 +1100
-Subject: [PATCH 7/8] ACTUALLY use external absl
+Subject: [PATCH 07/10] ACTUALLY use external absl
 
 ---
  src/CMakeLists.txt                    |  6 ------
@@ -60,10 +60,10 @@ Subject: [PATCH 7/8] ACTUALLY use external absl
  53 files changed, 103 insertions(+), 133 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 7de5e32..e446b49 100644
+index 043f9c0..acd968e 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -104,12 +104,6 @@ endif()
+@@ -106,12 +106,6 @@ endif()
  include_directories(${CMAKE_CURRENT_BINARY_DIR})
  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third_party)
  
@@ -880,5 +880,5 @@ index c4a8bc6..366810f 100644
  #include "word_model_trainer.h"
  
 -- 
-2.37.0.windows.1
+2.38.1.windows.1
 

@@ -1,0 +1,42 @@
+From de8cd81cceadf0e2d6e9e81bcedd01f63bd2bb29 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 21 Feb 2022 16:07:24 +1100
+Subject: [PATCH 09/10] debug linker errors
+
+---
+ src/CMakeLists.txt | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 626215d..eb8b319 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -250,6 +250,25 @@ if (SPM_ENABLE_SHARED)
+   if (MSVC)
+     set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX "_import.lib")
+     set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX "_import.lib")
++    target_link_options(sentencepiece PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
++    target_link_options(sentencepiece_train PUBLIC "/verbose" "/NODEFAULTLIB:libcmt.lib libcpmt.lib")
++    set(MSVC_C_CXX_FLAGS
++      CMAKE_C_FLAGS_DEBUG
++      CMAKE_C_FLAGS_MINSIZEREL
++      CMAKE_C_FLAGS_RELEASE
++      CMAKE_C_FLAGS_RELWITHDEBINFO
++      CMAKE_CXX_FLAGS_DEBUG
++      CMAKE_CXX_FLAGS_MINSIZEREL
++      CMAKE_CXX_FLAGS_RELEASE
++      CMAKE_CXX_FLAGS_RELWITHDEBINFO
++    )
++    foreach(flag ${MSVC_C_CXX_FLAGS})
++      if(${flag} MATCHES "/MT")
++        string(REGEX REPLACE "/MT" "/MD" ${flag} "${${flag}}")
++        # also replace possible debug flags
++        string(REGEX REPLACE "/MDd" "/MD" ${flag} "${${flag}}")
++      endif()
++    endforeach()
+   elseif (MINGW)
+     set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX ".dll.a")
+     set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX ".dll.a")
+-- 
+2.38.1.windows.1
+

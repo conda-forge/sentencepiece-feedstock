@@ -1,7 +1,7 @@
 From 550028cdaef3caba61b9057c37ec7af3f5ae8b53 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 9 Feb 2022 00:42:22 +1100
-Subject: [PATCH 5/8] use C++17
+Subject: [PATCH 05/10] use C++17
 
 ---
  CMakeLists.txt  | 2 +-
@@ -35,5 +35,5 @@ index 79f2691..8e17c67 100755
      # See: https://github.com/neulab/xnmt/issues/199
      if sys.platform == 'darwin':
 -- 
-2.37.0.windows.1
+2.38.1.windows.1
 
