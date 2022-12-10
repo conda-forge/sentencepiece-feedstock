@@ -1,0 +1,1700 @@
+From 0167bac2f4a7594e6b17628565632f5464b31af2 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 21 Feb 2022 12:50:47 +1100
+Subject: [PATCH 08/10] stop pretending sp glue code belongs in
+ third_party/absl
+
+---
+ src/CMakeLists.txt                      |   4 +-
+ src/bpe_model_trainer.cc                |   3 +-
+ src/bpe_model_trainer_test.cc           |  13 +--
+ src/builder_test.cc                     |  17 ++--
+ src/char_model_trainer_test.cc          |   7 +-
+ src/compile_charsmap_main.cc            |   6 +-
+ src/error.cc                            |   9 --
+ src/filesystem_test.cc                  |   7 +-
+ {third_party/absl/flags => src}/flag.cc |  22 ++--
+ {third_party/absl/flags => src}/flag.h  |  16 +--
+ src/init.h                              |  10 +-
+ src/init_test.cc                        |  61 +++++------
+ {third_party/absl/flags => src}/parse.h |  10 +-
+ src/sentencepiece_processor_test.cc     |  11 +-
+ src/sentencepiece_trainer_test.cc       |  29 +++---
+ src/spm_decode_main.cc                  |  44 ++++----
+ src/spm_encode_main.cc                  |  74 +++++++-------
+ src/spm_export_vocab_main.cc            |  18 ++--
+ src/spm_normalize_main.cc               |  44 ++++----
+ src/spm_train_main.cc                   | 130 ++++++++++++------------
+ src/test_main.cc                        |   7 +-
+ src/testharness.cc                      |   7 +-
+ src/testharness.h                       |   7 +-
+ src/trainer_interface_test.cc           |  11 +-
+ src/unigram_model_trainer_test.cc       |  11 +-
+ src/util_test.cc                        |   7 +-
+ src/word_model_trainer_test.cc          |   9 +-
+ 27 files changed, 300 insertions(+), 294 deletions(-)
+ rename {third_party/absl/flags => src}/flag.cc (94%)
+ rename {third_party/absl/flags => src}/flag.h (78%)
+ rename {third_party/absl/flags => src}/parse.h (79%)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index acd968e..626215d 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -13,7 +13,9 @@
+ # limitations under the License.!
+ 
+ if (SPM_USE_EXTERNAL_ABSL)
+-  set(ABSL_FLAGS_SRCS "")
++  # originally part of third_party/absl, but actually
++  # only relevant for sentencepiece; now moved.
++  set(ABSL_FLAGS_SRCS "flag.cc")
+   set(ABSL_STRINGS_SRCS "")
+   list(APPEND SPM_LIBS absl::strings)
+   list(APPEND SPM_LIBS absl::flags)
+diff --git a/src/bpe_model_trainer.cc b/src/bpe_model_trainer.cc
+index ae8983c..be78bef 100644
+--- a/src/bpe_model_trainer.cc
++++ b/src/bpe_model_trainer.cc
+@@ -18,8 +18,9 @@
+ #include <vector>
+ 
+ #include "bpe_model_trainer.h"
+-#include "absl/container/flat_hash_set.h"
++#include "flag.h"
+ #include "util.h"
++#include "absl/container/flat_hash_set.h"
+ 
+ namespace sentencepiece {
+ namespace bpe {
+diff --git a/src/bpe_model_trainer_test.cc b/src/bpe_model_trainer_test.cc
+index 2a43c3a..c5224ca 100644
+--- a/src/bpe_model_trainer_test.cc
++++ b/src/bpe_model_trainer_test.cc
+@@ -17,12 +17,13 @@
+ 
+ #include "bpe_model_trainer.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "sentencepiece_processor.h"
+ #include "sentencepiece_trainer.h"
+ #include "testharness.h"
++#include "util.h"
+ #include "absl/strings/str_cat.h"
+ #include "absl/strings/str_join.h"
+-#include "util.h"
+ 
+ namespace sentencepiece {
+ namespace bpe {
+@@ -35,9 +36,9 @@ std::string RunTrainer(
+     const std::vector<std::string> &input, int size,
+     const std::vector<std::string> &user_defined_symbols = {}) {
+   const std::string input_file =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "input");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "input");
+   const std::string model_prefix =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "model");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "model");
+   {
+     auto output = filesystem::NewWritableFile(input_file);
+     for (const auto &line : input) {
+@@ -93,13 +94,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
+ 
+ TEST(BPETrainerTest, EndToEndTest) {
+   const std::string input =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestInputData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestInputData);
+ 
+   ASSERT_TRUE(
+       SentencePieceTrainer::Train(
+           absl::StrCat(
+               "--model_prefix=",
+-              util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "tmp_model"),
++              util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "tmp_model"),
+               " --input=", input,
+               " --vocab_size=8000 --normalization_rule_name=identity"
+               " --model_type=bpe --control_symbols=<ctrl> "
+@@ -108,7 +109,7 @@ TEST(BPETrainerTest, EndToEndTest) {
+ 
+   SentencePieceProcessor sp;
+   ASSERT_TRUE(sp.Load(std::string(util::JoinPath(
+-                          absl::GetFlag(FLAGS_test_tmpdir), "tmp_model.model")))
++                          sentencepiece::GetFlag(FLAGS_test_tmpdir), "tmp_model.model")))
+                   .ok());
+   EXPECT_EQ(8000, sp.GetPieceSize());
+ 
+diff --git a/src/builder_test.cc b/src/builder_test.cc
+index 1dee5c7..ddd1d5f 100644
+--- a/src/builder_test.cc
++++ b/src/builder_test.cc
+@@ -15,11 +15,12 @@
+ #include "builder.h"
+ #include "common.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "normalizer.h"
+ #include "sentencepiece_trainer.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
+ 
+ namespace sentencepiece {
+ namespace normalizer {
+@@ -143,7 +144,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
+   Builder::CharsMap chars_map;
+   ASSERT_TRUE(
+       Builder::LoadCharsMap(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestInputData),
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestInputData),
+           &chars_map)
+           .ok());
+ 
+@@ -158,14 +159,14 @@ TEST(BuilderTest, LoadCharsMapTest) {
+ 
+   ASSERT_TRUE(
+       Builder::SaveCharsMap(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "output.tsv"),
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "output.tsv"),
+           chars_map)
+           .ok());
+ 
+   Builder::CharsMap saved_chars_map;
+   ASSERT_TRUE(
+       Builder::LoadCharsMap(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "output.tsv"),
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "output.tsv"),
+           &saved_chars_map)
+           .ok());
+   EXPECT_EQ(chars_map, saved_chars_map);
+@@ -180,7 +181,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
+ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
+   {
+     auto output = filesystem::NewWritableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test.tsv"));
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test.tsv"));
+     output->WriteLine("0061\t0041");
+     output->WriteLine("0062");
+     output->WriteLine("0063\t\t#foo=>bar");
+@@ -188,7 +189,7 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
+ 
+   Builder::CharsMap chars_map;
+   EXPECT_TRUE(Builder::LoadCharsMap(
+-                  util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test.tsv"),
++                  util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test.tsv"),
+                   &chars_map)
+                   .ok());
+ 
+@@ -199,14 +200,14 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
+ 
+   EXPECT_TRUE(
+       Builder::SaveCharsMap(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_out.tsv"),
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_out.tsv"),
+           chars_map)
+           .ok());
+ 
+   Builder::CharsMap new_chars_map;
+   EXPECT_TRUE(
+       Builder::LoadCharsMap(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_out.tsv"),
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_out.tsv"),
+           &new_chars_map)
+           .ok());
+   EXPECT_EQ(chars_map, new_chars_map);
+diff --git a/src/char_model_trainer_test.cc b/src/char_model_trainer_test.cc
+index e8b4979..ded903d 100644
+--- a/src/char_model_trainer_test.cc
++++ b/src/char_model_trainer_test.cc
+@@ -17,11 +17,12 @@
+ 
+ #include "char_model_trainer.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "sentencepiece_processor.h"
+ #include "testharness.h"
++#include "util.h"
+ #include "absl/strings/str_cat.h"
+ #include "absl/strings/str_join.h"
+-#include "util.h"
+ 
+ namespace sentencepiece {
+ namespace character {
+@@ -32,9 +33,9 @@ namespace {
+ 
+ std::string RunTrainer(const std::vector<std::string> &input, int size) {
+   const std::string input_file =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "input");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "input");
+   const std::string model_prefix =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "model");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "model");
+   {
+     auto output = filesystem::NewWritableFile(input_file);
+     for (const auto &line : input) {
+diff --git a/src/compile_charsmap_main.cc b/src/compile_charsmap_main.cc
+index 931028b..d0736ac 100644
+--- a/src/compile_charsmap_main.cc
++++ b/src/compile_charsmap_main.cc
+@@ -20,14 +20,14 @@
+ 
+ #include "builder.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "sentencepiece_processor.h"
+-#include "absl/flags/flag.h"
+ #include "absl/strings/string_view.h"
+ 
+ using sentencepiece::normalizer::Builder;
+ 
+-ABSL_FLAG(bool, output_precompiled_header, false,
++STPC_FLAG(bool, output_precompiled_header, false,
+           "make normalization_rule.h file");
+ 
+ namespace sentencepiece {
+@@ -180,7 +180,7 @@ int main(int argc, char **argv) {
+     CHECK_OK(Builder::SaveCharsMap(p.first + ".tsv", normalized_map));
+   }
+ 
+-  if (absl::GetFlag(FLAGS_output_precompiled_header)) {
++  if (sentencepiece::GetFlag(FLAGS_output_precompiled_header)) {
+     constexpr char kPrecompiledHeaderFileName[] = "normalization_rule.h";
+     auto output =
+         sentencepiece::filesystem::NewWritableFile(kPrecompiledHeaderFileName);
+diff --git a/src/error.cc b/src/error.cc
+index ab4675d..16eb68c 100644
+--- a/src/error.cc
++++ b/src/error.cc
+@@ -17,15 +17,6 @@
+ #include "common.h"
+ #include "sentencepiece_processor.h"
+ 
+-#ifdef _USE_EXTERNAL_ABSL
+-// Naive workaround to define minloglevel on external absl package.
+-// We want to define them in other cc file.
+-#include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
+-ABSL_FLAG(int32, minloglevel, 0,
+-          "Messages logged at a lower level than this don't actually.");
+-#endif
+-
+ namespace sentencepiece {
+ namespace error {
+ int gTestCounter = 0;
+diff --git a/src/filesystem_test.cc b/src/filesystem_test.cc
+index 39ece99..cd2eff0 100644
+--- a/src/filesystem_test.cc
++++ b/src/filesystem_test.cc
+@@ -13,9 +13,10 @@
+ // limitations under the License.!
+ 
+ #include "filesystem.h"
++#include "flag.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
+ 
+ namespace sentencepiece {
+ 
+@@ -28,7 +29,7 @@ TEST(UtilTest, FilesystemTest) {
+ 
+   {
+     auto output = filesystem::NewWritableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_file"));
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_file"));
+     for (size_t i = 0; i < kData.size(); ++i) {
+       output->WriteLine(kData[i]);
+     }
+@@ -36,7 +37,7 @@ TEST(UtilTest, FilesystemTest) {
+ 
+   {
+     auto input = filesystem::NewReadableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_file"));
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_file"));
+     std::string line;
+     for (size_t i = 0; i < kData.size(); ++i) {
+       EXPECT_TRUE(input->ReadLine(&line));
+diff --git a/third_party/absl/flags/flag.cc b/src/flag.cc
+similarity index 94%
+rename from third_party/absl/flags/flag.cc
+rename to src/flag.cc
+index e7ac841..bc2f181 100644
+--- a/third_party/absl/flags/flag.cc
++++ b/src/flag.cc
+@@ -12,25 +12,25 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#include "third_party/absl/flags/flag.h"
+-
+ #include <algorithm>
+ #include <iostream>
+ #include <map>
+ #include <sstream>
+ #include <string>
+ 
++#include "flag.h"
++
+ #include "config.h"
+-#include "src/common.h"
+-#include "src/util.h"
++#include "common.h"
++#include "util.h"
+ 
+-ABSL_FLAG(bool, help, false, "show help");
+-ABSL_FLAG(bool, version, false, "show version");
+-ABSL_FLAG(int, minloglevel, 0,
++STPC_FLAG(bool, help, false, "show help");
++STPC_FLAG(bool, version, false, "show version");
++STPC_FLAG(int, minloglevel, 0,
+           "Messages logged at a lower level than this don't actually get "
+           "logged anywhere");
+ 
+-namespace absl {
++namespace sentencepiece {
+ namespace internal {
+ namespace {
+ template <typename T>
+@@ -208,14 +208,14 @@ std::vector<char *> ParseCommandLine(int argc, char *argv[]) {
+     }
+   }
+ 
+-  if (absl::GetFlag(FLAGS_help)) {
++  if (sentencepiece::GetFlag(FLAGS_help)) {
+     std::cout << internal::PrintHelp(argv[0]);
+     sentencepiece::error::Exit(0);
+-  } else if (absl::GetFlag(FLAGS_version)) {
++  } else if (sentencepiece::GetFlag(FLAGS_version)) {
+     std::cout << PACKAGE_STRING << " " << VERSION << std::endl;
+     sentencepiece::error::Exit(0);
+   }
+ 
+   return output_args;
+ }
+-}  // namespace absl
++}  // namespace sentencepiece
+diff --git a/third_party/absl/flags/flag.h b/src/flag.h
+similarity index 78%
+rename from third_party/absl/flags/flag.h
+rename to src/flag.h
+index e540edf..c8a7dab 100644
+--- a/third_party/absl/flags/flag.h
++++ b/src/flag.h
+@@ -12,15 +12,15 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#ifndef ABSL_FLAGS_FLAG_H_
+-#define ABSL_FLAGS_FLAG_H_
++#ifndef SENTENCEPIECE_FLAG_H_
++#define SENTENCEPIECE_FLAG_H_
+ 
+ #include <functional>
+ #include <memory>
+ #include <string>
+ #include <vector>
+ 
+-namespace absl {
++namespace sentencepiece {
+ namespace internal {
+ struct FlagFunc;
+ 
+@@ -52,11 +52,11 @@ void SetFlag(Flag<T> *flag, const V &v) {
+   const T value(v);
+   flag->set_value(value);
+ }
+-}  // namespace absl
++}  // namespace sentencepiece
+ 
+-#define ABSL_FLAG(Type, name, defautl_value, help) \
+-  absl::Flag<Type> FLAGS_##name(#name, #Type, help, defautl_value);
++#define STPC_FLAG(Type, name, default_value, help) \
++  sentencepiece::Flag<Type> FLAGS_##name(#name, #Type, help, default_value);
+ 
+-#define ABSL_DECLARE_FLAG(Type, name) extern absl::Flag<Type> FLAGS_##name;
++#define STPC_DECLARE_FLAG(Type, name) extern sentencepiece::Flag<Type> FLAGS_##name;
+ 
+-#endif  // ABSL_FLAGS_FLAG_H_
++#endif  // SENTENCEPIECE_FLAG_H_
+diff --git a/src/init.h b/src/init.h
+index acfda8a..d9946c0 100644
+--- a/src/init.h
++++ b/src/init.h
+@@ -16,15 +16,15 @@
+ #define INIT_H_
+ 
+ #include "common.h"
+-#include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
++#include "flag.h"
++#include "parse.h"
+ 
+-ABSL_DECLARE_FLAG(int32, minloglevel);
++STPC_DECLARE_FLAG(int32, minloglevel);
+ 
+ namespace sentencepiece {
+ inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
+                                   bool remove_arg = true) {
+-  const auto unused_args = absl::ParseCommandLine(*argc, *argv);
++  const auto unused_args = sentencepiece::ParseCommandLine(*argc, *argv);
+ 
+   if (remove_arg) {
+     char **argv_val = *argv;
+@@ -33,7 +33,7 @@ inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
+     *argc = static_cast<int>(unused_args.size());
+   }
+ 
+-  logging::SetMinLogLevel(absl::GetFlag(FLAGS_minloglevel));
++  logging::SetMinLogLevel(sentencepiece::GetFlag(FLAGS_minloglevel));
+ }
+ }  // namespace sentencepiece
+ 
+diff --git a/src/init_test.cc b/src/init_test.cc
+index e5cd2e4..f9e509a 100644
+--- a/src/init_test.cc
++++ b/src/init_test.cc
+@@ -15,28 +15,29 @@
+ #include "init.h"
+ 
+ #include "common.h"
++#include "flag.h"
+ #include "testharness.h"
+ 
+-ABSL_FLAG(int32, int32_f, 10, "int32_flags");
+-ABSL_FLAG(bool, bool_f, false, "bool_flags");
+-ABSL_FLAG(int64, int64_f, 9223372036854775807LL, "int64_flags");
+-ABSL_FLAG(uint64, uint64_f, 18446744073709551615ULL, "uint64_flags");
+-ABSL_FLAG(double, double_f, 40.0, "double_flags");
+-ABSL_FLAG(std::string, string_f, "str", "string_flags");
++STPC_FLAG(int32, int32_f, 10, "int32_flags");
++STPC_FLAG(bool, bool_f, false, "bool_flags");
++STPC_FLAG(int64, int64_f, 9223372036854775807LL, "int64_flags");
++STPC_FLAG(uint64, uint64_f, 18446744073709551615ULL, "uint64_flags");
++STPC_FLAG(double, double_f, 40.0, "double_flags");
++STPC_FLAG(std::string, string_f, "str", "string_flags");
+ 
+-ABSL_DECLARE_FLAG(bool, help);
+-ABSL_DECLARE_FLAG(bool, version);
++STPC_DECLARE_FLAG(bool, help);
++STPC_DECLARE_FLAG(bool, version);
+ 
+ using sentencepiece::ParseCommandLineFlags;
+ 
+ namespace absl {
+ TEST(FlagsTest, DefaultValueTest) {
+-  EXPECT_EQ(10, absl::GetFlag(FLAGS_int32_f));
+-  EXPECT_EQ(false, absl::GetFlag(FLAGS_bool_f));
+-  EXPECT_EQ(9223372036854775807LL, absl::GetFlag(FLAGS_int64_f));
+-  EXPECT_EQ(18446744073709551615ULL, absl::GetFlag(FLAGS_uint64_f));
+-  EXPECT_EQ(40.0, absl::GetFlag(FLAGS_double_f));
+-  EXPECT_EQ("str", absl::GetFlag(FLAGS_string_f));
++  EXPECT_EQ(10, sentencepiece::GetFlag(FLAGS_int32_f));
++  EXPECT_EQ(false, sentencepiece::GetFlag(FLAGS_bool_f));
++  EXPECT_EQ(9223372036854775807LL, sentencepiece::GetFlag(FLAGS_int64_f));
++  EXPECT_EQ(18446744073709551615ULL, sentencepiece::GetFlag(FLAGS_uint64_f));
++  EXPECT_EQ(40.0, sentencepiece::GetFlag(FLAGS_double_f));
++  EXPECT_EQ("str", sentencepiece::GetFlag(FLAGS_string_f));
+ }
+ 
+ TEST(FlagsTest, ParseCommandLineFlagsTest) {
+@@ -48,12 +49,12 @@ TEST(FlagsTest, ParseCommandLineFlagsTest) {
+   char **argv = const_cast<char **>(kFlags);
+   ParseCommandLineFlags(kFlags[0], &argc, &argv);
+ 
+-  EXPECT_EQ(100, absl::GetFlag(FLAGS_int32_f));
+-  EXPECT_EQ(true, absl::GetFlag(FLAGS_bool_f));
+-  EXPECT_EQ(200, absl::GetFlag(FLAGS_int64_f));
+-  EXPECT_EQ(300, absl::GetFlag(FLAGS_uint64_f));
+-  EXPECT_EQ(400.0, absl::GetFlag(FLAGS_double_f));
+-  EXPECT_EQ("foo", absl::GetFlag(FLAGS_string_f));
++  EXPECT_EQ(100, sentencepiece::GetFlag(FLAGS_int32_f));
++  EXPECT_EQ(true, sentencepiece::GetFlag(FLAGS_bool_f));
++  EXPECT_EQ(200, sentencepiece::GetFlag(FLAGS_int64_f));
++  EXPECT_EQ(300, sentencepiece::GetFlag(FLAGS_uint64_f));
++  EXPECT_EQ(400.0, sentencepiece::GetFlag(FLAGS_double_f));
++  EXPECT_EQ("foo", sentencepiece::GetFlag(FLAGS_string_f));
+   EXPECT_EQ(4, argc);
+   EXPECT_EQ("program", std::string(argv[0]));
+   EXPECT_EQ("other1", std::string(argv[1]));
+@@ -69,10 +70,10 @@ TEST(FlagsTest, ParseCommandLineFlagsTest2) {
+   char **argv = const_cast<char **>(kFlags);
+   ParseCommandLineFlags(kFlags[0], &argc, &argv);
+ 
+-  EXPECT_EQ(500, absl::GetFlag(FLAGS_int32_f));
+-  EXPECT_EQ(600, absl::GetFlag(FLAGS_int64_f));
+-  EXPECT_EQ(700, absl::GetFlag(FLAGS_uint64_f));
+-  EXPECT_FALSE(absl::GetFlag(FLAGS_bool_f));
++  EXPECT_EQ(500, sentencepiece::GetFlag(FLAGS_int32_f));
++  EXPECT_EQ(600, sentencepiece::GetFlag(FLAGS_int64_f));
++  EXPECT_EQ(700, sentencepiece::GetFlag(FLAGS_uint64_f));
++  EXPECT_FALSE(sentencepiece::GetFlag(FLAGS_bool_f));
+   EXPECT_EQ(1, argc);
+ }
+ 
+@@ -82,8 +83,8 @@ TEST(FlagsTest, ParseCommandLineFlagsTest3) {
+   int argc = arraysize(kFlags);
+   char **argv = const_cast<char **>(kFlags);
+   ParseCommandLineFlags(kFlags[0], &argc, &argv);
+-  EXPECT_TRUE(absl::GetFlag(FLAGS_bool_f));
+-  EXPECT_EQ(800, absl::GetFlag(FLAGS_int32_f));
++  EXPECT_TRUE(sentencepiece::GetFlag(FLAGS_bool_f));
++  EXPECT_EQ(800, sentencepiece::GetFlag(FLAGS_int32_f));
+   EXPECT_EQ(1, argc);
+ }
+ 
+@@ -94,7 +95,7 @@ TEST(FlagsTest, ParseCommandLineFlagsHelpTest) {
+   int argc = arraysize(kFlags);
+   char **argv = const_cast<char **>(kFlags);
+   EXPECT_DEATH(ParseCommandLineFlags(kFlags[0], &argc, &argv), "");
+-  absl::SetFlag(&FLAGS_help, false);
++  sentencepiece::SetFlag(&FLAGS_help, false);
+ }
+ 
+ TEST(FlagsTest, ParseCommandLineFlagsVersionTest) {
+@@ -102,7 +103,7 @@ TEST(FlagsTest, ParseCommandLineFlagsVersionTest) {
+   int argc = arraysize(kFlags);
+   char **argv = const_cast<char **>(kFlags);
+   EXPECT_DEATH(ParseCommandLineFlags(kFlags[0], &argc, &argv), "");
+-  absl::SetFlag(&FLAGS_version, false);
++  sentencepiece::SetFlag(&FLAGS_version, false);
+ }
+ 
+ TEST(FlagsTest, ParseCommandLineFlagsUnknownTest) {
+@@ -125,7 +126,7 @@ TEST(FlagsTest, ParseCommandLineFlagsEmptyStringArgs) {
+   char **argv = const_cast<char **>(kFlags);
+   ParseCommandLineFlags(kFlags[0], &argc, &argv);
+   EXPECT_EQ(1, argc);
+-  EXPECT_EQ("", absl::GetFlag(FLAGS_string_f));
++  EXPECT_EQ("", sentencepiece::GetFlag(FLAGS_string_f));
+ }
+ 
+ TEST(FlagsTest, ParseCommandLineFlagsEmptyBoolArgs) {
+@@ -134,7 +135,7 @@ TEST(FlagsTest, ParseCommandLineFlagsEmptyBoolArgs) {
+   char **argv = const_cast<char **>(kFlags);
+   ParseCommandLineFlags(kFlags[0], &argc, &argv);
+   EXPECT_EQ(1, argc);
+-  EXPECT_TRUE(absl::GetFlag(FLAGS_bool_f));
++  EXPECT_TRUE(sentencepiece::GetFlag(FLAGS_bool_f));
+ }
+ 
+ TEST(FlagsTest, ParseCommandLineFlagsEmptyIntArgs) {
+diff --git a/third_party/absl/flags/parse.h b/src/parse.h
+similarity index 79%
+rename from third_party/absl/flags/parse.h
+rename to src/parse.h
+index 6a06e63..705eadf 100644
+--- a/third_party/absl/flags/parse.h
++++ b/src/parse.h
+@@ -12,14 +12,14 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#ifndef ABSL_FLAGS_PARSE_H_
+-#define ABSL_FLAGS_PARSE_H_
++#ifndef SENTENCEPIECE_FLAGS_PARSE_H_
++#define SENTENCEPIECE_FLAGS_PARSE_H_
+ 
+ #include <vector>
+ 
+-namespace absl {
++namespace sentencepiece {
+ 
+ std::vector<char *> ParseCommandLine(int argc, char *argv[]);
+-}  // namespace absl
++}  // namespace sentencepiece
+ 
+-#endif  // ABSL_FLAGS_PARSE_H_
++#endif  // SENTENCEPIECE_FLAGS_PARSE_H_
+diff --git a/src/sentencepiece_processor_test.cc b/src/sentencepiece_processor_test.cc
+index 829c3d4..53a1369 100644
+--- a/src/sentencepiece_processor_test.cc
++++ b/src/sentencepiece_processor_test.cc
+@@ -16,6 +16,7 @@
+ 
+ #include "builder.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "model_interface.h"
+ #include "normalizer.h"
+ #include "sentencepiece.pb.h"
+@@ -23,11 +24,11 @@
+ #include "sentencepiece_processor.h"
+ #include "sentencepiece_trainer.h"
+ #include "testharness.h"
++#include "util.h"
+ #include "absl/container/flat_hash_map.h"
+ #include "absl/memory/memory.h"
+ #include "absl/strings/str_cat.h"
+ #include "absl/strings/string_view.h"
+-#include "util.h"
+ 
+ namespace sentencepiece {
+ 
+@@ -915,13 +916,13 @@ TEST(SentencePieceProcessorTest, EndToEndTest) {
+ 
+   {
+     auto output = filesystem::NewWritableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "model"), true);
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "model"), true);
+     output->Write(model_proto.SerializeAsString());
+   }
+ 
+   SentencePieceProcessor sp;
+   EXPECT_TRUE(
+-      sp.Load(util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "model")).ok());
++      sp.Load(util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "model")).ok());
+ 
+   EXPECT_EQ(model_proto.SerializeAsString(),
+             sp.model_proto().SerializeAsString());
+@@ -1400,10 +1401,10 @@ TEST(SentencePieceProcessorTest, VocabularyTest) {
+   auto GetInlineFilename = [](const std::string content) {
+     {
+       auto out = filesystem::NewWritableFile(
+-          util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "vocab.txt"));
++          util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "vocab.txt"));
+       out->Write(content);
+     }
+-    return util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "vocab.txt");
++    return util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "vocab.txt");
+   };
+ 
+   sp1->set_type(ModelProto::SentencePiece::UNKNOWN);
+diff --git a/src/sentencepiece_trainer_test.cc b/src/sentencepiece_trainer_test.cc
+index fc73b1d..7e0f74f 100644
+--- a/src/sentencepiece_trainer_test.cc
++++ b/src/sentencepiece_trainer_test.cc
+@@ -13,11 +13,12 @@
+ // limitations under the License.!
+ 
+ #include "filesystem.h"
++#include "flag.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_trainer.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
+ 
+ namespace sentencepiece {
+ namespace {
+@@ -50,9 +51,9 @@ void CheckNormalizer(absl::string_view filename, bool expected_has_normalizer,
+ 
+ TEST(SentencePieceTrainerTest, TrainFromArgsTest) {
+   const std::string input =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestData);
+   const std::string model =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "m");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "m");
+ 
+   ASSERT_TRUE(SentencePieceTrainer::Train(
+                   absl::StrCat("--input=", input, " --model_prefix=", model,
+@@ -117,9 +118,9 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
+   };
+ 
+   const std::string input =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestData);
+   const std::string model =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "m");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "m");
+ 
+   std::vector<std::string> sentences;
+   {
+@@ -140,11 +141,11 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
+ 
+ TEST(SentencePieceTrainerTest, TrainWithCustomNormalizationRule) {
+   std::string input =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestData);
+   std::string rule =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kNfkcTestData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kNfkcTestData);
+   const std::string model =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "m");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "m");
+ 
+   EXPECT_TRUE(SentencePieceTrainer::Train(
+                   absl::StrCat("--input=", input, " --model_prefix=", model,
+@@ -156,13 +157,13 @@ TEST(SentencePieceTrainerTest, TrainWithCustomNormalizationRule) {
+ 
+ TEST(SentencePieceTrainerTest, TrainWithCustomDenormalizationRule) {
+   const std::string input_file =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestDataJa);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestDataJa);
+   const std::string model =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "m");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "m");
+   const std::string norm_rule_tsv =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kIdsNormTsv);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kIdsNormTsv);
+   const std::string denorm_rule_tsv =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kIdsDenormTsv);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kIdsDenormTsv);
+   EXPECT_TRUE(
+       SentencePieceTrainer::Train(
+           absl::StrCat("--input=", input_file, " --model_prefix=", model,
+@@ -185,9 +186,9 @@ TEST(SentencePieceTrainerTest, TrainErrorTest) {
+ TEST(SentencePieceTrainerTest, TrainTest) {
+   TrainerSpec trainer_spec;
+   trainer_spec.add_input(
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestData));
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestData));
+   trainer_spec.set_model_prefix(
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "m"));
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "m"));
+   trainer_spec.set_vocab_size(1000);
+   NormalizerSpec normalizer_spec;
+   ASSERT_TRUE(SentencePieceTrainer::Train(trainer_spec, normalizer_spec).ok());
+diff --git a/src/spm_decode_main.cc b/src/spm_decode_main.cc
+index 9dda65c..882cb9e 100644
+--- a/src/spm_decode_main.cc
++++ b/src/spm_decode_main.cc
+@@ -18,44 +18,44 @@
+ 
+ #include "common.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "sentencepiece.pb.h"
+ #include "sentencepiece_processor.h"
+-#include "absl/flags/flag.h"
+ #include "absl/strings/str_split.h"
+ #include "util.h"
+ 
+-ABSL_FLAG(std::string, model, "", "model file name");
+-ABSL_FLAG(std::string, input, "", "input filename");
+-ABSL_FLAG(std::string, output, "", "output filename");
+-ABSL_FLAG(std::string, input_format, "piece", "choose from piece or id");
+-ABSL_FLAG(std::string, output_format, "string", "choose from string or proto");
+-ABSL_FLAG(std::string, extra_options, "",
++STPC_FLAG(std::string, model, "", "model file name");
++STPC_FLAG(std::string, input, "", "input filename");
++STPC_FLAG(std::string, output, "", "output filename");
++STPC_FLAG(std::string, input_format, "piece", "choose from piece or id");
++STPC_FLAG(std::string, output_format, "string", "choose from string or proto");
++STPC_FLAG(std::string, extra_options, "",
+           "':' separated encoder extra options, e.g., \"reverse:bos:eos\"");
+ 
+ int main(int argc, char *argv[]) {
+   sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
+   std::vector<std::string> rest_args;
+ 
+-  if (absl::GetFlag(FLAGS_input).empty()) {
++  if (sentencepiece::GetFlag(FLAGS_input).empty()) {
+     for (int i = 1; i < argc; ++i) {
+       rest_args.push_back(std::string(argv[i]));
+     }
+   } else {
+-    rest_args.push_back(absl::GetFlag(FLAGS_input));
++    rest_args.push_back(sentencepiece::GetFlag(FLAGS_input));
+   }
+ 
+   if (rest_args.empty())
+     rest_args.push_back("");  // empty means that reading from stdin.
+ 
+-  CHECK(!absl::GetFlag(FLAGS_model).empty());
++  CHECK(!sentencepiece::GetFlag(FLAGS_model).empty());
+ 
+   sentencepiece::SentencePieceProcessor sp;
+-  CHECK_OK(sp.Load(absl::GetFlag(FLAGS_model)));
+-  CHECK_OK(sp.SetDecodeExtraOptions(absl::GetFlag(FLAGS_extra_options)));
++  CHECK_OK(sp.Load(sentencepiece::GetFlag(FLAGS_model)));
++  CHECK_OK(sp.SetDecodeExtraOptions(sentencepiece::GetFlag(FLAGS_extra_options)));
+ 
+   auto output =
+-      sentencepiece::filesystem::NewWritableFile(absl::GetFlag(FLAGS_output));
++      sentencepiece::filesystem::NewWritableFile(sentencepiece::GetFlag(FLAGS_output));
+   CHECK_OK(output->status());
+ 
+   std::string detok, line;
+@@ -71,36 +71,36 @@ int main(int argc, char *argv[]) {
+     return ids;
+   };
+ 
+-  if (absl::GetFlag(FLAGS_input_format) == "piece") {
+-    if (absl::GetFlag(FLAGS_output_format) == "string") {
++  if (sentencepiece::GetFlag(FLAGS_input_format) == "piece") {
++    if (sentencepiece::GetFlag(FLAGS_output_format) == "string") {
+       process = [&](const std::vector<std::string> &pieces) {
+         CHECK_OK(sp.Decode(pieces, &detok));
+         output->WriteLine(detok);
+       };
+-    } else if (absl::GetFlag(FLAGS_output_format) == "proto") {
++    } else if (sentencepiece::GetFlag(FLAGS_output_format) == "proto") {
+       process = [&](const std::vector<std::string> &pieces) {
+         CHECK_OK(sp.Decode(pieces, &spt));
+       };
+     } else {
+       LOG(FATAL) << "Unknown output format: "
+-                 << absl::GetFlag(FLAGS_output_format);
++                 << sentencepiece::GetFlag(FLAGS_output_format);
+     }
+-  } else if (absl::GetFlag(FLAGS_input_format) == "id") {
+-    if (absl::GetFlag(FLAGS_output_format) == "string") {
++  } else if (sentencepiece::GetFlag(FLAGS_input_format) == "id") {
++    if (sentencepiece::GetFlag(FLAGS_output_format) == "string") {
+       process = [&](const std::vector<std::string> &pieces) {
+         CHECK_OK(sp.Decode(ToIds(pieces), &detok));
+         output->WriteLine(detok);
+       };
+-    } else if (absl::GetFlag(FLAGS_output_format) == "proto") {
++    } else if (sentencepiece::GetFlag(FLAGS_output_format) == "proto") {
+       process = [&](const std::vector<std::string> &pieces) {
+         CHECK_OK(sp.Decode(ToIds(pieces), &spt));
+       };
+     } else {
+       LOG(FATAL) << "Unknown output format: "
+-                 << absl::GetFlag(FLAGS_output_format);
++                 << sentencepiece::GetFlag(FLAGS_output_format);
+     }
+   } else {
+-    LOG(FATAL) << "Unknown input format: " << absl::GetFlag(FLAGS_input_format);
++    LOG(FATAL) << "Unknown input format: " << sentencepiece::GetFlag(FLAGS_input_format);
+   }
+ 
+   for (const auto &filename : rest_args) {
+diff --git a/src/spm_encode_main.cc b/src/spm_encode_main.cc
+index 29b7458..e194d51 100644
+--- a/src/spm_encode_main.cc
++++ b/src/spm_encode_main.cc
+@@ -18,70 +18,70 @@
+ 
+ #include "common.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "sentencepiece.pb.h"
+ #include "sentencepiece_processor.h"
+ #include "absl/container/flat_hash_map.h"
+-#include "absl/flags/flag.h"
+ #include "absl/strings/str_cat.h"
+ #include "absl/strings/str_join.h"
+ #include "trainer_interface.h"
+ 
+-ABSL_FLAG(std::string, model, "", "model file name");
+-ABSL_FLAG(
++STPC_FLAG(std::string, model, "", "model file name");
++STPC_FLAG(
+     std::string, output_format, "piece",
+     "choose from piece, id, proto, nbest_piece, nbest_id, or nbest_proto");
+-ABSL_FLAG(std::string, input, "", "input filename");
+-ABSL_FLAG(std::string, output, "", "output filename");
+-ABSL_FLAG(std::string, extra_options, "",
++STPC_FLAG(std::string, input, "", "input filename");
++STPC_FLAG(std::string, output, "", "output filename");
++STPC_FLAG(std::string, extra_options, "",
+           "':' separated encoder extra options, e.g., \"reverse:bos:eos\"");
+-ABSL_FLAG(int32, nbest_size, 10, "NBest size");
+-ABSL_FLAG(double, alpha, 0.5, "Smoothing parameter for sampling mode.");
+-ABSL_FLAG(uint32, random_seed, static_cast<uint32>(-1),
++STPC_FLAG(int32, nbest_size, 10, "NBest size");
++STPC_FLAG(double, alpha, 0.5, "Smoothing parameter for sampling mode.");
++STPC_FLAG(uint32, random_seed, static_cast<uint32>(-1),
+           "Seed value for random generator.");
+ 
+ // Piece restriction with vocabulary file.
+ // https://github.com/rsennrich/subword-nmt#best-practice-advice-for-byte-pair-encoding-in-nmt
+-ABSL_FLAG(std::string, vocabulary, "",
++STPC_FLAG(std::string, vocabulary, "",
+           "Restrict the vocabulary. The encoder only emits the "
+           "tokens in \"vocabulary\" file");
+-ABSL_FLAG(int32, vocabulary_threshold, 0,
++STPC_FLAG(int32, vocabulary_threshold, 0,
+           "Words with frequency < threshold will be treated as OOV");
+-ABSL_FLAG(bool, generate_vocabulary, false,
++STPC_FLAG(bool, generate_vocabulary, false,
+           "Generates vocabulary file instead of segmentation");
+ 
+ int main(int argc, char *argv[]) {
+   sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
+   std::vector<std::string> rest_args;
+ 
+-  if (absl::GetFlag(FLAGS_input).empty()) {
++  if (sentencepiece::GetFlag(FLAGS_input).empty()) {
+     for (int i = 1; i < argc; ++i) {
+       rest_args.push_back(std::string(argv[i]));
+     }
+   } else {
+-    rest_args.push_back(absl::GetFlag(FLAGS_input));
++    rest_args.push_back(sentencepiece::GetFlag(FLAGS_input));
+   }
+ 
+-  if (absl::GetFlag(FLAGS_random_seed) != -1) {
+-    sentencepiece::SetRandomGeneratorSeed(absl::GetFlag(FLAGS_random_seed));
++  if (sentencepiece::GetFlag(FLAGS_random_seed) != -1) {
++    sentencepiece::SetRandomGeneratorSeed(sentencepiece::GetFlag(FLAGS_random_seed));
+   }
+ 
+   if (rest_args.empty())
+     rest_args.push_back("");  // empty means that reading from stdin.
+ 
+-  CHECK(!absl::GetFlag(FLAGS_model).empty());
++  CHECK(!sentencepiece::GetFlag(FLAGS_model).empty());
+ 
+   sentencepiece::SentencePieceProcessor sp;
+-  CHECK_OK(sp.Load(absl::GetFlag(FLAGS_model)));
+-  CHECK_OK(sp.SetEncodeExtraOptions(absl::GetFlag(FLAGS_extra_options)));
++  CHECK_OK(sp.Load(sentencepiece::GetFlag(FLAGS_model)));
++  CHECK_OK(sp.SetEncodeExtraOptions(sentencepiece::GetFlag(FLAGS_extra_options)));
+ 
+-  if (!absl::GetFlag(FLAGS_vocabulary).empty()) {
+-    CHECK_OK(sp.LoadVocabulary(absl::GetFlag(FLAGS_vocabulary),
+-                               absl::GetFlag(FLAGS_vocabulary_threshold)));
++  if (!sentencepiece::GetFlag(FLAGS_vocabulary).empty()) {
++    CHECK_OK(sp.LoadVocabulary(sentencepiece::GetFlag(FLAGS_vocabulary),
++                               sentencepiece::GetFlag(FLAGS_vocabulary_threshold)));
+   }
+ 
+   auto output =
+-      sentencepiece::filesystem::NewWritableFile(absl::GetFlag(FLAGS_output));
++      sentencepiece::filesystem::NewWritableFile(sentencepiece::GetFlag(FLAGS_output));
+   CHECK_OK(output->status());
+ 
+   std::string line;
+@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
+   sentencepiece::NBestSentencePieceText nbest_spt;
+   std::function<void(const std::string &line)> process;
+ 
+-  const int nbest_size = absl::GetFlag(FLAGS_nbest_size);
+-  const float alpha = absl::GetFlag(FLAGS_alpha);
++  const int nbest_size = sentencepiece::GetFlag(FLAGS_nbest_size);
++  const float alpha = sentencepiece::GetFlag(FLAGS_alpha);
+ 
+-  if (absl::GetFlag(FLAGS_generate_vocabulary)) {
++  if (sentencepiece::GetFlag(FLAGS_generate_vocabulary)) {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.Encode(line, &spt));
+       for (const auto &piece : spt.pieces()) {
+@@ -105,53 +105,53 @@ int main(int argc, char *argv[]) {
+           vocab[piece.piece()]++;
+       }
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "piece") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "piece") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.Encode(line, &sps));
+       output->WriteLine(absl::StrJoin(sps, " "));
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "id") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "id") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.Encode(line, &ids));
+       output->WriteLine(absl::StrJoin(ids, " "));
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "proto") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "proto") {
+     process = [&](const std::string &line) { CHECK_OK(sp.Encode(line, &spt)); };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "sample_piece") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "sample_piece") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.SampleEncode(line, nbest_size, alpha, &sps));
+       output->WriteLine(absl::StrJoin(sps, " "));
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "sample_id") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "sample_id") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.SampleEncode(line, nbest_size, alpha, &ids));
+       output->WriteLine(absl::StrJoin(ids, " "));
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "sample_proto") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "sample_proto") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.SampleEncode(line, nbest_size, alpha, &spt));
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "nbest_piece") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "nbest_piece") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.NBestEncode(line, nbest_size, &nbest_sps));
+       for (const auto &result : nbest_sps) {
+         output->WriteLine(absl::StrJoin(result, " "));
+       }
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "nbest_id") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "nbest_id") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.NBestEncode(line, nbest_size, &nbest_ids));
+       for (const auto &result : nbest_ids) {
+         output->WriteLine(absl::StrJoin(result, " "));
+       }
+     };
+-  } else if (absl::GetFlag(FLAGS_output_format) == "nbest_proto") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "nbest_proto") {
+     process = [&](const std::string &line) {
+       CHECK_OK(sp.NBestEncode(line, nbest_size, &nbest_spt));
+     };
+   } else {
+     LOG(FATAL) << "Unknown output format: "
+-               << absl::GetFlag(FLAGS_output_format);
++               << sentencepiece::GetFlag(FLAGS_output_format);
+   }
+ 
+   for (const auto &filename : rest_args) {
+@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
+     }
+   }
+ 
+-  if (absl::GetFlag(FLAGS_generate_vocabulary)) {
++  if (sentencepiece::GetFlag(FLAGS_generate_vocabulary)) {
+     for (const auto &it : sentencepiece::Sorted(vocab)) {
+       output->WriteLine(it.first + "\t" +
+                         sentencepiece::string_util::SimpleItoa(it.second));
+diff --git a/src/spm_export_vocab_main.cc b/src/spm_export_vocab_main.cc
+index 70a65c1..78c8e21 100644
+--- a/src/spm_export_vocab_main.cc
++++ b/src/spm_export_vocab_main.cc
+@@ -17,14 +17,14 @@
+ 
+ #include "common.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_processor.h"
+-#include "absl/flags/flag.h"
+ 
+-ABSL_FLAG(std::string, output, "", "Output filename");
+-ABSL_FLAG(std::string, model, "", "input model file name");
+-ABSL_FLAG(std::string, output_format, "vocab",
++STPC_FLAG(std::string, output, "", "Output filename");
++STPC_FLAG(std::string, model, "", "input model file name");
++STPC_FLAG(std::string, output_format, "vocab",
+           "output format. choose from vocab or syms. vocab outputs pieces "
+           "and scores, syms outputs pieces and indices.");
+ 
+@@ -32,19 +32,19 @@ int main(int argc, char *argv[]) {
+   sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
+ 
+   sentencepiece::SentencePieceProcessor sp;
+-  CHECK_OK(sp.Load(absl::GetFlag(FLAGS_model)));
++  CHECK_OK(sp.Load(sentencepiece::GetFlag(FLAGS_model)));
+ 
+   auto output =
+-      sentencepiece::filesystem::NewWritableFile(absl::GetFlag(FLAGS_output));
++      sentencepiece::filesystem::NewWritableFile(sentencepiece::GetFlag(FLAGS_output));
+   CHECK_OK(output->status());
+ 
+-  if (absl::GetFlag(FLAGS_output_format) == "vocab") {
++  if (sentencepiece::GetFlag(FLAGS_output_format) == "vocab") {
+     for (const auto &piece : sp.model_proto().pieces()) {
+       std::ostringstream os;
+       os << piece.piece() << "\t" << piece.score();
+       output->WriteLine(os.str());
+     }
+-  } else if (absl::GetFlag(FLAGS_output_format) == "syms") {
++  } else if (sentencepiece::GetFlag(FLAGS_output_format) == "syms") {
+     for (int i = 0; i < sp.model_proto().pieces_size(); i++) {
+       std::ostringstream os;
+       os << sp.model_proto().pieces(i).piece() << "\t" << i;
+@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
+     }
+   } else {
+     LOG(FATAL) << "Unsupported output format: "
+-               << absl::GetFlag(FLAGS_output_format);
++               << sentencepiece::GetFlag(FLAGS_output_format);
+   }
+ 
+   return 0;
+diff --git a/src/spm_normalize_main.cc b/src/spm_normalize_main.cc
+index 8c541b8..5d7c4c7 100644
+--- a/src/spm_normalize_main.cc
++++ b/src/spm_normalize_main.cc
+@@ -15,28 +15,28 @@
+ #include "builder.h"
+ #include "common.h"
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "normalizer.h"
+ #include "sentencepiece.pb.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_processor.h"
+ #include "sentencepiece_trainer.h"
+-#include "absl/flags/flag.h"
+ 
+-ABSL_FLAG(std::string, model, "", "Model file name");
+-ABSL_FLAG(bool, use_internal_normalization, false,
++STPC_FLAG(std::string, model, "", "Model file name");
++STPC_FLAG(bool, use_internal_normalization, false,
+           "Use NormalizerSpec \"as-is\" to run the normalizer "
+           "for SentencePiece segmentation");
+-ABSL_FLAG(std::string, normalization_rule_name, "",
++STPC_FLAG(std::string, normalization_rule_name, "",
+           "Normalization rule name. "
+           "Choose from nfkc or identity");
+-ABSL_FLAG(std::string, normalization_rule_tsv, "",
++STPC_FLAG(std::string, normalization_rule_tsv, "",
+           "Normalization rule TSV file. ");
+-ABSL_FLAG(bool, remove_extra_whitespaces, true, "Remove extra whitespaces");
+-ABSL_FLAG(bool, decompile, false,
++STPC_FLAG(bool, remove_extra_whitespaces, true, "Remove extra whitespaces");
++STPC_FLAG(bool, decompile, false,
+           "Decompile compiled charamap and output it as TSV.");
+-ABSL_FLAG(std::string, input, "", "Input filename");
+-ABSL_FLAG(std::string, output, "", "Output filename");
++STPC_FLAG(std::string, input, "", "Input filename");
++STPC_FLAG(std::string, output, "", "Output filename");
+ 
+ using sentencepiece::ModelProto;
+ using sentencepiece::NormalizerSpec;
+@@ -49,27 +49,27 @@ int main(int argc, char *argv[]) {
+   sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
+   std::vector<std::string> rest_args;
+ 
+-  if (absl::GetFlag(FLAGS_input).empty()) {
++  if (sentencepiece::GetFlag(FLAGS_input).empty()) {
+     for (int i = 1; i < argc; ++i) {
+       rest_args.push_back(std::string(argv[i]));
+     }
+   } else {
+-    rest_args.push_back(absl::GetFlag(FLAGS_input));
++    rest_args.push_back(sentencepiece::GetFlag(FLAGS_input));
+   }
+ 
+   NormalizerSpec spec;
+ 
+-  if (!absl::GetFlag(FLAGS_model).empty()) {
++  if (!sentencepiece::GetFlag(FLAGS_model).empty()) {
+     ModelProto model_proto;
+     SentencePieceProcessor sp;
+-    CHECK_OK(sp.Load(absl::GetFlag(FLAGS_model)));
++    CHECK_OK(sp.Load(sentencepiece::GetFlag(FLAGS_model)));
+     spec = sp.model_proto().normalizer_spec();
+-  } else if (!absl::GetFlag(FLAGS_normalization_rule_tsv).empty()) {
++  } else if (!sentencepiece::GetFlag(FLAGS_normalization_rule_tsv).empty()) {
+     spec.set_normalization_rule_tsv(
+-        absl::GetFlag(FLAGS_normalization_rule_tsv));
++        sentencepiece::GetFlag(FLAGS_normalization_rule_tsv));
+     CHECK_OK(SentencePieceTrainer::PopulateNormalizerSpec(&spec));
+-  } else if (!absl::GetFlag(FLAGS_normalization_rule_name).empty()) {
+-    spec.set_name(absl::GetFlag(FLAGS_normalization_rule_name));
++  } else if (!sentencepiece::GetFlag(FLAGS_normalization_rule_name).empty()) {
++    spec.set_name(sentencepiece::GetFlag(FLAGS_normalization_rule_name));
+     CHECK_OK(SentencePieceTrainer::PopulateNormalizerSpec(&spec));
+   } else {
+     LOG(FATAL) << "Sets --model, normalization_rule_tsv, or "
+@@ -77,22 +77,22 @@ int main(int argc, char *argv[]) {
+   }
+ 
+   // Uses the normalizer spec encoded in the model_pb.
+-  if (!absl::GetFlag(FLAGS_use_internal_normalization)) {
++  if (!sentencepiece::GetFlag(FLAGS_use_internal_normalization)) {
+     spec.set_add_dummy_prefix(false);    // do not add dummy prefix.
+     spec.set_escape_whitespaces(false);  // do not output meta symbol.
+     spec.set_remove_extra_whitespaces(
+-        absl::GetFlag(FLAGS_remove_extra_whitespaces));
++        sentencepiece::GetFlag(FLAGS_remove_extra_whitespaces));
+   }
+ 
+-  if (absl::GetFlag(FLAGS_decompile)) {
++  if (sentencepiece::GetFlag(FLAGS_decompile)) {
+     Builder::CharsMap chars_map;
+     CHECK_OK(
+         Builder::DecompileCharsMap(spec.precompiled_charsmap(), &chars_map));
+-    CHECK_OK(Builder::SaveCharsMap(absl::GetFlag(FLAGS_output), chars_map));
++    CHECK_OK(Builder::SaveCharsMap(sentencepiece::GetFlag(FLAGS_output), chars_map));
+   } else {
+     const Normalizer normalizer(spec);
+     auto output =
+-        sentencepiece::filesystem::NewWritableFile(absl::GetFlag(FLAGS_output));
++        sentencepiece::filesystem::NewWritableFile(sentencepiece::GetFlag(FLAGS_output));
+     CHECK_OK(output->status());
+ 
+     if (rest_args.empty()) {
+diff --git a/src/spm_train_main.cc b/src/spm_train_main.cc
+index ba1e811..90a6673 100644
+--- a/src/spm_train_main.cc
++++ b/src/spm_train_main.cc
+@@ -15,10 +15,10 @@
+ #include <map>
+ 
+ #include "filesystem.h"
++#include "flag.h"
+ #include "init.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_trainer.h"
+-#include "absl/flags/flag.h"
+ #include "absl/strings/ascii.h"
+ #include "absl/strings/str_join.h"
+ #include "absl/strings/str_split.h"
+@@ -32,116 +32,116 @@ static sentencepiece::TrainerSpec kDefaultTrainerSpec;
+ static sentencepiece::NormalizerSpec kDefaultNormalizerSpec;
+ }  // namespace
+ 
+-ABSL_FLAG(std::string, input, "", "comma separated list of input sentences");
+-ABSL_FLAG(std::string, input_format, kDefaultTrainerSpec.input_format(),
++STPC_FLAG(std::string, input, "", "comma separated list of input sentences");
++STPC_FLAG(std::string, input_format, kDefaultTrainerSpec.input_format(),
+           "Input format. Supported format is `text` or `tsv`.");
+-ABSL_FLAG(std::string, model_prefix, "", "output model prefix");
+-ABSL_FLAG(std::string, model_type, "unigram",
++STPC_FLAG(std::string, model_prefix, "", "output model prefix");
++STPC_FLAG(std::string, model_type, "unigram",
+           "model algorithm: unigram, bpe, word or char");
+-ABSL_FLAG(int32, vocab_size, kDefaultTrainerSpec.vocab_size(),
++STPC_FLAG(int32, vocab_size, kDefaultTrainerSpec.vocab_size(),
+           "vocabulary size");
+-ABSL_FLAG(std::string, accept_language, "",
++STPC_FLAG(std::string, accept_language, "",
+           "comma-separated list of languages this model can accept");
+-ABSL_FLAG(int32, self_test_sample_size,
++STPC_FLAG(int32, self_test_sample_size,
+           kDefaultTrainerSpec.self_test_sample_size(),
+           "the size of self test samples");
+-ABSL_FLAG(double, character_coverage, kDefaultTrainerSpec.character_coverage(),
++STPC_FLAG(double, character_coverage, kDefaultTrainerSpec.character_coverage(),
+           "character coverage to determine the minimum symbols");
+-ABSL_FLAG(std::uint64_t, input_sentence_size,
++STPC_FLAG(std::uint64_t, input_sentence_size,
+           kDefaultTrainerSpec.input_sentence_size(),
+           "maximum size of sentences the trainer loads");
+-ABSL_FLAG(bool, shuffle_input_sentence,
++STPC_FLAG(bool, shuffle_input_sentence,
+           kDefaultTrainerSpec.shuffle_input_sentence(),
+           "Randomly sample input sentences in advance. Valid when "
+           "--input_sentence_size > 0");
+-ABSL_FLAG(int32, seed_sentencepiece_size,
++STPC_FLAG(int32, seed_sentencepiece_size,
+           kDefaultTrainerSpec.seed_sentencepiece_size(),
+           "the size of seed sentencepieces");
+-ABSL_FLAG(double, shrinking_factor, kDefaultTrainerSpec.shrinking_factor(),
++STPC_FLAG(double, shrinking_factor, kDefaultTrainerSpec.shrinking_factor(),
+           "Keeps top shrinking_factor pieces with respect to the loss");
+-ABSL_FLAG(int32, num_threads, kDefaultTrainerSpec.num_threads(),
++STPC_FLAG(int32, num_threads, kDefaultTrainerSpec.num_threads(),
+           "number of threads for training");
+-ABSL_FLAG(int32, num_sub_iterations, kDefaultTrainerSpec.num_sub_iterations(),
++STPC_FLAG(int32, num_sub_iterations, kDefaultTrainerSpec.num_sub_iterations(),
+           "number of EM sub-iterations");
+-ABSL_FLAG(int32, max_sentencepiece_length,
++STPC_FLAG(int32, max_sentencepiece_length,
+           kDefaultTrainerSpec.max_sentencepiece_length(),
+           "maximum length of sentence piece");
+-ABSL_FLAG(int32, max_sentence_length, kDefaultTrainerSpec.max_sentence_length(),
++STPC_FLAG(int32, max_sentence_length, kDefaultTrainerSpec.max_sentence_length(),
+           "maximum length of sentence in byte");
+-ABSL_FLAG(bool, split_by_unicode_script,
++STPC_FLAG(bool, split_by_unicode_script,
+           kDefaultTrainerSpec.split_by_unicode_script(),
+           "use Unicode script to split sentence pieces");
+-ABSL_FLAG(bool, split_by_number, kDefaultTrainerSpec.split_by_number(),
++STPC_FLAG(bool, split_by_number, kDefaultTrainerSpec.split_by_number(),
+           "split tokens by numbers (0-9)");
+-ABSL_FLAG(bool, split_by_whitespace, kDefaultTrainerSpec.split_by_whitespace(),
++STPC_FLAG(bool, split_by_whitespace, kDefaultTrainerSpec.split_by_whitespace(),
+           "use a white space to split sentence pieces");
+-ABSL_FLAG(bool, split_digits, kDefaultTrainerSpec.split_digits(),
++STPC_FLAG(bool, split_digits, kDefaultTrainerSpec.split_digits(),
+           "split all digits (0-9) into separate pieces");
+-ABSL_FLAG(bool, treat_whitespace_as_suffix,
++STPC_FLAG(bool, treat_whitespace_as_suffix,
+           kDefaultTrainerSpec.treat_whitespace_as_suffix(),
+           "treat whitespace marker as suffix instead of prefix.");
+-ABSL_FLAG(bool, allow_whitespace_only_pieces,
++STPC_FLAG(bool, allow_whitespace_only_pieces,
+           kDefaultTrainerSpec.allow_whitespace_only_pieces(),
+           "allow pieces that only contain (consecutive) whitespace tokens");
+-ABSL_FLAG(std::string, control_symbols, "",
++STPC_FLAG(std::string, control_symbols, "",
+           "comma separated list of control symbols");
+-ABSL_FLAG(std::string, control_symbols_file, "",
++STPC_FLAG(std::string, control_symbols_file, "",
+           "load control_symbols from file.");
+-ABSL_FLAG(std::string, user_defined_symbols, "",
++STPC_FLAG(std::string, user_defined_symbols, "",
+           "comma separated list of user defined symbols");
+-ABSL_FLAG(std::string, user_defined_symbols_file, "",
++STPC_FLAG(std::string, user_defined_symbols_file, "",
+           "load user_defined_symbols from file.");
+-ABSL_FLAG(std::string, required_chars, "",
++STPC_FLAG(std::string, required_chars, "",
+           "UTF8 characters in this flag are always used in the character "
+           "set regardless of --character_coverage");
+-ABSL_FLAG(std::string, required_chars_file, "",
++STPC_FLAG(std::string, required_chars_file, "",
+           "load required_chars from file.");
+-ABSL_FLAG(bool, byte_fallback, kDefaultTrainerSpec.byte_fallback(),
++STPC_FLAG(bool, byte_fallback, kDefaultTrainerSpec.byte_fallback(),
+           "decompose unknown pieces into UTF-8 byte pieces");
+-ABSL_FLAG(bool, vocabulary_output_piece_score,
++STPC_FLAG(bool, vocabulary_output_piece_score,
+           kDefaultTrainerSpec.vocabulary_output_piece_score(),
+           "Define score in vocab file");
+-ABSL_FLAG(std::string, normalization_rule_name, "nmt_nfkc",
++STPC_FLAG(std::string, normalization_rule_name, "nmt_nfkc",
+           "Normalization rule name. "
+           "Choose from nfkc or identity");
+-ABSL_FLAG(std::string, normalization_rule_tsv, "",
++STPC_FLAG(std::string, normalization_rule_tsv, "",
+           "Normalization rule TSV file. ");
+-ABSL_FLAG(std::string, denormalization_rule_tsv, "",
++STPC_FLAG(std::string, denormalization_rule_tsv, "",
+           "Denormalization rule TSV file.");
+-ABSL_FLAG(bool, add_dummy_prefix, kDefaultNormalizerSpec.add_dummy_prefix(),
++STPC_FLAG(bool, add_dummy_prefix, kDefaultNormalizerSpec.add_dummy_prefix(),
+           "Add dummy whitespace at the beginning of text");
+-ABSL_FLAG(bool, remove_extra_whitespaces,
++STPC_FLAG(bool, remove_extra_whitespaces,
+           kDefaultNormalizerSpec.remove_extra_whitespaces(),
+           "Removes leading, trailing, and "
+           "duplicate internal whitespace");
+-ABSL_FLAG(bool, hard_vocab_limit, kDefaultTrainerSpec.hard_vocab_limit(),
++STPC_FLAG(bool, hard_vocab_limit, kDefaultTrainerSpec.hard_vocab_limit(),
+           "If set to false, --vocab_size is considered as a soft limit.");
+-ABSL_FLAG(bool, use_all_vocab, kDefaultTrainerSpec.use_all_vocab(),
++STPC_FLAG(bool, use_all_vocab, kDefaultTrainerSpec.use_all_vocab(),
+           "If set to true, use all tokens as vocab. "
+           "Valid for word/char models.");
+-ABSL_FLAG(int32, unk_id, kDefaultTrainerSpec.unk_id(),
++STPC_FLAG(int32, unk_id, kDefaultTrainerSpec.unk_id(),
+           "Override UNK (<unk>) id.");
+-ABSL_FLAG(int32, bos_id, kDefaultTrainerSpec.bos_id(),
++STPC_FLAG(int32, bos_id, kDefaultTrainerSpec.bos_id(),
+           "Override BOS (<s>) id. Set -1 to disable BOS.");
+-ABSL_FLAG(int32, eos_id, kDefaultTrainerSpec.eos_id(),
++STPC_FLAG(int32, eos_id, kDefaultTrainerSpec.eos_id(),
+           "Override EOS (</s>) id. Set -1 to disable EOS.");
+-ABSL_FLAG(int32, pad_id, kDefaultTrainerSpec.pad_id(),
++STPC_FLAG(int32, pad_id, kDefaultTrainerSpec.pad_id(),
+           "Override PAD (<pad>) id. Set -1 to disable PAD.");
+-ABSL_FLAG(std::string, unk_piece, kDefaultTrainerSpec.unk_piece(),
++STPC_FLAG(std::string, unk_piece, kDefaultTrainerSpec.unk_piece(),
+           "Override UNK (<unk>) piece.");
+-ABSL_FLAG(std::string, bos_piece, kDefaultTrainerSpec.bos_piece(),
++STPC_FLAG(std::string, bos_piece, kDefaultTrainerSpec.bos_piece(),
+           "Override BOS (<s>) piece.");
+-ABSL_FLAG(std::string, eos_piece, kDefaultTrainerSpec.eos_piece(),
++STPC_FLAG(std::string, eos_piece, kDefaultTrainerSpec.eos_piece(),
+           "Override EOS (</s>) piece.");
+-ABSL_FLAG(std::string, pad_piece, kDefaultTrainerSpec.pad_piece(),
++STPC_FLAG(std::string, pad_piece, kDefaultTrainerSpec.pad_piece(),
+           "Override PAD (<pad>) piece.");
+-ABSL_FLAG(std::string, unk_surface, kDefaultTrainerSpec.unk_surface(),
++STPC_FLAG(std::string, unk_surface, kDefaultTrainerSpec.unk_surface(),
+           "Dummy surface string for <unk>. In decoding <unk> is decoded to "
+           "`unk_surface`.");
+-ABSL_FLAG(bool, train_extremely_large_corpus,
++STPC_FLAG(bool, train_extremely_large_corpus,
+           kDefaultTrainerSpec.train_extremely_large_corpus(),
+           "Increase bit depth for unigram tokenization.");
+-ABSL_FLAG(uint32, random_seed, static_cast<uint32>(-1),
++STPC_FLAG(uint32, random_seed, static_cast<uint32>(-1),
+           "Seed value for random generator.");
+ 
+ int main(int argc, char *argv[]) {
+@@ -151,11 +151,11 @@ int main(int argc, char *argv[]) {
+   sentencepiece::NormalizerSpec normalizer_spec;
+   NormalizerSpec denormalizer_spec;
+ 
+-  CHECK(!absl::GetFlag(FLAGS_input).empty());
+-  CHECK(!absl::GetFlag(FLAGS_model_prefix).empty());
++  CHECK(!sentencepiece::GetFlag(FLAGS_input).empty());
++  CHECK(!sentencepiece::GetFlag(FLAGS_model_prefix).empty());
+ 
+-  if (absl::GetFlag(FLAGS_random_seed) != -1) {
+-    sentencepiece::SetRandomGeneratorSeed(absl::GetFlag(FLAGS_random_seed));
++  if (sentencepiece::GetFlag(FLAGS_random_seed) != -1) {
++    sentencepiece::SetRandomGeneratorSeed(sentencepiece::GetFlag(FLAGS_random_seed));
+   }
+ 
+   auto load_lines = [](absl::string_view filename) {
+@@ -169,28 +169,28 @@ int main(int argc, char *argv[]) {
+ 
+ // Populates the value from flags to spec.
+ #define SetTrainerSpecFromFlag(name) \
+-  trainer_spec.set_##name(absl::GetFlag(FLAGS_##name));
++  trainer_spec.set_##name(sentencepiece::GetFlag(FLAGS_##name));
+ 
+ #define SetNormalizerSpecFromFlag(name) \
+-  normalizer_spec.set_##name(absl::GetFlag(FLAGS_##name));
++  normalizer_spec.set_##name(sentencepiece::GetFlag(FLAGS_##name));
+ 
+ #define SetTrainerSpecFromFile(name)                                   \
+-  if (!absl::GetFlag(FLAGS_##name##_file).empty()) {                   \
+-    const auto lines = load_lines(absl::GetFlag(FLAGS_##name##_file)); \
++  if (!sentencepiece::GetFlag(FLAGS_##name##_file).empty()) {          \
++    const auto lines = load_lines(sentencepiece::GetFlag(FLAGS_##name##_file)); \
+     trainer_spec.set_##name(absl::StrJoin(lines, ""));                 \
+   }
+ 
+ #define SetRepeatedTrainerSpecFromFlag(name)                                \
+-  if (!absl::GetFlag(FLAGS_##name).empty()) {                               \
++  if (!sentencepiece::GetFlag(FLAGS_##name).empty()) {                      \
+     for (const auto &v :                                                    \
+-         sentencepiece::util::StrSplitAsCSV(absl::GetFlag(FLAGS_##name))) { \
++         sentencepiece::util::StrSplitAsCSV(sentencepiece::GetFlag(FLAGS_##name))) { \
+       trainer_spec.add_##name(v);                                           \
+     }                                                                       \
+   }
+ 
+ #define SetRepeatedTrainerSpecFromFile(name)                               \
+-  if (!absl::GetFlag(FLAGS_##name##_file).empty()) {                       \
+-    for (const auto &v : load_lines(absl::GetFlag(FLAGS_##name##_file))) { \
++  if (!sentencepiece::GetFlag(FLAGS_##name##_file).empty()) {              \
++    for (const auto &v : load_lines(sentencepiece::GetFlag(FLAGS_##name##_file))) { \
+       trainer_spec.add_##name(v);                                          \
+     }                                                                      \
+   }
+@@ -239,21 +239,21 @@ int main(int argc, char *argv[]) {
+   SetRepeatedTrainerSpecFromFile(control_symbols);
+   SetRepeatedTrainerSpecFromFile(user_defined_symbols);
+ 
+-  normalizer_spec.set_name(absl::GetFlag(FLAGS_normalization_rule_name));
++  normalizer_spec.set_name(sentencepiece::GetFlag(FLAGS_normalization_rule_name));
+   SetNormalizerSpecFromFlag(normalization_rule_tsv);
+   SetNormalizerSpecFromFlag(add_dummy_prefix);
+   SetNormalizerSpecFromFlag(remove_extra_whitespaces);
+ 
+-  if (!absl::GetFlag(FLAGS_denormalization_rule_tsv).empty()) {
++  if (!sentencepiece::GetFlag(FLAGS_denormalization_rule_tsv).empty()) {
+     denormalizer_spec.set_normalization_rule_tsv(
+-        absl::GetFlag(FLAGS_denormalization_rule_tsv));
++        sentencepiece::GetFlag(FLAGS_denormalization_rule_tsv));
+     denormalizer_spec.set_add_dummy_prefix(false);
+     denormalizer_spec.set_remove_extra_whitespaces(false);
+     denormalizer_spec.set_escape_whitespaces(false);
+   }
+ 
+   CHECK_OK(sentencepiece::SentencePieceTrainer::PopulateModelTypeFromString(
+-      absl::GetFlag(FLAGS_model_type), &trainer_spec));
++      sentencepiece::GetFlag(FLAGS_model_type), &trainer_spec));
+ 
+   CHECK_OK(sentencepiece::SentencePieceTrainer::Train(
+       trainer_spec, normalizer_spec, denormalizer_spec));
+diff --git a/src/test_main.cc b/src/test_main.cc
+index b3170e2..d551244 100644
+--- a/src/test_main.cc
++++ b/src/test_main.cc
+@@ -12,16 +12,17 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
++#include "flag.h"
+ #include "init.h"
+ #include "testharness.h"
+ 
+ #ifdef OS_WIN
+-ABSL_FLAG(std::string, test_srcdir, "..\\data", "Data directory.");
++STPC_FLAG(std::string, test_srcdir, "..\\data", "Data directory.");
+ #else
+-ABSL_FLAG(std::string, test_srcdir, "../data", "Data directory.");
++STPC_FLAG(std::string, test_srcdir, "../data", "Data directory.");
+ #endif
+ 
+-ABSL_FLAG(std::string, test_tmpdir, "test_tmp", "Temporary directory.");
++STPC_FLAG(std::string, test_tmpdir, "test_tmp", "Temporary directory.");
+ 
+ int main(int argc, char **argv) {
+   sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
+diff --git a/src/testharness.cc b/src/testharness.cc
+index daf2d14..75d4efe 100644
+--- a/src/testharness.cc
++++ b/src/testharness.cc
+@@ -26,8 +26,9 @@
+ #include <vector>
+ 
+ #include "common.h"
+-#include "absl/strings/str_cat.h"
++#include "flag.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
+ 
+ namespace sentencepiece {
+ namespace test {
+@@ -56,9 +57,9 @@ bool RegisterTest(const char *base, const char *name, void (*func)()) {
+ int RunAllTests() {
+   int num = 0;
+ #ifdef OS_WIN
+-  _mkdir(absl::GetFlag(FLAGS_test_tmpdir).c_str());
++  _mkdir(sentencepiece::GetFlag(FLAGS_test_tmpdir).c_str());
+ #else
+-  mkdir(absl::GetFlag(FLAGS_test_tmpdir).c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
++  mkdir(sentencepiece::GetFlag(FLAGS_test_tmpdir).c_str(), S_IRUSR | S_IWUSR | S_IXUSR);
+ #endif
+ 
+   if (tests == nullptr) {
+diff --git a/src/testharness.h b/src/testharness.h
+index 98317ad..7aa0c01 100644
+--- a/src/testharness.h
++++ b/src/testharness.h
+@@ -21,12 +21,11 @@
+ #include <string>
+ 
+ #include "common.h"
+-#include "absl/flags/flag.h"
+-#include "absl/flags/parse.h"
++#include "flag.h"
+ #include "absl/strings/string_view.h"
+ 
+-ABSL_DECLARE_FLAG(std::string, test_tmpdir);
+-ABSL_DECLARE_FLAG(std::string, test_srcdir);
++STPC_DECLARE_FLAG(std::string, test_tmpdir);
++STPC_DECLARE_FLAG(std::string, test_srcdir);
+ 
+ namespace sentencepiece {
+ namespace test {
+diff --git a/src/trainer_interface_test.cc b/src/trainer_interface_test.cc
+index d7f3f0c..fbd8d19 100644
+--- a/src/trainer_interface_test.cc
++++ b/src/trainer_interface_test.cc
+@@ -15,11 +15,12 @@
+ #include <utility>
+ 
+ #include "filesystem.h"
++#include "flag.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+-#include "absl/strings/str_format.h"
+ #include "trainer_interface.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
++#include "absl/strings/str_format.h"
+ 
+ namespace sentencepiece {
+ 
+@@ -468,7 +469,7 @@ TEST(TrainerInterfaceTest, SerializeTest) {
+ 
+ TEST(TrainerInterfaceTest, CharactersTest) {
+   const std::string input_file =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "input");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "input");
+   {
+     auto output = filesystem::NewWritableFile(input_file);
+     // Make a single line with 50 "a", 49 "あ", and 1 "b".
+@@ -534,7 +535,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
+   std::vector<std::string> files;
+   std::vector<std::string> expected;
+   for (int i = 0; i < 10; ++i) {
+-    const std::string file = util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir),
++    const std::string file = util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir),
+                                             absl::StrCat("input", i));
+     auto output = filesystem::NewWritableFile(file);
+     int num_line = (rand() % 100) + 1;
+@@ -556,7 +557,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
+ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorErrorTest) {
+   std::vector<std::string> files;
+   for (int i = 0; i < 10; ++i) {
+-    const std::string file = util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir),
++    const std::string file = util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir),
+                                             absl::StrCat("input_not_exist", i));
+     files.push_back(file);
+   }
+diff --git a/src/unigram_model_trainer_test.cc b/src/unigram_model_trainer_test.cc
+index fdb25f6..327124b 100644
+--- a/src/unigram_model_trainer_test.cc
++++ b/src/unigram_model_trainer_test.cc
+@@ -12,14 +12,15 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
++#include "flag.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_processor.h"
+ #include "sentencepiece_trainer.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+-#include "absl/strings/str_join.h"
+ #include "unigram_model_trainer.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
++#include "absl/strings/str_join.h"
+ 
+ namespace sentencepiece {
+ namespace unigram {
+@@ -39,13 +40,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
+ 
+ TEST(UnigramTrainerTest, EndToEndTest) {
+   const std::string input =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_srcdir), kTestInputData);
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_srcdir), kTestInputData);
+ 
+   ASSERT_TRUE(
+       SentencePieceTrainer::Train(
+           absl::StrCat(
+               "--model_prefix=",
+-              util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "tmp_model"),
++              util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "tmp_model"),
+               " --input=", input,
+               " --vocab_size=8000 --normalization_rule_name=identity",
+               " --model_type=unigram --user_defined_symbols=<user>",
+@@ -53,7 +54,7 @@ TEST(UnigramTrainerTest, EndToEndTest) {
+           .ok());
+ 
+   SentencePieceProcessor sp;
+-  EXPECT_TRUE(sp.Load(util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir),
++  EXPECT_TRUE(sp.Load(util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir),
+                                      "tmp_model.model"))
+                   .ok());
+   EXPECT_EQ(8000, sp.GetPieceSize());
+diff --git a/src/util_test.cc b/src/util_test.cc
+index 231fc96..1025767 100644
+--- a/src/util_test.cc
++++ b/src/util_test.cc
+@@ -14,10 +14,11 @@
+ 
+ #include <map>
+ 
++#include "flag.h"
+ #include "filesystem.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+ #include "util.h"
++#include "absl/strings/str_cat.h"
+ 
+ namespace sentencepiece {
+ namespace {
+@@ -332,7 +333,7 @@ TEST(UtilTest, InputOutputBufferTest) {
+ 
+   {
+     auto output = filesystem::NewWritableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_file"));
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_file"));
+     for (size_t i = 0; i < kData.size(); ++i) {
+       output->WriteLine(kData[i]);
+     }
+@@ -340,7 +341,7 @@ TEST(UtilTest, InputOutputBufferTest) {
+ 
+   {
+     auto input = filesystem::NewReadableFile(
+-        util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "test_file"));
++        util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "test_file"));
+     std::string line;
+     for (size_t i = 0; i < kData.size(); ++i) {
+       EXPECT_TRUE(input->ReadLine(&line));
+diff --git a/src/word_model_trainer_test.cc b/src/word_model_trainer_test.cc
+index 366810f..da522e4 100644
+--- a/src/word_model_trainer_test.cc
++++ b/src/word_model_trainer_test.cc
+@@ -16,12 +16,13 @@
+ #include <vector>
+ 
+ #include "filesystem.h"
++#include "flag.h"
+ #include "sentencepiece_processor.h"
+ #include "testharness.h"
+-#include "absl/strings/str_cat.h"
+-#include "absl/strings/str_join.h"
+ #include "util.h"
+ #include "word_model_trainer.h"
++#include "absl/strings/str_cat.h"
++#include "absl/strings/str_join.h"
+ 
+ namespace sentencepiece {
+ namespace word {
+@@ -32,9 +33,9 @@ namespace {
+ 
+ std::string RunTrainer(const std::vector<std::string> &input, int size) {
+   const std::string input_file =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "input");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "input");
+   const std::string model_prefix =
+-      util::JoinPath(absl::GetFlag(FLAGS_test_tmpdir), "model");
++      util::JoinPath(sentencepiece::GetFlag(FLAGS_test_tmpdir), "model");
+   {
+     auto output = filesystem::NewWritableFile(input_file);
+     for (const auto &line : input) {
+-- 
+2.38.1.windows.1
+
