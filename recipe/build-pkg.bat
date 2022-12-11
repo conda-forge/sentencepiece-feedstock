@@ -1,5 +1,8 @@
 @echo on
 
+set PROTOBUF_USE_DLLS=1
+set ABSL_CONSUME_DLL=1
+
 cd %SRC_DIR%\python
 %PYTHON% -m pip install --no-deps --ignore-installed -v .
 IF %ERRORLEVEL% NEQ 0 exit 1
