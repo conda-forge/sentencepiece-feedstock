@@ -25,6 +25,8 @@ source:
     - patches/0007-point-to-our-libs-headers-for-windows-in-setup.py.patch
     # we don't want to link the msvc runtime statically
     - patches/0008-don-t-force-replace-MD-with-MT.patch
+    # install pkg-config metadata also on windows
+    - patches/0009-also-install-pkg-config-files-on-windows.patch
 
 build:
   number: 1
@@ -54,6 +56,8 @@ outputs:
         - pthreads-win32  # [win]
 
     test:
+      requires:
+        - pkg-config
       commands:
         {% for each_lib in ["sentencepiece", "sentencepiece_train"] %}
         # presence of shared libraries
@@ -66,6 +70,9 @@ outputs:
         # absence of static libraries (on unix)
         - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
         {% endfor %}
+
+        # pkg-config
+        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
 
         # headers
         {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
@@ -86,7 +93,7 @@ outputs:
         - python                                 # [build_platform != target_platform]
         - cross-python_{{ target_platform }}     # [build_platform != target_platform]
         - {{ compiler('cxx') }}
-        - pkg-config
+        - pkg-config   # [unix]
       host:
         - pip
         - python
