@@ -19,6 +19,7 @@ if [[ "${target_platform}" != "${build_platform}" ]]; then
 fi
 
 cmake -G "Ninja" \
+    -DCMAKE_BUILD_TYPE=Release \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_INSTALL_LIBDIR=$PREFIX/lib \
     -DCMAKE_AR="${AR}" \
