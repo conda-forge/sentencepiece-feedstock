@@ -9,11 +9,6 @@ rm -rf third_party/protobuf-lite
 mkdir build
 cd build
 
-export LD_LIBRARY_PATH=${PREFIX}/lib
-export CPATH=${PREFIX}/include
-export INCLUDE=${PREFIX}/include
-export LIBRARY_PATH=${PREFIX}/lib
-
 if [[ "${target_platform}" != "${build_platform}" ]]; then
     CMAKE_ARGS="${CMAKE_ARGS} -DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc"
 fi

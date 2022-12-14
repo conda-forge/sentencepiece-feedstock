@@ -8,11 +8,6 @@ rmdir /S /Q third_party\protobuf-lite
 mkdir build
 cd build
 
-set _CL_=/utf-8
-set _USE_EXTERNAL_ABSL=1
-set PROTOBUF_USE_DLLS=1
-set ABSL_CONSUME_DLL=1
-
 cmake -G "Ninja" ^
     -DCMAKE_BUILD_TYPE=Release ^
     -DCMAKE_PREFIX_PATH=%LIBRARY_PREFIX%;%LIBRARY_BIN%;%LIBRARY_LIB% ^
