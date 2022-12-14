@@ -22,3 +22,11 @@ IF %ERRORLEVEL% NEQ 0 exit 1
 
 cmake --build . --config Release --target install
 IF %ERRORLEVEL% NEQ 0 exit 1
+
+if [%PKG_NAME%] == [libsentencepiece] (
+    del /s /q %LIBRARY_BIN%\spm_*
+)
+
+:: clean up for rerun
+cd ..
+rd /s /q build

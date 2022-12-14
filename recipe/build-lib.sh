@@ -28,6 +28,10 @@ cmake -G "Ninja" \
 cmake --build .
 cmake --install .
 
-if [[ "${target_platform}" == linux-* ]]; then
-    ldconfig -v -N
+if [[ "$PKG_NAME" == "libsentencepiece" ]]; then
+    rm ${PREFIX}/bin/spm_*
 fi
+
+# clean up for rerun
+cd ..
+rm -rf build
