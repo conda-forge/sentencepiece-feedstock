@@ -38,6 +38,11 @@ requirements:
 outputs:
   - name: sentencepiece
     # metapackage that holds everything together
+    build:
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - libsentencepiece ={{ version }}
     requirements:
       host:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
