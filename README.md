@@ -95,6 +95,8 @@ Current release info
 | --- | --- | --- | --- |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-libsentencepiece-green.svg)](https://anaconda.org/conda-forge/libsentencepiece) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/libsentencepiece.svg)](https://anaconda.org/conda-forge/libsentencepiece) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/libsentencepiece.svg)](https://anaconda.org/conda-forge/libsentencepiece) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/libsentencepiece.svg)](https://anaconda.org/conda-forge/libsentencepiece) |
 | [![Conda Recipe](https://img.shields.io/badge/recipe-sentencepiece-green.svg)](https://anaconda.org/conda-forge/sentencepiece) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/sentencepiece.svg)](https://anaconda.org/conda-forge/sentencepiece) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/sentencepiece.svg)](https://anaconda.org/conda-forge/sentencepiece) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/sentencepiece.svg)](https://anaconda.org/conda-forge/sentencepiece) |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-sentencepiece--python-green.svg)](https://anaconda.org/conda-forge/sentencepiece-python) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/sentencepiece-python.svg)](https://anaconda.org/conda-forge/sentencepiece-python) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/sentencepiece-python.svg)](https://anaconda.org/conda-forge/sentencepiece-python) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/sentencepiece-python.svg)](https://anaconda.org/conda-forge/sentencepiece-python) |
+| [![Conda Recipe](https://img.shields.io/badge/recipe-sentencepiece--spm-green.svg)](https://anaconda.org/conda-forge/sentencepiece-spm) | [![Conda Downloads](https://img.shields.io/conda/dn/conda-forge/sentencepiece-spm.svg)](https://anaconda.org/conda-forge/sentencepiece-spm) | [![Conda Version](https://img.shields.io/conda/vn/conda-forge/sentencepiece-spm.svg)](https://anaconda.org/conda-forge/sentencepiece-spm) | [![Conda Platforms](https://img.shields.io/conda/pn/conda-forge/sentencepiece-spm.svg)](https://anaconda.org/conda-forge/sentencepiece-spm) |
 
 Installing sentencepiece
 ========================
@@ -106,16 +108,16 @@ conda config --add channels conda-forge
 conda config --set channel_priority strict
 ```
 
-Once the `conda-forge` channel has been enabled, `libsentencepiece, sentencepiece` can be installed with `conda`:
+Once the `conda-forge` channel has been enabled, `libsentencepiece, sentencepiece, sentencepiece-python, sentencepiece-spm` can be installed with `conda`:
 
 ```
-conda install libsentencepiece sentencepiece
+conda install libsentencepiece sentencepiece sentencepiece-python sentencepiece-spm
 ```
 
 or with `mamba`:
 
 ```
-mamba install libsentencepiece sentencepiece
+mamba install libsentencepiece sentencepiece sentencepiece-python sentencepiece-spm
 ```
 
 It is possible to list all of the versions of `libsentencepiece` available on your platform with `conda`:
