@@ -1,0 +1,41 @@
+From 366beb19a2920900528dc9a096ec480bef96a42e Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Sun, 11 Dec 2022 21:40:56 +1100
+Subject: [PATCH 8/9] don't force-replace /MD with /MT
+
+---
+ CMakeLists.txt  | 4 ----
+ python/setup.py | 2 +-
+ 2 files changed, 1 insertion(+), 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index f712e3b..23d4a48 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -56,10 +56,6 @@ else()
+ endif()
+ 
+ if (MSVC)
+-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_DEBUG          ${CMAKE_CXX_FLAGS_DEBUG})
+-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_MINSIZEREL     ${CMAKE_CXX_FLAGS_MINSIZEREL})
+-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELEASE        ${CMAKE_CXX_FLAGS_RELEASE})
+-  string(REPLACE "/MD" "/MT" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+   add_definitions("/wd4267 /wd4244 /wd4305 /Zc:strictStrings /utf-8")
+ endif()
+ 
+diff --git a/python/setup.py b/python/setup.py
+index e734f19..d8a3c08 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -84,7 +84,7 @@ class build_ext(_build_ext):
+ 
+ 
+ if os.name == 'nt':
+-  cflags = ['/MT', '/I' + os.environ["LIBRARY_INC"], '/std:c++17']
++  cflags = ['/MD', '/I' + os.environ["LIBRARY_INC"], '/std:c++17']
+   libs = [
+     # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
+     os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
+-- 
+2.38.1.windows.1
+

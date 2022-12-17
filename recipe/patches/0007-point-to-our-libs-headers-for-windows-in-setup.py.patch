@@ -1,0 +1,44 @@
+From 63c37471b3a650fcd3b272fd8ec0cd82ec0c2bae Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Sun, 11 Dec 2022 01:09:03 +1100
+Subject: [PATCH 7/9] point to our libs / headers for windows in setup.py
+
+also do not risk building against bundled libs
+---
+ python/setup.py | 12 ++++++++----
+ 1 file changed, 8 insertions(+), 4 deletions(-)
+
+diff --git a/python/setup.py b/python/setup.py
+index dafcb40..e734f19 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -65,7 +65,7 @@ class build_ext(_build_ext):
+ 
+   def build_extension(self, ext):
+     pkg_config_path = None
+-    if not is_sentencepiece_installed():
++    if False:
+       subprocess.check_call(['./build_bundled.sh', version()])
+       pkg_config_path = './bundled/lib/pkgconfig:./bundled/lib64/pkgconfig'
+ 
+@@ -84,10 +84,14 @@ class build_ext(_build_ext):
+ 
+ 
+ if os.name == 'nt':
+-  cflags = ['/MT', '/I..\\build\\root\\include', '/std:c++17']
++  cflags = ['/MT', '/I' + os.environ["LIBRARY_INC"], '/std:c++17']
+   libs = [
+-      '..\\build\\root\\lib\\sentencepiece.lib',
+-      '..\\build\\root\\lib\\sentencepiece_train.lib'
++    # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
++    os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
++    # protobuf actually has the lib-prefix in the name also on windows;
++    # since libsentencepiece is static on windows, we also need _its_
++    # host dependencies for the link interface, i.e. also abseil
++    for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
+   ]
+   SENTENCEPIECE_EXT = Extension(
+       'sentencepiece._sentencepiece',
+-- 
+2.38.1.windows.1
+

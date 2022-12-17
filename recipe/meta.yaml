@@ -1,46 +1,161 @@
 {% set version = "0.1.96" %}
 
 package:
-  name: sentencepiece
+  name: sentencepiece-split
   version: {{ version }}
 
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
   sha256: 5198f31c3bb25e685e9e68355a3bf67a1db23c9e8bdccc33dc015f496a44df7a
+  patches:
+    # trying to build both static & shared build seems to break on OSX
+    - patches/0001-do-not-mix-static-shared-builds.patch
+    # unvendor abseil & protobuf-lite
+    - patches/0002-do-not-build-vendored-abseil-libprotobuf-lite.patch
+    # avoid installing into $PREFIX/lib64; make sure pkg-config template is filled correctly
+    - patches/0003-consistently-use-absolute-paths-for-CMAKE_INSTALL_-D.patch
+    # use C++17; needs to match standard with which libabseil was compiled
+    - patches/0004-use-C-17.patch
+    # upstream sources still directly include third_party/absl...
+    - patches/0005-ACTUALLY-use-external-absl.patch
+    # upstream carries its own glue code under third_party/absl/flags;
+    # move it to the sentencepiece sources
+    - patches/0006-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
+    # ensure python bindings link to correct libs on windows
+    - patches/0007-point-to-our-libs-headers-for-windows-in-setup.py.patch
+    # we don't want to link the msvc runtime statically
+    - patches/0008-don-t-force-replace-MD-with-MT.patch
+    # install pkg-config metadata also on windows
+    - patches/0009-also-install-pkg-config-files-on-windows.patch
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
-    - python                                 # [build_platform != target_platform]
-    - cross-python_{{ target_platform }}     # [build_platform != target_platform]
-    - cmake
     - {{ compiler('cxx') }}
-    - gperftools  # [unix]
-    - make
-    - pkg-config
-  host:
-    - pip
-    - python
-  run:
-    - python
 
-test:
-  imports:
-    - sentencepiece
-  requires:
-    - pip
-    - pytest
-  source_files:
-    - python/test
-    - data
-  commands:
-    - pip check
-    - spm_export_vocab --help  # [linux]
-    - spm_normalize --help     # [linux]
-    # upstream test suite expects to be run from PKG_ROOT/python
-    - cd python && pytest test
+outputs:
+  - name: sentencepiece
+    # metapackage that holds everything together
+    build:
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - libsentencepiece ={{ version }}
+    requirements:
+      host:
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+      run:
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        - {{ pin_subpackage('sentencepiece-spm', exact=True) }}
+        - {{ pin_subpackage('sentencepiece-python', exact=True) }}
+    test:
+      commands:
+        # tested in other outputs
+        - exit 0
+
+  - name: libsentencepiece
+    script: build-lib.sh   # [unix]
+    script: build-lib.bat  # [win]
+    build:
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - libsentencepiece ={{ version }}
+    requirements:
+      build:
+        - libprotobuf     # [build_platform != target_platform]
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - libabseil
+        - libprotobuf
+        - pthreads-win32  # [win]
+
+    test:
+      requires:
+        - pkg-config
+      commands:
+        {% for each_lib in ["sentencepiece", "sentencepiece_train"] %}
+        # presence of shared libraries
+        - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
+        - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
+
+        # static libraries on windows
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
+
+        # absence of static libraries (on unix)
+        - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
+        {% endfor %}
+
+        # pkg-config
+        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
+
+        # headers
+        {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
+        - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
+        - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
+        {% endfor %}
+
+  - name: sentencepiece-spm
+    script: build-lib.sh   # [unix]
+    script: build-lib.bat  # [win]
+    requirements:
+      build:
+        - libprotobuf     # [build_platform != target_platform]
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
+      host:
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        - libabseil
+        - libprotobuf
+        - pthreads-win32  # [win]
+      run:
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+
+    test:
+      commands:
+        # binaries
+        {% for each_bin in ["decode", "encode", "export_vocab", "normalize", "train"] %}
+        - spm_{{ each_bin }} --help
+        {% endfor %}
+
+  - name: sentencepiece-python
+    script: build-pkg.sh   # [unix]
+    script: build-pkg.bat  # [win]
+    requirements:
+      build:
+        - python                                 # [build_platform != target_platform]
+        - cross-python_{{ target_platform }}     # [build_platform != target_platform]
+        - {{ compiler('cxx') }}
+        - pkg-config   # [unix]
+      host:
+        - pip
+        - python
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        - libprotobuf
+        # host deps of static libsentencepiece leak to consumers
+        - libabseil    # [win]
+      run:
+        - python
+        - {{ pin_subpackage('libsentencepiece', exact=True) }}
+
+    test:
+      imports:
+        - sentencepiece
+      requires:
+        - pip
+        - pytest
+      source_files:
+        - python/test
+        - data
+      commands:
+        - pip check
+        # upstream test suite expects to be run from PKG_ROOT/python
+        - cd python && pytest test
 
 about:
   home: "https://github.com/google/sentencepiece/"
@@ -67,3 +182,4 @@ extra:
     - ndmaxar
     - oblute
     - h-vetinari
+  feedstock-name: sentencepiece

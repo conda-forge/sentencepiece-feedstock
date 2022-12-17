@@ -1,0 +1,48 @@
+From 40165c6e26750f48ddbb5d6b0483665c0d9d15cd Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Wed, 9 Feb 2022 00:42:22 +1100
+Subject: [PATCH 4/9] use C++17
+
+---
+ CMakeLists.txt  | 2 +-
+ python/setup.py | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 13e5964..f712e3b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -28,7 +28,7 @@ option(SPM_NO_THREADLOCAL "Disable thread_local operator" OFF)
+ option(SPM_USE_BUILTIN_PROTOBUF "Use built-in protobuf" ON)
+ option(SPM_USE_EXTERNAL_ABSL "Use external protobuf" OFF)
+ 
+-set(CMAKE_CXX_STANDARD 11)
++set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
+ if((CMAKE_CXX_COMPILER_ID STREQUAL "Clang" AND
+diff --git a/python/setup.py b/python/setup.py
+index 79f2691..dafcb40 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -69,7 +69,7 @@ class build_ext(_build_ext):
+       subprocess.check_call(['./build_bundled.sh', version()])
+       pkg_config_path = './bundled/lib/pkgconfig:./bundled/lib64/pkgconfig'
+ 
+-    cflags = ['-std=c++11']
++    cflags = ['-std=c++17']
+     # Fix compile on some versions of Mac OSX
+     # See: https://github.com/neulab/xnmt/issues/199
+     if sys.platform == 'darwin':
+@@ -84,7 +84,7 @@ class build_ext(_build_ext):
+ 
+ 
+ if os.name == 'nt':
+-  cflags = ['/MT', '/I..\\build\\root\\include']
++  cflags = ['/MT', '/I..\\build\\root\\include', '/std:c++17']
+   libs = [
+       '..\\build\\root\\lib\\sentencepiece.lib',
+       '..\\build\\root\\lib\\sentencepiece_train.lib'
+-- 
+2.38.1.windows.1
+
