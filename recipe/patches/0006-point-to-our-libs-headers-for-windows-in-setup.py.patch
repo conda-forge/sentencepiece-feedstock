@@ -1,0 +1,58 @@
+From 9f80885f9a32cf8e871f645d208f2e102981cbb3 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Sun, 11 Dec 2022 01:09:03 +1100
+Subject: [PATCH 6/9] point to our libs / headers for windows in setup.py
+
+also do not risk building against bundled libs
+---
+ python/setup.py | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+
+diff --git a/python/setup.py b/python/setup.py
+index fdf9394..fa55d78 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -77,12 +77,12 @@ class build_ext(_build_ext):
+   """Override build_extension to run cmake."""
+ 
+   def build_extension(self, ext):
+-    cflags, libs = get_cflags_and_libs('../build/root')
+-    if len(libs) == 0:
++    cflags = ['-std=c++17']
++    if False:
+       cflags, libs = get_cflags_and_libs('./bundled/root')
+ 
+-    if len(libs) == 0:
+-      if is_sentencepiece_installed():
++    if True:
++      if True:
+         cflags = cflags + run_pkg_config('cflags')
+         libs = run_pkg_config('libs')
+       else:
+@@ -108,13 +108,22 @@ if os.name == 'nt':
+   arch = 'win32'
+   if sys.maxsize > 2**32:
+     arch = 'amd64'
+-  if os.path.exists('..\\build\\root_{}\\lib'.format(arch)):
++  if False:
+     cflags = ['/std:c++17', '/MT', '/I..\\build\\root_{}\\include'.format(arch)]
+     libs = [
+         '..\\build\\root_{}\\lib\\sentencepiece.lib'.format(arch),
+         '..\\build\\root_{}\\lib\\sentencepiece_train.lib'.format(arch)
+     ]
+   else:
++    cflags = ['/std:c++17', '/MT', '/I' + os.environ["LIBRARY_INC"]]
++    libs = [
++      # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
++      os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
++      # protobuf actually has the lib-prefix in the name also on windows;
++      # since libsentencepiece is static on windows, we also need _its_
++      # host dependencies for the link interface, i.e. also abseil
++      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
++    ]
+     cflags = ['/std:c++17', '/MT', '/I..\\build\\root\\include']
+     libs = [
+         '..\\build\\root\\lib\\sentencepiece.lib',
+-- 
+2.38.1.windows.1
+

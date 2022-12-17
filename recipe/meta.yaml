@@ -1,4 +1,4 @@
-{% set version = "0.1.96" %}
+{% set version = "0.1.97" %}
 
 package:
   name: sentencepiece-split
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
-  sha256: 5198f31c3bb25e685e9e68355a3bf67a1db23c9e8bdccc33dc015f496a44df7a
+  sha256: 41c3a07f315e3ac87605460c8bb8d739955bc8e7f478caec4017ef9b7d78669b
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
@@ -14,24 +14,22 @@ source:
     - patches/0002-do-not-build-vendored-abseil-libprotobuf-lite.patch
     # avoid installing into $PREFIX/lib64; make sure pkg-config template is filled correctly
     - patches/0003-consistently-use-absolute-paths-for-CMAKE_INSTALL_-D.patch
-    # use C++17; needs to match standard with which libabseil was compiled
-    - patches/0004-use-C-17.patch
     # upstream sources still directly include third_party/absl...
-    - patches/0005-ACTUALLY-use-external-absl.patch
+    - patches/0004-ACTUALLY-use-external-absl.patch
     # upstream carries its own glue code under third_party/absl/flags;
     # move it to the sentencepiece sources
-    - patches/0006-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
+    - patches/0005-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
     # ensure python bindings link to correct libs on windows
-    - patches/0007-point-to-our-libs-headers-for-windows-in-setup.py.patch
+    - patches/0006-point-to-our-libs-headers-for-windows-in-setup.py.patch
     # we don't want to link the msvc runtime statically
-    - patches/0008-don-t-force-replace-MD-with-MT.patch
+    - patches/0007-don-t-force-replace-MD-with-MT.patch
     # install pkg-config metadata also on windows
-    - patches/0009-also-install-pkg-config-files-on-windows.patch
+    - patches/0008-also-install-pkg-config-files-on-windows.patch
     # install CMake metadata
-    - patches/0010-create-and-install-CMake-metadata.patch
+    - patches/0009-create-and-install-CMake-metadata.patch
 
 build:
-  number: 4
+  number: 0
 
 requirements:
   build:
