@@ -1,43 +1,43 @@
-From 5939944ce5172e8950e16315a40ec43b56a8d33c Mon Sep 17 00:00:00 2001
+From a716820aa396fb2ea3693917c0c19fe3f4ed2b27 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 12:50:47 +1100
 Subject: [PATCH 5/9] stop pretending sp glue code belongs in third_party/absl
 
 ---
- src/CMakeLists.txt                      |   4 +-
- src/bpe_model_trainer.cc                |   3 +-
- src/bpe_model_trainer_test.cc           |  13 +--
- src/builder_test.cc                     |  17 ++--
- src/char_model_trainer_test.cc          |   7 +-
- src/compile_charsmap_main.cc            |   6 +-
- src/error.cc                            |   9 --
- src/filesystem_test.cc                  |   7 +-
- {third_party/absl/flags => src}/flag.cc |  22 ++--
- {third_party/absl/flags => src}/flag.h  |  16 +--
- src/init.h                              |  10 +-
- src/init_test.cc                        |  61 +++++------
- {third_party/absl/flags => src}/parse.h |  10 +-
- src/sentencepiece_processor_test.cc     |  11 +-
- src/sentencepiece_trainer_test.cc       |  29 +++---
- src/spm_decode_main.cc                  |  44 ++++----
- src/spm_encode_main.cc                  |  74 +++++++-------
- src/spm_export_vocab_main.cc            |  18 ++--
- src/spm_normalize_main.cc               |  44 ++++----
- src/spm_train_main.cc                   | 130 ++++++++++++------------
- src/test_main.cc                        |   7 +-
- src/testharness.cc                      |   7 +-
- src/testharness.h                       |   7 +-
- src/trainer_interface_test.cc           |  11 +-
- src/unigram_model_trainer_test.cc       |   9 +-
- src/util_test.cc                        |   7 +-
- src/word_model_trainer_test.cc          |   9 +-
- 27 files changed, 299 insertions(+), 293 deletions(-)
- rename {third_party/absl/flags => src}/flag.cc (94%)
- rename {third_party/absl/flags => src}/flag.h (78%)
- rename {third_party/absl/flags => src}/parse.h (79%)
+ src/CMakeLists.txt                           |   4 +-
+ src/bpe_model_trainer.cc                     |   4 +-
+ src/bpe_model_trainer_test.cc                |  11 +-
+ src/builder_test.cc                          |  15 +-
+ src/char_model_trainer_test.cc               |   5 +-
+ src/compile_charsmap_main.cc                 |   6 +-
+ src/error.cc                                 |   9 --
+ src/filesystem_test.cc                       |   5 +-
+ {third_party/absl => src/glue}/flags/flag.cc |  22 +--
+ {third_party/absl => src/glue}/flags/flag.h  |  16 +--
+ {third_party/absl => src/glue}/flags/parse.h |  10 +-
+ src/init.h                                   |  11 +-
+ src/init_test.cc                             |  61 +++++----
+ src/sentencepiece_processor_test.cc          |   9 +-
+ src/sentencepiece_trainer_test.cc            |  27 ++--
+ src/spm_decode_main.cc                       |  43 +++---
+ src/spm_encode_main.cc                       |  74 +++++-----
+ src/spm_export_vocab_main.cc                 |  19 ++-
+ src/spm_normalize_main.cc                    |  45 +++---
+ src/spm_train_main.cc                        | 136 +++++++++----------
+ src/test_main.cc                             |   7 +-
+ src/testharness.cc                           |   5 +-
+ src/testharness.h                            |   8 +-
+ src/trainer_interface_test.cc                |   7 +-
+ src/unigram_model_trainer_test.cc            |   7 +-
+ src/util_test.cc                             |   5 +-
+ src/word_model_trainer_test.cc               |   5 +-
+ 27 files changed, 291 insertions(+), 285 deletions(-)
+ rename {third_party/absl => src/glue}/flags/flag.cc (93%)
+ rename {third_party/absl => src/glue}/flags/flag.h (78%)
+ rename {third_party/absl => src/glue}/flags/parse.h (79%)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 944f726..4a2e490 100644
+index 944f726..6d986b6 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -13,7 +13,9 @@
@@ -47,45 +47,45 @@ index 944f726..4a2e490 100644
 -  set(ABSL_FLAGS_SRCS "")
 +  # originally part of third_party/absl, but actually
 +  # only relevant for sentencepiece; now moved.
-+  set(ABSL_FLAGS_SRCS "flag.cc")
++  set(ABSL_FLAGS_SRCS "glue/flags/flag.cc")
    set(ABSL_STRINGS_SRCS "")
    list(APPEND SPM_LIBS absl::strings)
    list(APPEND SPM_LIBS absl::flags)
 diff --git a/src/bpe_model_trainer.cc b/src/bpe_model_trainer.cc
-index ae8983c..be78bef 100644
+index d3b9d50..b0073df 100644
 --- a/src/bpe_model_trainer.cc
 +++ b/src/bpe_model_trainer.cc
-@@ -18,8 +18,9 @@
- #include <vector>
+@@ -12,6 +12,8 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
  
- #include "bpe_model_trainer.h"
--#include "absl/container/flat_hash_set.h"
-+#include "flag.h"
++#include "bpe_model_trainer.h"
++
+ #include <algorithm>
+ #include <string>
+ #include <unordered_set>
+@@ -19,7 +21,7 @@
+ 
+ #include "absl/container/flat_hash_set.h"
+ 
+-#include "bpe_model_trainer.h"
++#include "glue/flags/flag.h"
  #include "util.h"
-+#include "absl/container/flat_hash_set.h"
  
  namespace sentencepiece {
- namespace bpe {
 diff --git a/src/bpe_model_trainer_test.cc b/src/bpe_model_trainer_test.cc
-index 2a43c3a..c5224ca 100644
+index f977fd0..67b5b2d 100644
 --- a/src/bpe_model_trainer_test.cc
 +++ b/src/bpe_model_trainer_test.cc
-@@ -17,12 +17,13 @@
+@@ -20,6 +20,7 @@
  
  #include "bpe_model_trainer.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "sentencepiece_processor.h"
  #include "sentencepiece_trainer.h"
  #include "testharness.h"
-+#include "util.h"
- #include "absl/strings/str_cat.h"
- #include "absl/strings/str_join.h"
--#include "util.h"
- 
- namespace sentencepiece {
- namespace bpe {
-@@ -35,9 +36,9 @@ std::string RunTrainer(
+@@ -36,9 +37,9 @@ std::string RunTrainer(
      const std::vector<std::string> &input, int size,
      const std::vector<std::string> &user_defined_symbols = {}) {
    const std::string input_file =
@@ -97,7 +97,7 @@ index 2a43c3a..c5224ca 100644
    {
      auto output = filesystem::NewWritableFile(input_file);
      for (const auto &line : input) {
-@@ -93,13 +94,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
+@@ -94,13 +95,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
  
  TEST(BPETrainerTest, EndToEndTest) {
    const std::string input =
@@ -113,7 +113,7 @@ index 2a43c3a..c5224ca 100644
                " --input=", input,
                " --vocab_size=8000 --normalization_rule_name=identity"
                " --model_type=bpe --control_symbols=<ctrl> "
-@@ -108,7 +109,7 @@ TEST(BPETrainerTest, EndToEndTest) {
+@@ -109,7 +110,7 @@ TEST(BPETrainerTest, EndToEndTest) {
  
    SentencePieceProcessor sp;
    ASSERT_TRUE(sp.Load(std::string(util::JoinPath(
@@ -123,24 +123,18 @@ index 2a43c3a..c5224ca 100644
    EXPECT_EQ(8000, sp.GetPieceSize());
  
 diff --git a/src/builder_test.cc b/src/builder_test.cc
-index 1dee5c7..ddd1d5f 100644
+index f586fba..c6e6344 100644
 --- a/src/builder_test.cc
 +++ b/src/builder_test.cc
-@@ -15,11 +15,12 @@
+@@ -17,6 +17,7 @@
  #include "builder.h"
  #include "common.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "normalizer.h"
  #include "sentencepiece_trainer.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
- #include "util.h"
-+#include "absl/strings/str_cat.h"
- 
- namespace sentencepiece {
- namespace normalizer {
-@@ -143,7 +144,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
+@@ -144,7 +145,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
    Builder::CharsMap chars_map;
    ASSERT_TRUE(
        Builder::LoadCharsMap(
@@ -149,7 +143,7 @@ index 1dee5c7..ddd1d5f 100644
            &chars_map)
            .ok());
  
-@@ -158,14 +159,14 @@ TEST(BuilderTest, LoadCharsMapTest) {
+@@ -159,14 +160,14 @@ TEST(BuilderTest, LoadCharsMapTest) {
  
    ASSERT_TRUE(
        Builder::SaveCharsMap(
@@ -166,7 +160,7 @@ index 1dee5c7..ddd1d5f 100644
            &saved_chars_map)
            .ok());
    EXPECT_EQ(chars_map, saved_chars_map);
-@@ -180,7 +181,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
+@@ -181,7 +182,7 @@ TEST(BuilderTest, LoadCharsMapTest) {
  TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
    {
      auto output = filesystem::NewWritableFile(
@@ -175,7 +169,7 @@ index 1dee5c7..ddd1d5f 100644
      output->WriteLine("0061\t0041");
      output->WriteLine("0062");
      output->WriteLine("0063\t\t#foo=>bar");
-@@ -188,7 +189,7 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
+@@ -189,7 +190,7 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
  
    Builder::CharsMap chars_map;
    EXPECT_TRUE(Builder::LoadCharsMap(
@@ -184,7 +178,7 @@ index 1dee5c7..ddd1d5f 100644
                    &chars_map)
                    .ok());
  
-@@ -199,14 +200,14 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
+@@ -200,14 +201,14 @@ TEST(BuilderTest, LoadCharsMapWithEmptyeTest) {
  
    EXPECT_TRUE(
        Builder::SaveCharsMap(
@@ -202,24 +196,18 @@ index 1dee5c7..ddd1d5f 100644
            .ok());
    EXPECT_EQ(chars_map, new_chars_map);
 diff --git a/src/char_model_trainer_test.cc b/src/char_model_trainer_test.cc
-index e8b4979..ded903d 100644
+index b49cea1..7192b68 100644
 --- a/src/char_model_trainer_test.cc
 +++ b/src/char_model_trainer_test.cc
-@@ -17,11 +17,12 @@
+@@ -20,6 +20,7 @@
  
  #include "char_model_trainer.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "sentencepiece_processor.h"
  #include "testharness.h"
-+#include "util.h"
- #include "absl/strings/str_cat.h"
- #include "absl/strings/str_join.h"
--#include "util.h"
- 
- namespace sentencepiece {
- namespace character {
-@@ -32,9 +33,9 @@ namespace {
+ #include "util.h"
+@@ -33,9 +34,9 @@ namespace {
  
  std::string RunTrainer(const std::vector<std::string> &input, int size) {
    const std::string input_file =
@@ -232,18 +220,21 @@ index e8b4979..ded903d 100644
      auto output = filesystem::NewWritableFile(input_file);
      for (const auto &line : input) {
 diff --git a/src/compile_charsmap_main.cc b/src/compile_charsmap_main.cc
-index a0e7cec..253ac59 100644
+index 48da74a..a05c069 100644
 --- a/src/compile_charsmap_main.cc
 +++ b/src/compile_charsmap_main.cc
-@@ -20,14 +20,14 @@
+@@ -18,17 +18,17 @@
+ #include <sstream>
+ #include <string>
+ 
+-#include "absl/flags/flag.h"
+ #include "absl/strings/string_view.h"
  
  #include "builder.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "init.h"
  #include "sentencepiece_processor.h"
--#include "absl/flags/flag.h"
- #include "absl/strings/string_view.h"
  
  using sentencepiece::normalizer::Builder;
  
@@ -252,7 +243,7 @@ index a0e7cec..253ac59 100644
            "make normalization_rule.h file");
  
  namespace sentencepiece {
-@@ -185,7 +185,7 @@ int main(int argc, char **argv) {
+@@ -186,7 +186,7 @@ int main(int argc, char **argv) {
      data.emplace_back(p.first, index);
    }
  
@@ -282,22 +273,18 @@ index 1cc77b8..f12c739 100644
  namespace error {
  int gTestCounter = 0;
 diff --git a/src/filesystem_test.cc b/src/filesystem_test.cc
-index 39ece99..cd2eff0 100644
+index 3c9fbdc..305cd87 100644
 --- a/src/filesystem_test.cc
 +++ b/src/filesystem_test.cc
-@@ -13,9 +13,10 @@
- // limitations under the License.!
+@@ -15,6 +15,7 @@
+ #include "absl/strings/str_cat.h"
  
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
  #include "util.h"
-+#include "absl/strings/str_cat.h"
  
- namespace sentencepiece {
- 
-@@ -28,7 +29,7 @@ TEST(UtilTest, FilesystemTest) {
+@@ -29,7 +30,7 @@ TEST(UtilTest, FilesystemTest) {
  
    {
      auto output = filesystem::NewWritableFile(
@@ -306,7 +293,7 @@ index 39ece99..cd2eff0 100644
      for (size_t i = 0; i < kData.size(); ++i) {
        output->WriteLine(kData[i]);
      }
-@@ -36,7 +37,7 @@ TEST(UtilTest, FilesystemTest) {
+@@ -37,7 +38,7 @@ TEST(UtilTest, FilesystemTest) {
  
    {
      auto input = filesystem::NewReadableFile(
@@ -315,13 +302,13 @@ index 39ece99..cd2eff0 100644
      std::string line;
      for (size_t i = 0; i < kData.size(); ++i) {
        EXPECT_TRUE(input->ReadLine(&line));
-diff --git a/third_party/absl/flags/flag.cc b/src/flag.cc
-similarity index 94%
+diff --git a/third_party/absl/flags/flag.cc b/src/glue/flags/flag.cc
+similarity index 93%
 rename from third_party/absl/flags/flag.cc
-rename to src/flag.cc
-index 8e99c0d..cab3b2f 100644
+rename to src/glue/flags/flag.cc
+index 8e99c0d..ceaa595 100644
 --- a/third_party/absl/flags/flag.cc
-+++ b/src/flag.cc
++++ b/src/glue/flags/flag.cc
 @@ -12,25 +12,25 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
@@ -339,8 +326,8 @@ index 8e99c0d..cab3b2f 100644
  #include "config.h"
 -#include "src/common.h"
 -#include "src/util.h"
-+#include "common.h"
-+#include "util.h"
++#include "../../common.h"
++#include "../../util.h"
  
 -ABSL_FLAG(bool, help, false, "show help");
 -ABSL_FLAG(bool, version, false, "show version");
@@ -374,13 +361,13 @@ index 8e99c0d..cab3b2f 100644
  }
 -}  // namespace absl
 +}  // namespace sentencepiece
-diff --git a/third_party/absl/flags/flag.h b/src/flag.h
+diff --git a/third_party/absl/flags/flag.h b/src/glue/flags/flag.h
 similarity index 78%
 rename from third_party/absl/flags/flag.h
-rename to src/flag.h
+rename to src/glue/flags/flag.h
 index e540edf..c8a7dab 100644
 --- a/third_party/absl/flags/flag.h
-+++ b/src/flag.h
++++ b/src/glue/flags/flag.h
 @@ -12,15 +12,15 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
@@ -417,18 +404,47 @@ index e540edf..c8a7dab 100644
  
 -#endif  // ABSL_FLAGS_FLAG_H_
 +#endif  // SENTENCEPIECE_FLAG_H_
+diff --git a/third_party/absl/flags/parse.h b/src/glue/flags/parse.h
+similarity index 79%
+rename from third_party/absl/flags/parse.h
+rename to src/glue/flags/parse.h
+index 6a06e63..705eadf 100644
+--- a/third_party/absl/flags/parse.h
++++ b/src/glue/flags/parse.h
+@@ -12,14 +12,14 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#ifndef ABSL_FLAGS_PARSE_H_
+-#define ABSL_FLAGS_PARSE_H_
++#ifndef SENTENCEPIECE_FLAGS_PARSE_H_
++#define SENTENCEPIECE_FLAGS_PARSE_H_
+ 
+ #include <vector>
+ 
+-namespace absl {
++namespace sentencepiece {
+ 
+ std::vector<char *> ParseCommandLine(int argc, char *argv[]);
+-}  // namespace absl
++}  // namespace sentencepiece
+ 
+-#endif  // ABSL_FLAGS_PARSE_H_
++#endif  // SENTENCEPIECE_FLAGS_PARSE_H_
 diff --git a/src/init.h b/src/init.h
-index acfda8a..d9946c0 100644
+index 8a557f2..d9c40e0 100644
 --- a/src/init.h
 +++ b/src/init.h
-@@ -16,15 +16,15 @@
+@@ -15,17 +15,16 @@
+ #ifndef INIT_H_
  #define INIT_H_
  
- #include "common.h"
 -#include "absl/flags/flag.h"
 -#include "absl/flags/parse.h"
-+#include "flag.h"
-+#include "parse.h"
+-
+ #include "common.h"
++#include "glue/flags/flag.h"
++#include "glue/flags/parse.h"
  
 -ABSL_DECLARE_FLAG(int32, minloglevel);
 +STPC_DECLARE_FLAG(int32, minloglevel);
@@ -441,7 +457,7 @@ index acfda8a..d9946c0 100644
  
    if (remove_arg) {
      char **argv_val = *argv;
-@@ -33,7 +33,7 @@ inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
+@@ -34,7 +33,7 @@ inline void ParseCommandLineFlags(const char *usage, int *argc, char ***argv,
      *argc = static_cast<int>(unused_args.size());
    }
  
@@ -451,14 +467,14 @@ index acfda8a..d9946c0 100644
  }  // namespace sentencepiece
  
 diff --git a/src/init_test.cc b/src/init_test.cc
-index e5cd2e4..f9e509a 100644
+index e5cd2e4..82381c2 100644
 --- a/src/init_test.cc
 +++ b/src/init_test.cc
 @@ -15,28 +15,29 @@
  #include "init.h"
  
  #include "common.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "testharness.h"
  
 -ABSL_FLAG(int32, int32_f, 10, "int32_flags");
@@ -579,58 +595,19 @@ index e5cd2e4..f9e509a 100644
  }
  
  TEST(FlagsTest, ParseCommandLineFlagsEmptyIntArgs) {
-diff --git a/third_party/absl/flags/parse.h b/src/parse.h
-similarity index 79%
-rename from third_party/absl/flags/parse.h
-rename to src/parse.h
-index 6a06e63..705eadf 100644
---- a/third_party/absl/flags/parse.h
-+++ b/src/parse.h
-@@ -12,14 +12,14 @@
- // See the License for the specific language governing permissions and
- // limitations under the License.!
- 
--#ifndef ABSL_FLAGS_PARSE_H_
--#define ABSL_FLAGS_PARSE_H_
-+#ifndef SENTENCEPIECE_FLAGS_PARSE_H_
-+#define SENTENCEPIECE_FLAGS_PARSE_H_
- 
- #include <vector>
- 
--namespace absl {
-+namespace sentencepiece {
- 
- std::vector<char *> ParseCommandLine(int argc, char *argv[]);
--}  // namespace absl
-+}  // namespace sentencepiece
- 
--#endif  // ABSL_FLAGS_PARSE_H_
-+#endif  // SENTENCEPIECE_FLAGS_PARSE_H_
 diff --git a/src/sentencepiece_processor_test.cc b/src/sentencepiece_processor_test.cc
-index 4f2f33b..6b9c581 100644
+index 4077c65..208b92f 100644
 --- a/src/sentencepiece_processor_test.cc
 +++ b/src/sentencepiece_processor_test.cc
-@@ -18,17 +18,18 @@
+@@ -23,6 +23,7 @@
  
  #include "builder.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "model_interface.h"
  #include "normalizer.h"
  #include "sentencepiece.pb.h"
- #include "sentencepiece_model.pb.h"
- #include "sentencepiece_trainer.h"
- #include "testharness.h"
-+#include "util.h"
- #include "absl/container/flat_hash_map.h"
- #include "absl/memory/memory.h"
- #include "absl/strings/str_cat.h"
- #include "absl/strings/string_view.h"
--#include "util.h"
- 
- namespace sentencepiece {
- 
-@@ -995,13 +996,13 @@ TEST(SentencePieceProcessorTest, EndToEndTest) {
+@@ -996,13 +997,13 @@ TEST(SentencePieceProcessorTest, EndToEndTest) {
  
    {
      auto output = filesystem::NewWritableFile(
@@ -646,7 +623,7 @@ index 4f2f33b..6b9c581 100644
  
    EXPECT_EQ(model_proto.SerializeAsString(),
              sp.model_proto().SerializeAsString());
-@@ -1468,10 +1469,10 @@ TEST(SentencePieceProcessorTest, VocabularyTest) {
+@@ -1469,10 +1470,10 @@ TEST(SentencePieceProcessorTest, VocabularyTest) {
    auto GetInlineFilename = [](const std::string content) {
      {
        auto out = filesystem::NewWritableFile(
@@ -660,24 +637,18 @@ index 4f2f33b..6b9c581 100644
  
    sp1->set_type(ModelProto::SentencePiece::UNKNOWN);
 diff --git a/src/sentencepiece_trainer_test.cc b/src/sentencepiece_trainer_test.cc
-index fc73b1d..7e0f74f 100644
+index 0bb5aab..1a241b0 100644
 --- a/src/sentencepiece_trainer_test.cc
 +++ b/src/sentencepiece_trainer_test.cc
-@@ -13,11 +13,12 @@
- // limitations under the License.!
+@@ -15,6 +15,7 @@
+ #include "absl/strings/str_cat.h"
  
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "sentencepiece_model.pb.h"
  #include "sentencepiece_trainer.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
- #include "util.h"
-+#include "absl/strings/str_cat.h"
- 
- namespace sentencepiece {
- namespace {
-@@ -50,9 +51,9 @@ void CheckNormalizer(absl::string_view filename, bool expected_has_normalizer,
+@@ -51,9 +52,9 @@ void CheckNormalizer(absl::string_view filename, bool expected_has_normalizer,
  
  TEST(SentencePieceTrainerTest, TrainFromArgsTest) {
    const std::string input =
@@ -689,7 +660,7 @@ index fc73b1d..7e0f74f 100644
  
    ASSERT_TRUE(SentencePieceTrainer::Train(
                    absl::StrCat("--input=", input, " --model_prefix=", model,
-@@ -117,9 +118,9 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
+@@ -118,9 +119,9 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
    };
  
    const std::string input =
@@ -701,7 +672,7 @@ index fc73b1d..7e0f74f 100644
  
    std::vector<std::string> sentences;
    {
-@@ -140,11 +141,11 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
+@@ -141,11 +142,11 @@ TEST(SentencePieceTrainerTest, TrainFromIterator) {
  
  TEST(SentencePieceTrainerTest, TrainWithCustomNormalizationRule) {
    std::string input =
@@ -716,7 +687,7 @@ index fc73b1d..7e0f74f 100644
  
    EXPECT_TRUE(SentencePieceTrainer::Train(
                    absl::StrCat("--input=", input, " --model_prefix=", model,
-@@ -156,13 +157,13 @@ TEST(SentencePieceTrainerTest, TrainWithCustomNormalizationRule) {
+@@ -157,13 +158,13 @@ TEST(SentencePieceTrainerTest, TrainWithCustomNormalizationRule) {
  
  TEST(SentencePieceTrainerTest, TrainWithCustomDenormalizationRule) {
    const std::string input_file =
@@ -734,7 +705,7 @@ index fc73b1d..7e0f74f 100644
    EXPECT_TRUE(
        SentencePieceTrainer::Train(
            absl::StrCat("--input=", input_file, " --model_prefix=", model,
-@@ -185,9 +186,9 @@ TEST(SentencePieceTrainerTest, TrainErrorTest) {
+@@ -186,9 +187,9 @@ TEST(SentencePieceTrainerTest, TrainErrorTest) {
  TEST(SentencePieceTrainerTest, TrainTest) {
    TrainerSpec trainer_spec;
    trainer_spec.add_input(
@@ -747,19 +718,17 @@ index fc73b1d..7e0f74f 100644
    NormalizerSpec normalizer_spec;
    ASSERT_TRUE(SentencePieceTrainer::Train(trainer_spec, normalizer_spec).ok());
 diff --git a/src/spm_decode_main.cc b/src/spm_decode_main.cc
-index 9dda65c..882cb9e 100644
+index f3b8269..e66f7f4 100644
 --- a/src/spm_decode_main.cc
 +++ b/src/spm_decode_main.cc
-@@ -18,44 +18,44 @@
+@@ -21,42 +21,43 @@
  
  #include "common.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "init.h"
  #include "sentencepiece.pb.h"
  #include "sentencepiece_processor.h"
--#include "absl/flags/flag.h"
- #include "absl/strings/str_split.h"
  #include "util.h"
  
 -ABSL_FLAG(std::string, model, "", "model file name");
@@ -808,7 +777,7 @@ index 9dda65c..882cb9e 100644
    CHECK_OK(output->status());
  
    std::string detok, line;
-@@ -71,36 +71,36 @@ int main(int argc, char *argv[]) {
+@@ -72,36 +73,36 @@ int main(int argc, char *argv[]) {
      return ids;
    };
  
@@ -855,21 +824,23 @@ index 9dda65c..882cb9e 100644
  
    for (const auto &filename : rest_args) {
 diff --git a/src/spm_encode_main.cc b/src/spm_encode_main.cc
-index 7af89d2..51d9ca7 100644
+index 2199aa4..4a4d19c 100644
 --- a/src/spm_encode_main.cc
 +++ b/src/spm_encode_main.cc
-@@ -18,70 +18,70 @@
+@@ -17,72 +17,72 @@
+ #include <vector>
  
- #include "common.h"
- #include "filesystem.h"
-+#include "flag.h"
- #include "init.h"
- #include "sentencepiece.pb.h"
- #include "sentencepiece_processor.h"
  #include "absl/container/flat_hash_map.h"
 -#include "absl/flags/flag.h"
  #include "absl/strings/str_cat.h"
  #include "absl/strings/str_join.h"
+ 
+ #include "common.h"
+ #include "filesystem.h"
++#include "glue/flags/flag.h"
+ #include "init.h"
+ #include "sentencepiece.pb.h"
+ #include "sentencepiece_processor.h"
  #include "trainer_interface.h"
  
 -ABSL_FLAG(std::string, model, "", "model file name");
@@ -952,7 +923,7 @@ index 7af89d2..51d9ca7 100644
    CHECK_OK(output->status());
  
    std::string line;
-@@ -94,10 +94,10 @@ int main(int argc, char *argv[]) {
+@@ -95,10 +95,10 @@ int main(int argc, char *argv[]) {
    sentencepiece::NBestSentencePieceText nbest_spt;
    std::function<void(absl::string_view line)> process;
  
@@ -966,7 +937,7 @@ index 7af89d2..51d9ca7 100644
      process = [&](absl::string_view line) {
        CHECK_OK(sp.Encode(line, &spt));
        for (const auto &piece : spt.pieces()) {
-@@ -105,53 +105,53 @@ int main(int argc, char *argv[]) {
+@@ -106,53 +106,53 @@ int main(int argc, char *argv[]) {
            vocab[piece.piece()]++;
        }
      };
@@ -1030,7 +1001,7 @@ index 7af89d2..51d9ca7 100644
    }
  
    for (const auto &filename : rest_args) {
-@@ -162,7 +162,7 @@ int main(int argc, char *argv[]) {
+@@ -163,7 +163,7 @@ int main(int argc, char *argv[]) {
      }
    }
  
@@ -1040,18 +1011,21 @@ index 7af89d2..51d9ca7 100644
        output->WriteLine(it.first + "\t" +
                          sentencepiece::string_util::SimpleItoa(it.second));
 diff --git a/src/spm_export_vocab_main.cc b/src/spm_export_vocab_main.cc
-index 70a65c1..78c8e21 100644
+index 1603195..585c143 100644
 --- a/src/spm_export_vocab_main.cc
 +++ b/src/spm_export_vocab_main.cc
-@@ -17,14 +17,14 @@
+@@ -15,17 +15,16 @@
  
+ #include <sstream>
+ 
+-#include "absl/flags/flag.h"
+-
  #include "common.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "init.h"
  #include "sentencepiece_model.pb.h"
  #include "sentencepiece_processor.h"
--#include "absl/flags/flag.h"
  
 -ABSL_FLAG(std::string, output, "", "Output filename");
 -ABSL_FLAG(std::string, model, "", "input model file name");
@@ -1062,7 +1036,7 @@ index 70a65c1..78c8e21 100644
            "output format. choose from vocab or syms. vocab outputs pieces "
            "and scores, syms outputs pieces and indices.");
  
-@@ -32,19 +32,19 @@ int main(int argc, char *argv[]) {
+@@ -33,19 +32,19 @@ int main(int argc, char *argv[]) {
    sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
  
    sentencepiece::SentencePieceProcessor sp;
@@ -1086,7 +1060,7 @@ index 70a65c1..78c8e21 100644
      for (int i = 0; i < sp.model_proto().pieces_size(); i++) {
        std::ostringstream os;
        os << sp.model_proto().pieces(i).piece() << "\t" << i;
-@@ -52,7 +52,7 @@ int main(int argc, char *argv[]) {
+@@ -53,7 +52,7 @@ int main(int argc, char *argv[]) {
      }
    } else {
      LOG(FATAL) << "Unsupported output format: "
@@ -1096,21 +1070,25 @@ index 70a65c1..78c8e21 100644
  
    return 0;
 diff --git a/src/spm_normalize_main.cc b/src/spm_normalize_main.cc
-index 8c541b8..5d7c4c7 100644
+index dca66b1..a61e7d4 100644
 --- a/src/spm_normalize_main.cc
 +++ b/src/spm_normalize_main.cc
-@@ -15,28 +15,28 @@
+@@ -12,11 +12,10 @@
+ // See the License for the specific language governing permissions and
+ // limitations under the License.!
+ 
+-#include "absl/flags/flag.h"
+-
  #include "builder.h"
  #include "common.h"
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "init.h"
  #include "normalizer.h"
  #include "sentencepiece.pb.h"
- #include "sentencepiece_model.pb.h"
+@@ -24,20 +23,20 @@
  #include "sentencepiece_processor.h"
  #include "sentencepiece_trainer.h"
--#include "absl/flags/flag.h"
  
 -ABSL_FLAG(std::string, model, "", "Model file name");
 -ABSL_FLAG(bool, use_internal_normalization, false,
@@ -1137,7 +1115,7 @@ index 8c541b8..5d7c4c7 100644
  
  using sentencepiece::ModelProto;
  using sentencepiece::NormalizerSpec;
-@@ -49,27 +49,27 @@ int main(int argc, char *argv[]) {
+@@ -50,27 +49,27 @@ int main(int argc, char *argv[]) {
    sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
    std::vector<std::string> rest_args;
  
@@ -1173,7 +1151,7 @@ index 8c541b8..5d7c4c7 100644
      CHECK_OK(SentencePieceTrainer::PopulateNormalizerSpec(&spec));
    } else {
      LOG(FATAL) << "Sets --model, normalization_rule_tsv, or "
-@@ -77,22 +77,22 @@ int main(int argc, char *argv[]) {
+@@ -78,22 +77,22 @@ int main(int argc, char *argv[]) {
    }
  
    // Uses the normalizer spec encoded in the model_pb.
@@ -1202,22 +1180,24 @@ index 8c541b8..5d7c4c7 100644
  
      if (rest_args.empty()) {
 diff --git a/src/spm_train_main.cc b/src/spm_train_main.cc
-index 2b870ce..cef527c 100644
+index 84131cf..742e8bd 100644
 --- a/src/spm_train_main.cc
 +++ b/src/spm_train_main.cc
-@@ -15,10 +15,10 @@
+@@ -14,12 +14,12 @@
+ 
  #include <map>
  
- #include "filesystem.h"
-+#include "flag.h"
- #include "init.h"
- #include "sentencepiece_model.pb.h"
- #include "sentencepiece_trainer.h"
 -#include "absl/flags/flag.h"
  #include "absl/strings/ascii.h"
  #include "absl/strings/str_join.h"
  #include "absl/strings/str_split.h"
-@@ -32,116 +32,116 @@ static sentencepiece::TrainerSpec kDefaultTrainerSpec;
+ 
+ #include "filesystem.h"
++#include "glue/flags/flag.h"
+ #include "init.h"
+ #include "sentencepiece_model.pb.h"
+ #include "sentencepiece_trainer.h"
+@@ -33,127 +33,127 @@ static sentencepiece::TrainerSpec kDefaultTrainerSpec;
  static sentencepiece::NormalizerSpec kDefaultNormalizerSpec;
  }  // namespace
  
@@ -1382,7 +1362,21 @@ index 2b870ce..cef527c 100644
            "Seed value for random generator.");
  
  // DP related.
-@@ -163,11 +163,11 @@ int main(int argc, char *argv[]) {
+-ABSL_FLAG(bool, enable_differential_privacy, false,
++STPC_FLAG(bool, enable_differential_privacy, false,
+           "Whether to add DP while training. Currently supported only by "
+           "UNIGRAM model.");
+ 
+-ABSL_FLAG(float, differential_privacy_noise_level, 0.0f,
++STPC_FLAG(float, differential_privacy_noise_level, 0.0f,
+           "Amount of noise to add for"
+           " DP");
+-ABSL_FLAG(std::uint64_t, differential_privacy_clipping_threshold, 0,
++STPC_FLAG(std::uint64_t, differential_privacy_clipping_threshold, 0,
+           "Threshold for"
+           " clipping the counts for DP");
+ 
+@@ -164,11 +164,11 @@ int main(int argc, char *argv[]) {
    sentencepiece::NormalizerSpec normalizer_spec;
    NormalizerSpec denormalizer_spec;
  
@@ -1398,7 +1392,7 @@ index 2b870ce..cef527c 100644
    }
  
    auto load_lines = [](absl::string_view filename) {
-@@ -181,28 +181,28 @@ int main(int argc, char *argv[]) {
+@@ -182,28 +182,28 @@ int main(int argc, char *argv[]) {
  
  // Populates the value from flags to spec.
  #define SetTrainerSpecFromFlag(name) \
@@ -1435,7 +1429,7 @@ index 2b870ce..cef527c 100644
        trainer_spec.add_##name(v);                                          \
      }                                                                      \
    }
-@@ -255,21 +255,21 @@ int main(int argc, char *argv[]) {
+@@ -256,21 +256,21 @@ int main(int argc, char *argv[]) {
    SetRepeatedTrainerSpecFromFile(control_symbols);
    SetRepeatedTrainerSpecFromFile(user_defined_symbols);
  
@@ -1462,14 +1456,14 @@ index 2b870ce..cef527c 100644
    CHECK_OK(sentencepiece::SentencePieceTrainer::Train(
        trainer_spec, normalizer_spec, denormalizer_spec));
 diff --git a/src/test_main.cc b/src/test_main.cc
-index b3170e2..d551244 100644
+index b3170e2..cc41c6e 100644
 --- a/src/test_main.cc
 +++ b/src/test_main.cc
 @@ -12,16 +12,17 @@
  // See the License for the specific language governing permissions and
  // limitations under the License.!
  
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "init.h"
  #include "testharness.h"
  
@@ -1487,21 +1481,18 @@ index b3170e2..d551244 100644
  int main(int argc, char **argv) {
    sentencepiece::ParseCommandLineFlags(argv[0], &argc, &argv, true);
 diff --git a/src/testharness.cc b/src/testharness.cc
-index daf2d14..75d4efe 100644
+index 6769cd8..d9a84d2 100644
 --- a/src/testharness.cc
 +++ b/src/testharness.cc
-@@ -26,8 +26,9 @@
- #include <vector>
+@@ -28,6 +28,7 @@
+ #include "absl/strings/str_cat.h"
  
  #include "common.h"
--#include "absl/strings/str_cat.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "util.h"
-+#include "absl/strings/str_cat.h"
  
  namespace sentencepiece {
- namespace test {
-@@ -56,9 +57,9 @@ bool RegisterTest(const char *base, const char *name, void (*func)()) {
+@@ -57,9 +58,9 @@ bool RegisterTest(const char *base, const char *name, void (*func)()) {
  int RunAllTests() {
    int num = 0;
  #ifdef OS_WIN
@@ -1514,17 +1505,20 @@ index daf2d14..75d4efe 100644
  
    if (tests == nullptr) {
 diff --git a/src/testharness.h b/src/testharness.h
-index 98317ad..7aa0c01 100644
+index 8de9c5c..022325d 100644
 --- a/src/testharness.h
 +++ b/src/testharness.h
-@@ -21,12 +21,11 @@
+@@ -20,14 +20,14 @@
+ #include <sstream>
  #include <string>
  
- #include "common.h"
 -#include "absl/flags/flag.h"
 -#include "absl/flags/parse.h"
-+#include "flag.h"
  #include "absl/strings/string_view.h"
+ 
+ #include "common.h"
++#include "glue/flags/flag.h"
++#include "glue/flags/parse.h"
  
 -ABSL_DECLARE_FLAG(std::string, test_tmpdir);
 -ABSL_DECLARE_FLAG(std::string, test_srcdir);
@@ -1534,25 +1528,18 @@ index 98317ad..7aa0c01 100644
  namespace sentencepiece {
  namespace test {
 diff --git a/src/trainer_interface_test.cc b/src/trainer_interface_test.cc
-index b6a0d3f..589b90d 100644
+index 6fea564..e3e452a 100644
 --- a/src/trainer_interface_test.cc
 +++ b/src/trainer_interface_test.cc
-@@ -15,11 +15,12 @@
- #include <utility>
+@@ -18,6 +18,7 @@
+ #include "absl/strings/str_format.h"
  
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
--#include "absl/strings/str_format.h"
  #include "trainer_interface.h"
  #include "util.h"
-+#include "absl/strings/str_cat.h"
-+#include "absl/strings/str_format.h"
- 
- namespace sentencepiece {
- 
-@@ -472,7 +473,7 @@ TEST(TrainerInterfaceTest, SerializeTest) {
+@@ -473,7 +474,7 @@ TEST(TrainerInterfaceTest, SerializeTest) {
  
  TEST(TrainerInterfaceTest, CharactersTest) {
    const std::string input_file =
@@ -1561,7 +1548,7 @@ index b6a0d3f..589b90d 100644
    {
      auto output = filesystem::NewWritableFile(input_file);
      // Make a single line with 50 "a", 49 "あ", and 1 "b".
-@@ -538,7 +539,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
+@@ -539,7 +540,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
    std::vector<std::string> files;
    std::vector<std::string> expected;
    for (int i = 0; i < 10; ++i) {
@@ -1570,7 +1557,7 @@ index b6a0d3f..589b90d 100644
                                              absl::StrCat("input", i));
      auto output = filesystem::NewWritableFile(file);
      int num_line = (rand() % 100) + 1;
-@@ -560,7 +561,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
+@@ -561,7 +562,7 @@ TEST(TrainerInterfaceTest, MultiFileSentenceIteratorTest) {
  TEST(TrainerInterfaceTest, MultiFileSentenceIteratorErrorTest) {
    std::vector<std::string> files;
    for (int i = 0; i < 10; ++i) {
@@ -1580,26 +1567,18 @@ index b6a0d3f..589b90d 100644
      files.push_back(file);
    }
 diff --git a/src/unigram_model_trainer_test.cc b/src/unigram_model_trainer_test.cc
-index 9e94a3e..b854533 100644
+index 4b336ec..9b8ddb7 100644
 --- a/src/unigram_model_trainer_test.cc
 +++ b/src/unigram_model_trainer_test.cc
-@@ -18,13 +18,14 @@
- #include <vector>
+@@ -21,6 +21,7 @@
+ #include "absl/strings/str_join.h"
  
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "sentencepiece_model.pb.h"
  #include "sentencepiece_processor.h"
  #include "sentencepiece_trainer.h"
- #include "testharness.h"
-+#include "util.h"
- #include "absl/strings/str_cat.h"
- #include "absl/strings/str_join.h"
--#include "util.h"
- 
- namespace sentencepiece {
- namespace unigram {
-@@ -153,13 +154,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
+@@ -154,13 +155,13 @@ static constexpr char kTestInputData[] = "wagahaiwa_nekodearu.txt";
  
  TEST(UnigramTrainerTest, EndToEndTest) {
    const std::string input =
@@ -1615,7 +1594,7 @@ index 9e94a3e..b854533 100644
                " --input=", input,
                " --vocab_size=8000 --normalization_rule_name=identity",
                " --model_type=unigram --user_defined_symbols=<user>",
-@@ -167,7 +168,7 @@ TEST(UnigramTrainerTest, EndToEndTest) {
+@@ -168,7 +169,7 @@ TEST(UnigramTrainerTest, EndToEndTest) {
            .ok());
  
    SentencePieceProcessor sp;
@@ -1625,23 +1604,18 @@ index 9e94a3e..b854533 100644
                    .ok());
    EXPECT_EQ(8000, sp.GetPieceSize());
 diff --git a/src/util_test.cc b/src/util_test.cc
-index 231fc96..1025767 100644
+index e264081..837cca4 100644
 --- a/src/util_test.cc
 +++ b/src/util_test.cc
-@@ -14,10 +14,11 @@
+@@ -17,6 +17,7 @@
+ #include "absl/strings/str_cat.h"
  
- #include <map>
- 
-+#include "flag.h"
  #include "filesystem.h"
++#include "glue/flags/flag.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
  #include "util.h"
-+#include "absl/strings/str_cat.h"
  
- namespace sentencepiece {
- namespace {
-@@ -332,7 +333,7 @@ TEST(UtilTest, InputOutputBufferTest) {
+@@ -333,7 +334,7 @@ TEST(UtilTest, InputOutputBufferTest) {
  
    {
      auto output = filesystem::NewWritableFile(
@@ -1650,7 +1624,7 @@ index 231fc96..1025767 100644
      for (size_t i = 0; i < kData.size(); ++i) {
        output->WriteLine(kData[i]);
      }
-@@ -340,7 +341,7 @@ TEST(UtilTest, InputOutputBufferTest) {
+@@ -341,7 +342,7 @@ TEST(UtilTest, InputOutputBufferTest) {
  
    {
      auto input = filesystem::NewReadableFile(
@@ -1660,26 +1634,18 @@ index 231fc96..1025767 100644
      for (size_t i = 0; i < kData.size(); ++i) {
        EXPECT_TRUE(input->ReadLine(&line));
 diff --git a/src/word_model_trainer_test.cc b/src/word_model_trainer_test.cc
-index 366810f..da522e4 100644
+index 8288027..ab55030 100644
 --- a/src/word_model_trainer_test.cc
 +++ b/src/word_model_trainer_test.cc
-@@ -16,12 +16,13 @@
- #include <vector>
+@@ -19,6 +19,7 @@
+ #include "absl/strings/str_join.h"
  
  #include "filesystem.h"
-+#include "flag.h"
++#include "glue/flags/flag.h"
  #include "sentencepiece_processor.h"
  #include "testharness.h"
--#include "absl/strings/str_cat.h"
--#include "absl/strings/str_join.h"
  #include "util.h"
- #include "word_model_trainer.h"
-+#include "absl/strings/str_cat.h"
-+#include "absl/strings/str_join.h"
- 
- namespace sentencepiece {
- namespace word {
-@@ -32,9 +33,9 @@ namespace {
+@@ -33,9 +34,9 @@ namespace {
  
  std::string RunTrainer(const std::vector<std::string> &input, int size) {
    const std::string input_file =

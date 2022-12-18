@@ -1,4 +1,4 @@
-From f77c6a324078e3a245ffbbeb685286eff12dcb7b Mon Sep 17 00:00:00 2001
+From d54c866657961b85ff8c0fc3a5672f17ae688a6c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 12 Dec 2022 14:36:45 +1100
 Subject: [PATCH 8/9] also install pkg-config files on windows
