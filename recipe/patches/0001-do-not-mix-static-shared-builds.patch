@@ -1,4 +1,4 @@
-From 1132b288ee6c0d1a8f742c661c76713ff2092724 Mon Sep 17 00:00:00 2001
+From 36b084be62cd5f116749cab4cc0de4206555c628 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 08:39:53 +1100
 Subject: [PATCH 1/9] do not mix static & shared builds

@@ -1,4 +1,4 @@
-From e60c08abd1ecd47e34668e9e4c303639ffd49c0e Mon Sep 17 00:00:00 2001
+From 34cac78c9f294920175936944ad58a76e8bab7c0 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
 Subject: [PATCH 6/9] point to our libs / headers for windows in setup.py

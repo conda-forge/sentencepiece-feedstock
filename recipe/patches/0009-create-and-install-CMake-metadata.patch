@@ -1,13 +1,13 @@
-From 1e0eac9d584f0257c1555c25f9c9195bfa4094bb Mon Sep 17 00:00:00 2001
+From 6ff22d17396ad48a087c6193b84de4939e6bf0bb Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 18 Jan 2023 19:44:15 +1100
 Subject: [PATCH 9/9] create and install CMake metadata
 
 ---
  CMakeLists.txt               | 10 ++++++++++
- sentencepieceConfig.cmake.in |  4 ++++
+ sentencepieceConfig.cmake.in |  8 ++++++++
  src/CMakeLists.txt           | 16 ++++++++++++----
- 3 files changed, 26 insertions(+), 4 deletions(-)
+ 3 files changed, 30 insertions(+), 4 deletions(-)
  create mode 100644 sentencepieceConfig.cmake.in
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
@@ -33,7 +33,7 @@ index 7e6196a..00b7baf 100644
  if (SPM_BUILD_TEST)
 diff --git a/sentencepieceConfig.cmake.in b/sentencepieceConfig.cmake.in
 new file mode 100644
-index 0000000..fcd3008
+index 0000000..b4c0474
 --- /dev/null
 +++ b/sentencepieceConfig.cmake.in
 @@ -0,0 +1,8 @@
