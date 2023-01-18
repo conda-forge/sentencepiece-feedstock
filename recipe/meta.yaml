@@ -27,9 +27,11 @@ source:
     - patches/0008-don-t-force-replace-MD-with-MT.patch
     # install pkg-config metadata also on windows
     - patches/0009-also-install-pkg-config-files-on-windows.patch
+    # install CMake metadata
+    - patches/0010-create-and-install-CMake-metadata.patch
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:

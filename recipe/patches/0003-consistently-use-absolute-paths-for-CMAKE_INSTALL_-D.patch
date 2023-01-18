@@ -1,7 +1,7 @@
 From adb755a89a25b946799c177de242bb7fea99421e Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 6 Dec 2021 21:18:54 +1100
-Subject: [PATCH 3/9] consistently use absolute paths for CMAKE_INSTALL_*DIR
+Subject: [PATCH 03/10] consistently use absolute paths for CMAKE_INSTALL_*DIR
 
 ---
  CMakeLists.txt | 13 +++++--------

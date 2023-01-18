@@ -25,8 +25,7 @@ cmake -G "Ninja" \
     ${CMAKE_ARGS} \
     ..
 
-cmake --build .
-cmake --install .
+cmake --build . --target install
 
 if [[ "$PKG_NAME" == "libsentencepiece" ]]; then
     rm ${PREFIX}/bin/spm_*
