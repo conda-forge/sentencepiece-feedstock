@@ -78,7 +78,16 @@ outputs:
 
     test:
       requires:
+        # cmake needs compiler to be able to run package detection, see
+        # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
         - pkg-config
+      files:
+        - cmake_test/
+        - test_sentencepiece.sh
+        - test_sentencepiece.bat
       commands:
         {% for each_lib in ["sentencepiece", "sentencepiece_train"] %}
         # presence of shared libraries
@@ -92,14 +101,18 @@ outputs:
         - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
         {% endfor %}
 
-        # pkg-config
-        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
-
         # headers
         {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
         - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
         - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
         {% endfor %}
+
+        # pkg-config
+        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
+
+        # minimal CMake test (using find_package)
+        - ./test_sentencepiece.sh   # [unix]
+        - ./test_sentencepiece.bat  # [win]
 
   - name: sentencepiece-spm
     script: build-lib.sh   # [unix]
