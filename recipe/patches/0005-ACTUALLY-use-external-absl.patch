@@ -1,7 +1,7 @@
 From 9f225f6f83ccea1909974ee95da9b724d017dad3 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 21 Feb 2022 10:05:39 +1100
-Subject: [PATCH 5/9] ACTUALLY use external absl
+Subject: [PATCH 05/10] ACTUALLY use external absl
 
 ---
  src/CMakeLists.txt                    |  6 ------

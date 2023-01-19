@@ -1,7 +1,7 @@
 From 63c37471b3a650fcd3b272fd8ec0cd82ec0c2bae Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
-Subject: [PATCH 7/9] point to our libs / headers for windows in setup.py
+Subject: [PATCH 07/10] point to our libs / headers for windows in setup.py
 
 also do not risk building against bundled libs
 ---

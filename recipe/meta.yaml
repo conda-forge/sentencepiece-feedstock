@@ -27,9 +27,11 @@ source:
     - patches/0008-don-t-force-replace-MD-with-MT.patch
     # install pkg-config metadata also on windows
     - patches/0009-also-install-pkg-config-files-on-windows.patch
+    # install CMake metadata
+    - patches/0010-create-and-install-CMake-metadata.patch
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:
@@ -46,6 +48,9 @@ outputs:
     requirements:
       host:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        # needs python host dep to avoid creating the same wrapper for
+        # different sentencepiece-python builds due to coinciding hashes
+        - python
       run:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - {{ pin_subpackage('sentencepiece-spm', exact=True) }}
@@ -76,7 +81,16 @@ outputs:
 
     test:
       requires:
+        # cmake needs compiler to be able to run package detection, see
+        # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+        - {{ compiler('cxx') }}
+        - cmake
+        - ninja
         - pkg-config
+      files:
+        - cmake_test/
+        - test_sentencepiece.sh
+        - test_sentencepiece.bat
       commands:
         {% for each_lib in ["sentencepiece", "sentencepiece_train"] %}
         # presence of shared libraries
@@ -90,14 +104,18 @@ outputs:
         - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
         {% endfor %}
 
-        # pkg-config
-        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
-
         # headers
         {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
         - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
         - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
         {% endfor %}
+
+        # pkg-config
+        - pkg-config --print-errors --exact-version "{{ version }}" sentencepiece
+
+        # minimal CMake test (using find_package)
+        - ./test_sentencepiece.sh   # [unix]
+        - ./test_sentencepiece.bat  # [win]
 
   - name: sentencepiece-spm
     script: build-lib.sh   # [unix]
