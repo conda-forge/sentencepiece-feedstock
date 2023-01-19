@@ -48,6 +48,9 @@ outputs:
     requirements:
       host:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
+        # needs python host dep to avoid creating the same wrapper for
+        # different sentencepiece-python builds due to coinciding hashes
+        - python
       run:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - {{ pin_subpackage('sentencepiece-spm', exact=True) }}
