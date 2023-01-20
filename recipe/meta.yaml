@@ -91,6 +91,8 @@ outputs:
         - cmake
         - ninja
         - pkg-config
+      source_files:
+        - data/botchan.txt
       files:
         - cmake_test/
         - test_sentencepiece.sh
