@@ -31,7 +31,7 @@ source:
     - patches/0010-create-and-install-CMake-metadata.patch
 
 build:
-  number: 3
+  number: 4
 
 requirements:
   build:
@@ -78,6 +78,10 @@ outputs:
         - libabseil
         - libprotobuf
         - pthreads-win32  # [win]
+      run:
+        # sentencepiece uses PUBLIC linkage for abseil, which is correct
+        # (unfortunately) because it contains abseil types in its API
+        - libabseil
 
     test:
       requires:
