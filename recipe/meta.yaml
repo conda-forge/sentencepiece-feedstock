@@ -31,7 +31,7 @@ source:
     - patches/0010-create-and-install-CMake-metadata.patch
 
 build:
-  number: 3
+  number: 4
 
 requirements:
   build:
@@ -78,6 +78,13 @@ outputs:
         - libabseil
         - libprotobuf
         - pthreads-win32  # [win]
+      run:
+        # sentencepiece uses PUBLIC linkage for abseil, which is correct
+        # (unfortunately) because it contains abseil types in its API
+        - libabseil
+        # additionally, the static windows build requires _its_
+        # host dependences to be present for successful linkage
+        - libprotobuf     # [win]
 
     test:
       requires:
@@ -87,6 +94,8 @@ outputs:
         - cmake
         - ninja
         - pkg-config
+      source_files:
+        - data/botchan.txt
       files:
         - cmake_test/
         - test_sentencepiece.sh

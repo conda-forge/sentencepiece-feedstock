@@ -12,3 +12,9 @@ cmake -G "Ninja" ^
     -DCMAKE_MODULE_PATH="%LIBRARY_PREFIX%/lib/cmake" ^
     .
 if %ERRORLEVEL% neq 0 exit 1
+
+cmake --build .
+if %ERRORLEVEL% neq 0 exit 1
+
+cmd /c ".\test_me.exe"
+if %ERRORLEVEL% neq 0 exit 1

@@ -8,3 +8,7 @@ cmake -G "Ninja" \
     -DCMAKE_PREFIX_PATH="$PREFIX" \
     -DCMAKE_MODULE_PATH="$PREFIX/lib/cmake" \
     .
+
+cmake --build .
+
+./test_me
