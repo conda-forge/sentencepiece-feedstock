@@ -82,6 +82,9 @@ outputs:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
         # (unfortunately) because it contains abseil types in its API
         - libabseil
+        # additionally, the static windows build requires _its_
+        # host dependences to be present for successful linkage
+        - libprotobuf     # [win]
 
     test:
       requires:
