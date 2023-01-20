@@ -7,6 +7,8 @@
 int main(int argc, char** argv) {
     sentencepiece::SentencePieceTrainer::Train("--input=../data/botchan.txt --model_prefix=m --vocab_size=1000");
 
+    // somehow, the below doesn't seem to run on windows at
+    // the moment (or at least doesn't produce log output)
     sentencepiece::SentencePieceProcessor processor;
     const auto status = processor.Load("./m.model");
     if (!status.ok()) {
