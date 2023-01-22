@@ -1,0 +1,96 @@
+From 6ff22d17396ad48a087c6193b84de4939e6bf0bb Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Wed, 18 Jan 2023 19:44:15 +1100
+Subject: [PATCH 9/9] create and install CMake metadata
+
+---
+ CMakeLists.txt               | 10 ++++++++++
+ sentencepieceConfig.cmake.in |  8 ++++++++
+ src/CMakeLists.txt           | 16 ++++++++++++----
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+ create mode 100644 sentencepieceConfig.cmake.in
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 7e6196a..00b7baf 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -94,6 +94,16 @@ if (TRUE)
+   install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sentencepiece.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+ endif()
+ 
++include(CMakePackageConfigHelpers)
++configure_package_config_file(
++  sentencepieceConfig.cmake.in
++  "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
++  INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
++)
++install(FILES "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
++  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
++)
++
+ include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${PROJECT_BINARY_DIR})
+ 
+ if (SPM_BUILD_TEST)
+diff --git a/sentencepieceConfig.cmake.in b/sentencepieceConfig.cmake.in
+new file mode 100644
+index 0000000..b4c0474
+--- /dev/null
++++ b/sentencepieceConfig.cmake.in
+@@ -0,0 +1,8 @@
++@PACKAGE_INIT@
++
++# sentencepiece has abseil types in its API and
++# therefore has it in its public link interface
++find_package(absl REQUIRED)
++
++# Targets
++include(${CMAKE_CURRENT_LIST_DIR}/sentencepieceTargets.cmake)
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 6d986b6..b327f25 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -221,7 +221,7 @@ if (SPM_ENABLE_SHARED)
+       (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "sh4"))
+     list(APPEND SPM_LIBS "atomic")
+   endif()
+-  set(SPM_INSTALLTARGETS sentencepiece sentencepiece_train)
++  set(SPM_LIBTARGETS sentencepiece sentencepiece_train)
+   set_target_properties(sentencepiece sentencepiece_train PROPERTIES SOVERSION 0 VERSION 0.0.0)
+   set_target_properties(sentencepiece PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
+   set_target_properties(sentencepiece_train PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
+@@ -235,7 +235,7 @@ if (SPM_ENABLE_SHARED)
+ else()
+   add_library(sentencepiece ALIAS sentencepiece-static)
+   add_library(sentencepiece_train ALIAS sentencepiece_train-static)
+-  set(SPM_INSTALLTARGETS sentencepiece-static sentencepiece_train-static)
++  set(SPM_LIBTARGETS sentencepiece-static sentencepiece_train-static)
+ 
+   set_target_properties(sentencepiece-static PROPERTIES OUTPUT_NAME "sentencepiece")
+   set_target_properties(sentencepiece_train-static PROPERTIES OUTPUT_NAME "sentencepiece_train")
+@@ -282,13 +282,21 @@ if (SPM_ENABLE_NFKC_COMPILE)
+   target_link_libraries(compile_charsmap sentencepiece sentencepiece_train)
+ endif()
+ 
+-list(APPEND SPM_INSTALLTARGETS
++set(SPM_BINTARGETS
+   spm_encode spm_decode spm_normalize spm_train spm_export_vocab)
+ 
+-install(TARGETS ${SPM_INSTALLTARGETS}
++install(TARGETS ${SPM_BINTARGETS}
+   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+   LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+   ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(TARGETS ${SPM_LIBTARGETS}
++  EXPORT sentencepieceTargets
++  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
++  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
++  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
++install(EXPORT sentencepieceTargets
++  FILE sentencepieceTargets.cmake
++  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sentencepiece")
+ install(FILES sentencepiece_trainer.h sentencepiece_processor.h
+   DESTINATION ${CMAKE_INSTALL_INCDIR})
+ if (NOT SPM_USE_BUILTIN_PROTOBUF)
+-- 
+2.38.1.windows.1
+
