@@ -29,7 +29,7 @@ source:
     - patches/0009-create-and-install-CMake-metadata.patch
 
 build:
-  number: 2
+  number: 3
 
 requirements:
   build:
