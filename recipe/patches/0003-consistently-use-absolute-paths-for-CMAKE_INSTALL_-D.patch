@@ -1,17 +1,17 @@
-From d275c55621f9fea17a1f07c885235e495f4eae34 Mon Sep 17 00:00:00 2001
+From bb0bda21c70a52c388353876a64560b5f6243c7b Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 6 Dec 2021 21:18:54 +1100
-Subject: [PATCH 3/9] consistently use absolute paths for CMAKE_INSTALL_*DIR
+Subject: [PATCH 3/8] consistently use absolute paths for CMAKE_INSTALL_*DIR
 
 ---
  CMakeLists.txt | 13 +++++--------
  1 file changed, 5 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 827d114..f4f7548 100644
+index 7e40f5c..434530a 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -40,11 +40,8 @@ endif()
+@@ -51,11 +51,8 @@ endif()
  
  if (UNIX)
    include(GNUInstallDirs)
@@ -25,7 +25,7 @@ index 827d114..f4f7548 100644
    set(prefix ${CMAKE_INSTALL_PREFIX})
    set(exec_prefix "\${prefix}")
    set(libdir "\${exec_prefix}/lib")
-@@ -83,15 +80,15 @@ if (APPLE)
+@@ -96,15 +93,15 @@ if (APPLE)
  endif()
  
  if (NOT DEFINED CMAKE_INSTALL_BINDIR)
@@ -43,7 +43,4 @@ index 827d114..f4f7548 100644
 +  set(CMAKE_INSTALL_INCDIR "${CMAKE_INSTALL_PREFIX}/include")
  endif()
  
- configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "config.h")
--- 
-2.38.1.windows.1
-
+ # SPDX-License-Identifier: (MIT OR CC0-1.0)
