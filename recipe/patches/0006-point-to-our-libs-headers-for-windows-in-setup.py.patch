@@ -1,26 +1,25 @@
-From 34cac78c9f294920175936944ad58a76e8bab7c0 Mon Sep 17 00:00:00 2001
+From e884436083b6d5c2beee6bc341f0a55958715f01 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
-Subject: [PATCH 6/9] point to our libs / headers for windows in setup.py
+Subject: [PATCH 6/8] point to our libs / headers for windows in setup.py
 
-also do not risk building against bundled libs
+also do not risk building against bundled libs, nor
+setting /MT for the MSVC static runtime libs
 ---
- python/setup.py | 20 ++++++++++++--------
- 1 file changed, 12 insertions(+), 8 deletions(-)
+ python/setup.py | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index fdf9394..ba4dda8 100755
+index 5411231..d8f0b5e 100755
 --- a/python/setup.py
 +++ b/python/setup.py
-@@ -77,12 +77,12 @@ class build_ext(_build_ext):
+@@ -77,10 +77,11 @@ class build_ext(_build_ext):
    """Override build_extension to run cmake."""
  
    def build_extension(self, ext):
 -    cflags, libs = get_cflags_and_libs('../build/root')
--    if len(libs) == 0:
++    # cflags, libs = get_cflags_and_libs('./bundled/root')
 +    cflags = ['-std=c++17']
-+    if False:
-       cflags, libs = get_cflags_and_libs('./bundled/root')
  
 -    if len(libs) == 0:
 -      if is_sentencepiece_installed():
@@ -29,23 +28,24 @@ index fdf9394..ba4dda8 100755
          cflags = cflags + run_pkg_config('cflags')
          libs = run_pkg_config('libs')
        else:
-@@ -108,17 +108,21 @@ if os.name == 'nt':
+@@ -106,17 +107,21 @@ if os.name == 'nt':
    arch = 'win32'
    if sys.maxsize > 2**32:
      arch = 'amd64'
 -  if os.path.exists('..\\build\\root_{}\\lib'.format(arch)):
 +  if False:
-     cflags = ['/std:c++17', '/MT', '/I..\\build\\root_{}\\include'.format(arch)]
+     cflags = ['/std:c++17', '/I..\\build\\root_{}\\include'.format(arch)]
      libs = [
          '..\\build\\root_{}\\lib\\sentencepiece.lib'.format(arch),
-         '..\\build\\root_{}\\lib\\sentencepiece_train.lib'.format(arch)
+         '..\\build\\root_{}\\lib\\sentencepiece_train.lib'.format(arch),
      ]
-   else:
--    cflags = ['/std:c++17', '/MT', '/I..\\build\\root\\include']
-+    cflags = ['/std:c++17', '/MT', '/I' + os.environ["LIBRARY_INC"]]
+-  elif os.path.exists('..\\build\\root\\lib'):
+-    cflags = ['/std:c++17', '/I..\\build\\root\\include']
++  elif True:
++    cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
      libs = [
 -        '..\\build\\root\\lib\\sentencepiece.lib',
--        '..\\build\\root\\lib\\sentencepiece_train.lib'
+-        '..\\build\\root\\lib\\sentencepiece_train.lib',
 +      # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
 +      os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
 +      # protobuf actually has the lib-prefix in the name also on windows;
@@ -53,8 +53,5 @@ index fdf9394..ba4dda8 100755
 +      # host dependencies for the link interface, i.e. also abseil
 +      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
      ]
- 
-   SENTENCEPIECE_EXT = Extension(
--- 
-2.38.1.windows.1
-
+   else:
+     # build library locally with cmake and vc++.

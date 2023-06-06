@@ -1,7 +1,7 @@
-From 285d03b18e98d013f33106694e963ef8e4c2e7bc Mon Sep 17 00:00:00 2001
+From 075ffeaf1de3319784ba18f2b516bb3daf9f8d16 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 10:05:12 +1100
-Subject: [PATCH 2/9] do not build vendored abseil & libprotobuf-lite
+Subject: [PATCH 2/8] do not build vendored abseil & libprotobuf-lite
 
 ---
  CMakeLists.txt             | 6 +++---
@@ -11,10 +11,10 @@ Subject: [PATCH 2/9] do not build vendored abseil & libprotobuf-lite
  4 files changed, 10 insertions(+), 8 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 78379a3..827d114 100644
+index 1b3af04..7e40f5c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -57,9 +57,9 @@ add_definitions(-D_FREEBSD)
+@@ -68,9 +68,9 @@ add_definitions(-D_FREEBSD)
  endif()
  
  if (SPM_USE_BUILTIN_PROTOBUF)
@@ -26,7 +26,7 @@ index 78379a3..827d114 100644
  endif()
  
  if (MSVC)
-@@ -110,7 +110,7 @@ if (SPM_BUILD_TEST)
+@@ -147,7 +147,7 @@ if (SPM_BUILD_TEST)
  endif()
  
  if (SPM_USE_EXTERNAL_ABSL)
@@ -36,10 +36,10 @@ index 78379a3..827d114 100644
  
  add_subdirectory(src)
 diff --git a/sentencepiece.pc.in b/sentencepiece.pc.in
-index ac7fef6..cc9bf78 100644
+index 6a5ba56..1108973 100644
 --- a/sentencepiece.pc.in
 +++ b/sentencepiece.pc.in
-@@ -6,5 +6,5 @@ includedir=@includedir@
+@@ -6,5 +6,5 @@ includedir=@includedir_for_pc_file@
  Name: @PROJECT_NAME@
  Description: Unsupervised text tokenizer and detokenizer for Neural Network-based text generation.
  Version: @PROJECT_VERSION@
@@ -47,7 +47,7 @@ index ac7fef6..cc9bf78 100644
 +Libs: -L${libdir} -lsentencepiece -lsentencepiece_train @libprotobuf@ @pkgconfiglibs@
  Cflags: -I${includedir} @pkgconfigcflags@
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 0a7f67e..d4e2ddc 100644
+index 39b0ef2..6dfd76d 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -69,6 +69,11 @@ if (SPM_USE_BUILTIN_PROTOBUF)
@@ -72,6 +72,3 @@ index d00ecba..3096702 100644
 -
 -
 +include_directories(darts_clone esaxx)
--- 
-2.38.1.windows.1
-

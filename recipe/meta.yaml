@@ -21,12 +21,10 @@ source:
     - patches/0005-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
     # ensure python bindings link to correct libs on windows
     - patches/0006-point-to-our-libs-headers-for-windows-in-setup.py.patch
-    # we don't want to link the msvc runtime statically
-    - patches/0007-don-t-force-replace-MD-with-MT.patch
     # install pkg-config metadata also on windows
-    - patches/0008-also-install-pkg-config-files-on-windows.patch
+    - patches/0007-also-install-pkg-config-files-on-windows.patch
     # install CMake metadata
-    - patches/0009-create-and-install-CMake-metadata.patch
+    - patches/0008-create-and-install-CMake-metadata.patch
 
 build:
   number: 0
