@@ -1,4 +1,4 @@
-{% set version = "0.1.97" %}
+{% set version = "0.1.99" %}
 
 package:
   name: sentencepiece-split
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/google/sentencepiece/archive/v{{ version }}.tar.gz
-  sha256: 41c3a07f315e3ac87605460c8bb8d739955bc8e7f478caec4017ef9b7d78669b
+  sha256: 63617eaf56c7a3857597dcd8780461f57dd21381b56a27716ef7d7e02e14ced4
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
@@ -29,7 +29,7 @@ source:
     - patches/0009-create-and-install-CMake-metadata.patch
 
 build:
-  number: 3
+  number: 0
 
 requirements:
   build:
