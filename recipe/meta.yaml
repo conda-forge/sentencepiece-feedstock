@@ -27,7 +27,7 @@ source:
     - patches/0008-create-and-install-CMake-metadata.patch
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
