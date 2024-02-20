@@ -1,11 +1,6 @@
 #!/bin/bash
 set -ex
 
-# we're trying to avoid the third_party sources, and not building them;
-# to avoid weird errors if those sources got picked up nevertheless, delete them
-rm -rf third_party/absl
-rm -rf third_party/protobuf-lite
-
 mkdir build
 cd build
 

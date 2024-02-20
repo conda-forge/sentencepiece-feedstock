@@ -1,10 +1,5 @@
 @echo on
 
-:: we're trying to avoid the third_party sources, and not building them;
-:: to avoid weird errors if those sources got picked up nevertheless, delete them
-rmdir /S /Q third_party\absl
-rmdir /S /Q third_party\protobuf-lite
-
 mkdir build
 cd build
 
