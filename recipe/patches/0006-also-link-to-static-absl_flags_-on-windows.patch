@@ -1,7 +1,7 @@
-From 64f7608bd0757387cee221df7014c9bdbe78585b Mon Sep 17 00:00:00 2001
+From 2a09741805ff7c3fad70b41e2c07b0520d9f77a9 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 20 Feb 2024 17:43:23 +1100
-Subject: [PATCH 6/6] also link to static absl_flags_* on windows
+Subject: [PATCH 6/7] also link to static absl_flags_* on windows
 
 ---
  python/setup.py | 10 +++++++++-

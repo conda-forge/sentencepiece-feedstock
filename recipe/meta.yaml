@@ -10,8 +10,8 @@ source:
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
-    # unvendor abseil & protobuf-lite
-    - patches/0002-do-not-build-vendored-abseil-libprotobuf-lite.patch
+    # set PROTOBUF_USE_DLLS
+    - patches/0002-ensure-we-set-PROTOBUF_USE_DLLS-when-using-our-own-p.patch
     # ensure python bindings link to correct libs on windows
     - patches/0003-point-to-our-libs-headers-for-windows-in-setup.py.patch
     # install pkg-config metadata also on windows
@@ -20,6 +20,9 @@ source:
     - patches/0005-create-and-install-CMake-metadata.patch
     # fix abseil setup on windows
     - patches/0006-also-link-to-static-absl_flags_-on-windows.patch
+    # backport of https://github.com/google/sentencepiece/pull/979:
+    # avoid having to specify CMAKE_INSTALL_{LIB,INCLUDE}DIR due to wrong order
+    - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
 
 build:
   number: 0
