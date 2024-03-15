@@ -141,7 +141,9 @@ outputs:
       commands:
         # binaries
         {% for each_bin in ["decode", "encode", "export_vocab", "normalize", "train"] %}
-        - spm_{{ each_bin }} --help
+        # expect exit code 1, see https://github.com/google/sentencepiece/issues/978
+        - spm_{{ each_bin }} --help >/dev/null || [[ $? == 1 ]]                     # [unix]
+        - spm_{{ each_bin }} --help & if %ERRORLEVEL% NEQ 1 (exit 0) else (exit 1)  # [win]
         {% endfor %}
 
   - name: sentencepiece-python
