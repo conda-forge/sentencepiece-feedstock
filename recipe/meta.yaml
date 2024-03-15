@@ -1,4 +1,4 @@
-{% set version = "0.1.99" %}
+{% set version = "0.2.0" %}
 
 package:
   name: sentencepiece-split
@@ -6,28 +6,26 @@ package:
 
 source:
   url: https://github.com/google/sentencepiece/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: 63617eaf56c7a3857597dcd8780461f57dd21381b56a27716ef7d7e02e14ced4
+  sha256: 9970f0a0afee1648890293321665e5b2efa04eaec9f1671fcf8048f456f5bb86
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
-    # unvendor abseil & protobuf-lite
-    - patches/0002-do-not-build-vendored-abseil-libprotobuf-lite.patch
-    # avoid installing into $PREFIX/lib64; make sure pkg-config template is filled correctly
-    - patches/0003-consistently-use-absolute-paths-for-CMAKE_INSTALL_-D.patch
-    # upstream sources still directly include third_party/absl...
-    - patches/0004-ACTUALLY-use-external-absl.patch
-    # upstream carries its own glue code under third_party/absl/flags;
-    # move it to the sentencepiece sources
-    - patches/0005-stop-pretending-sp-glue-code-belongs-in-third_party-.patch
+    # set PROTOBUF_USE_DLLS
+    - patches/0002-ensure-we-set-PROTOBUF_USE_DLLS-when-using-our-own-p.patch
     # ensure python bindings link to correct libs on windows
-    - patches/0006-point-to-our-libs-headers-for-windows-in-setup.py.patch
+    - patches/0003-point-to-our-libs-headers-for-windows-in-setup.py.patch
     # install pkg-config metadata also on windows
-    - patches/0007-also-install-pkg-config-files-on-windows.patch
+    - patches/0004-also-install-pkg-config-files-on-windows.patch
     # install CMake metadata
-    - patches/0008-create-and-install-CMake-metadata.patch
+    - patches/0005-create-and-install-CMake-metadata.patch
+    # fix abseil setup on windows
+    - patches/0006-also-link-to-static-absl_flags_-on-windows.patch
+    # backport of https://github.com/google/sentencepiece/pull/979:
+    # avoid having to specify CMAKE_INSTALL_{LIB,INCLUDE}DIR due to wrong order
+    - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
 
 build:
-  number: 8
+  number: 0
 
 requirements:
   build:
@@ -143,7 +141,9 @@ outputs:
       commands:
         # binaries
         {% for each_bin in ["decode", "encode", "export_vocab", "normalize", "train"] %}
-        - spm_{{ each_bin }} --help
+        # expect exit code 1, see https://github.com/google/sentencepiece/issues/978
+        - spm_{{ each_bin }} --help >/dev/null || [[ $? == 1 ]]                     # [unix]
+        - spm_{{ each_bin }} --help & if %ERRORLEVEL% NEQ 1 (exit 0) else (exit 1)  # [win]
         {% endfor %}
 
   - name: sentencepiece-python
