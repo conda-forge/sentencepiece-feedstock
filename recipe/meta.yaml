@@ -25,7 +25,7 @@ source:
     - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
 
 build:
-  number: 0
+  number: 1
 
 requirements:
   build:
@@ -38,7 +38,7 @@ outputs:
       run_exports:
         # not clear what ABI-compatibility of sentencepiece versions are;
         # for now, use same version at run & build time
-        - libsentencepiece ={{ version }}
+        - {{ pin_subpackage("libsentencepiece", max_pin="x.x.x") }}
     requirements:
       host:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
@@ -61,7 +61,7 @@ outputs:
       run_exports:
         # not clear what ABI-compatibility of sentencepiece versions are;
         # for now, use same version at run & build time
-        - libsentencepiece ={{ version }}
+        - {{ pin_subpackage("libsentencepiece", max_pin="x.x.x") }}
     requirements:
       build:
         - libprotobuf     # [build_platform != target_platform]
