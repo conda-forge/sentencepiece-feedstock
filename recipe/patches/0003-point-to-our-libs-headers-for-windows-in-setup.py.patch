@@ -1,4 +1,4 @@
-From a285dbb0bb469256fb43f483e398cc0f028cd2c8 Mon Sep 17 00:00:00 2001
+From fec0f2f37c4c35057c31757de3ff0704afcb37d3 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
 Subject: [PATCH 3/7] point to our libs / headers for windows in setup.py
@@ -10,7 +10,7 @@ setting /MT for the MSVC static runtime libs
  1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index d600321..fb301ac 100755
+index d600321..36ed833 100755
 --- a/python/setup.py
 +++ b/python/setup.py
 @@ -77,10 +77,11 @@ class build_ext(_build_ext):
@@ -46,12 +46,12 @@ index d600321..fb301ac 100755
      libs = [
 -        '..\\build\\root\\lib\\sentencepiece.lib',
 -        '..\\build\\root\\lib\\sentencepiece_train.lib',
-+      # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf-lite
++      # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
 +      os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
 +      # protobuf actually has the lib-prefix in the name also on windows;
 +      # since libsentencepiece is static on windows, we also need _its_
 +      # host dependencies for the link interface, i.e. also abseil
-+      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf-lite", "abseil_dll"]
++      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
      ]
    else:
      # build library locally with cmake and vc++.

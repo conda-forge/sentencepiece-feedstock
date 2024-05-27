@@ -1,4 +1,4 @@
-From 2a09741805ff7c3fad70b41e2c07b0520d9f77a9 Mon Sep 17 00:00:00 2001
+From d830e3c7a9a395f7db04c737dffa6771add78eb7 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 20 Feb 2024 17:43:23 +1100
 Subject: [PATCH 6/7] also link to static absl_flags_* on windows
@@ -8,7 +8,7 @@ Subject: [PATCH 6/7] also link to static absl_flags_* on windows
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index fb301ac..4366d1a 100755
+index 36ed833..1316df3 100755
 --- a/python/setup.py
 +++ b/python/setup.py
 @@ -117,13 +117,21 @@ if os.name == 'nt':
@@ -24,13 +24,13 @@ index fb301ac..4366d1a 100755
 +        "absl_flags_usage", "absl_flags_usage_internal",
 +    ]
      libs = [
-       # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf-lite
+       # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
        os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
        # protobuf actually has the lib-prefix in the name also on windows;
        # since libsentencepiece is static on windows, we also need _its_
        # host dependencies for the link interface, i.e. also abseil
--      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf-lite", "abseil_dll"]
-+      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf-lite"] + absl_libs
+-      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
++      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf"] + absl_libs
      ]
    else:
      # build library locally with cmake and vc++.

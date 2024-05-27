@@ -25,7 +25,7 @@ source:
     - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
 
 build:
-  number: 1
+  number: 2
 
 requirements:
   build:
