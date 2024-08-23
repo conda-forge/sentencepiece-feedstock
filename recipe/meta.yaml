@@ -26,9 +26,12 @@ source:
 
 build:
   number: 2
+  skip: true  # [python_impl == "pypy"]
 
 outputs:
   - name: sentencepiece
+    build:
+      skip: true  # [python_impl == "pypy"]
     # metapackage that holds everything together
     build:
       run_exports:
@@ -151,6 +154,8 @@ outputs:
   - name: sentencepiece-python
     script: build-pkg.sh   # [unix]
     script: build-pkg.bat  # [win]
+    build:
+      skip: true  # [python_impl == "pypy"]
     requirements:
       build:
         - python                                 # [build_platform != target_platform]
