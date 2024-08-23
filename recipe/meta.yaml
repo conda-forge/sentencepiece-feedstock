@@ -141,7 +141,11 @@ outputs:
         {% for each_bin in ["decode", "encode", "export_vocab", "normalize", "train"] %}
         # expect exit code 1, see https://github.com/google/sentencepiece/issues/978
         - spm_{{ each_bin }} --help >/dev/null || [[ $? == 1 ]]                     # [unix]
-        - spm_{{ each_bin }} --help & if %ERRORLEVEL% NEQ 1 (exit 0) else (exit 1)  # [win]
+        # do not use %ERRORLEVEL% or !ERRORLEVEL!, but ERRORLEVEL, c.f.
+        # https://devblogs.microsoft.com/oldnewthing/20080926-00/?p=20743;
+        # while `if ... NEQ 1 exit 1` would be nicer, NEQ is incompatible with
+        # using bare ERRORLEVEL, see https://stackoverflow.com/a/74148543
+        - spm_{{ each_bin }} --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)      # [win]
         {% endfor %}
 
   - name: sentencepiece-python
