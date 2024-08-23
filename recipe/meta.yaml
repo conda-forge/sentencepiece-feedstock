@@ -161,6 +161,7 @@ outputs:
       host:
         - pip
         - python
+        - setuptools
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - libprotobuf
         # host deps of static libsentencepiece leak to consumers
