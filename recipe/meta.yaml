@@ -25,7 +25,7 @@ source:
     - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
 
 build:
-  number: 6
+  number: 7
   skip: true  # [python_impl == "pypy"]
 
 outputs:
@@ -76,9 +76,6 @@ outputs:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
         # (unfortunately) because it contains abseil types in its API
         - libabseil
-        # additionally, the static windows build requires _its_
-        # host dependences to be present for successful linkage
-        - libprotobuf     # [win]
 
     test:
       requires:
@@ -99,8 +96,7 @@ outputs:
         # presence of shared libraries
         - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
         - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
-
-        # static libraries on windows
+        - if not exist %LIBRARY_BIN%\{{ each_lib }}.dll exit 1  # [win]
         - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
 
         # absence of static libraries (on unix)
