@@ -13,7 +13,7 @@ channel_targets:
 cxx_compiler:
 - clangxx
 cxx_compiler_version:
-- '17'
+- '18'
 libabseil:
 - '20240722'
 libprotobuf:
@@ -30,14 +30,5 @@ python:
 - 3.12.* *_cpython
 - 3.13.* *_cp313
 - 3.9.* *_cpython
-python_impl:
-- cpython
-- cpython
-- cpython
-- cpython
-- cpython
 target_platform:
 - osx-arm64
-zip_keys:
-- - python
-  - python_impl
