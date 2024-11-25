@@ -1,0 +1,21 @@
+From dd85ac56c5ef7987b1ab660a359aa8c73d9b9ae8 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 25 Nov 2024 20:29:08 +1100
+Subject: [PATCH 11/13] avoid spuriously inclusing vendored abseil
+
+---
+ src/CMakeLists.txt | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 125bbdf..7f6fc96 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -103,7 +103,6 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+ endif()
+ 
+ include_directories(${CMAKE_CURRENT_BINARY_DIR})
+-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../third_party)
+ 
+ if (MSVC)
+   add_definitions("/D_USE_INTERNAL_STRING_VIEW")

@@ -23,15 +23,19 @@ source:
     # backport of https://github.com/google/sentencepiece/pull/979:
     # avoid having to specify CMAKE_INSTALL_{LIB,INCLUDE}DIR due to wrong order
     - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
+    - patches/0008-respect-SPM_ENABLE_SHARED-also-on-windows.patch
+    # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
+    - patches/0009-add-SPM_DLL-machinery.patch                                  # [win]
+    - patches/0010-use-custom-protoc-plugin-to-insert-include-common.h.patch    # [win]
+    - patches/0011-avoid-spuriously-inclusing-vendored-abseil.patch
+    - patches/0012-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
+    - patches/0013-adapt-to-names-for-import_library.patch
 
 build:
-  number: 6
-  skip: true  # [python_impl == "pypy"]
+  number: 7
 
 outputs:
   - name: sentencepiece
-    build:
-      skip: true  # [python_impl == "pypy"]
     # metapackage that holds everything together
     build:
       run_exports:
@@ -71,14 +75,12 @@ outputs:
       host:
         - libabseil
         - libprotobuf
+        - protobuf
         - pthreads-win32  # [win]
       run:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
         # (unfortunately) because it contains abseil types in its API
         - libabseil
-        # additionally, the static windows build requires _its_
-        # host dependences to be present for successful linkage
-        - libprotobuf     # [win]
 
     test:
       requires:
@@ -99,12 +101,12 @@ outputs:
         # presence of shared libraries
         - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
         - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
+        - if not exist %LIBRARY_BIN%\{{ each_lib }}.dll exit 1  # [win]
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}_import.lib exit 1  # [win]
 
-        # static libraries on windows
-        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
-
-        # absence of static libraries (on unix)
+        # absence of static libraries
         - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
+        - if exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1      # [win]
         {% endfor %}
 
         # headers
@@ -134,6 +136,7 @@ outputs:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - libabseil
         - libprotobuf
+        - protobuf
         - pthreads-win32  # [win]
       run:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
@@ -154,8 +157,6 @@ outputs:
   - name: sentencepiece-python
     script: build-pkg.sh   # [unix]
     script: build-pkg.bat  # [win]
-    build:
-      skip: true  # [python_impl == "pypy"]
     requirements:
       build:
         - python                                 # [build_platform != target_platform]
@@ -169,8 +170,6 @@ outputs:
         - setuptools
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - libprotobuf
-        # host deps of static libsentencepiece leak to consumers
-        - libabseil    # [win]
       run:
         - python
         - {{ pin_subpackage('libsentencepiece', exact=True) }}

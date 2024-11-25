@@ -7,7 +7,7 @@ c_stdlib_version:
 cdt_arch:
 - aarch64
 cdt_name:
-- cos7
+- conda
 channel_sources:
 - conda-forge
 channel_targets:
@@ -17,7 +17,7 @@ cxx_compiler:
 cxx_compiler_version:
 - '13'
 docker_image:
-- quay.io/condaforge/linux-anvil-cos7-x86_64
+- quay.io/condaforge/linux-anvil-x86_64:alma9
 libabseil:
 - '20240722'
 libprotobuf:
@@ -32,16 +32,5 @@ python:
 - 3.12.* *_cpython
 - 3.13.* *_cp313
 - 3.9.* *_cpython
-python_impl:
-- cpython
-- cpython
-- cpython
-- cpython
-- cpython
 target_platform:
 - linux-aarch64
-zip_keys:
-- - c_stdlib_version
-  - cdt_name
-- - python
-  - python_impl
