@@ -1,4 +1,4 @@
-From 91eb5412898f3dd77e78048260d9dfa70f97fa6d Mon Sep 17 00:00:00 2001
+From c6425fe7ce0d4f7c83f1f6e41310b54f9917ff7e Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:29:08 +1100
 Subject: [PATCH 12/13] fix minloglevel situation; avoid _USE_EXTERNAL_ABSL
@@ -9,7 +9,7 @@ Subject: [PATCH 12/13] fix minloglevel situation; avoid _USE_EXTERNAL_ABSL
  2 files changed, 2 insertions(+), 8 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 7f6fc96..8b275eb 100644
+index 9399800..5d83577 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -20,11 +20,6 @@ if (SPM_ABSL_PROVIDER STREQUAL "module" OR SPM_ABSL_PROVIDER STREQUAL "package")

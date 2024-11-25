@@ -32,7 +32,7 @@ source:
     - patches/0013-adapt-to-names-for-import_library.patch
 
 build:
-  number: 7
+  number: 8
 
 outputs:
   - name: sentencepiece
@@ -110,7 +110,9 @@ outputs:
         {% endfor %}
 
         # headers
-        {% for each_header in ["sentencepiece_processor.h", "sentencepiece_trainer.h"] %}
+        {% for each_header in [
+            "sentencepiece.pb.h", "sentencepiece_processor.h", "sentencepiece_trainer.h"
+        ] %}
         - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
         - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
         {% endfor %}
