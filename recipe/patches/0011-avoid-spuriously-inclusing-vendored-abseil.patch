@@ -1,4 +1,4 @@
-From dd85ac56c5ef7987b1ab660a359aa8c73d9b9ae8 Mon Sep 17 00:00:00 2001
+From 644f4a4614c9b3c5e0f57363a5f433f9a77c1943 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:29:08 +1100
 Subject: [PATCH 11/13] avoid spuriously inclusing vendored abseil
@@ -8,10 +8,10 @@ Subject: [PATCH 11/13] avoid spuriously inclusing vendored abseil
  1 file changed, 1 deletion(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 125bbdf..7f6fc96 100644
+index 6028be9..9399800 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -103,7 +103,6 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+@@ -107,7 +107,6 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
  endif()
  
  include_directories(${CMAKE_CURRENT_BINARY_DIR})

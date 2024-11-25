@@ -1,23 +1,23 @@
-From 3bc920f488d9baea4d1a44c3f57119d6e915cc74 Mon Sep 17 00:00:00 2001
+From ed66cacd3b0996b274908abfd7188eacc1c2bc35 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 14:42:12 +1100
 Subject: [PATCH 10/13] use custom protoc plugin to insert `$include
  "common.h"`
 
 ---
- src/CMakeLists.txt            | 32 ++++++++++++++++++++++----------
+ src/CMakeLists.txt            | 24 ++++++++++++++++++++----
  src/common.h                  | 18 ++++++++++++++++++
  src/protoc_plugin_common.py   | 32 ++++++++++++++++++++++++++++++++
  src/protoc_plugin_wrapper.bat |  2 ++
- 4 files changed, 74 insertions(+), 10 deletions(-)
+ 4 files changed, 72 insertions(+), 4 deletions(-)
  create mode 100644 src/protoc_plugin_common.py
  create mode 100644 src/protoc_plugin_wrapper.bat
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 6203c31..125bbdf 100644
+index 6203c31..6028be9 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -77,10 +77,22 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+@@ -77,10 +77,26 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
     add_definitions("-DPROTOBUF_USE_DLLS")
    endif()
    include_directories(${Protobuf_INCLUDE_DIRS})
@@ -41,35 +41,13 @@ index 6203c31..125bbdf 100644
 +         ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.proto
 +    COMMENT "Running protoc with custom plugin"
 +  )
++  set(SPM_PROTO_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece.pb.h)
++  set(SPM_PROTO_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece.pb.cc)
++  set(SPM_MODEL_PROTO_HDRS ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.pb.h)
++  set(SPM_MODEL_PROTO_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.pb.cc)
    set(PROTOBUF_LITE_SRCS "")
    include_directories(${PROTOBUF_INCLUDE_DIR})
    if (MSVC)
-@@ -101,10 +113,10 @@ endif()
- 
- set(SPM_SRCS
-   ${PROTOBUF_LITE_SRCS}
--  ${SPM_PROTO_HDRS}
--  ${SPM_PROTO_SRCS}
--  ${SPM_MODEL_PROTO_HDRS}
--  ${SPM_MODEL_PROTO_SRCS}
-+  sentencepiece.pb.h
-+  sentencepiece.pb.cc
-+  sentencepiece_model.pb.h
-+  sentencepiece_model.pb.cc
-   bpe_model.h
-   common.h
-   normalizer.h
-@@ -134,8 +146,8 @@ set(SPM_SRCS
-   ${ABSL_FLAGS_SRCS})
- 
- set(SPM_TRAIN_SRCS
--  ${SPM_PROTO_HDRS}
--  ${SPM_MODEL_PROTO_HDRS}
-+  sentencepiece.pb.h
-+  sentencepiece_model.pb.h
-   builder.h
-   normalization_rule.h
-   unicode_script.h
 diff --git a/src/common.h b/src/common.h
 index d7e6186..b2bcb64 100644
 --- a/src/common.h
