@@ -27,6 +27,8 @@ source:
     # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
     - patches/0009-add-SPM_DLL-machinery.patch                                  # [win]
     - patches/0010-use-custom-protoc-plugin-to-insert-include-common.h.patch    # [win]
+    - patches/0011-avoid-spuriously-inclusing-vendored-abseil.patch
+    - patches/0012-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
 
 build:
   number: 7

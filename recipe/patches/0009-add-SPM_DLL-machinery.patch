@@ -1,7 +1,7 @@
 From 66448eb6817fa23f799cea6e9718297ba32b0c3c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 12:33:34 +1100
-Subject: [PATCH 09/10] add SPM_DLL machinery
+Subject: [PATCH 09/12] add SPM_DLL machinery
 
 ---
  src/CMakeLists.txt | 8 ++++++--

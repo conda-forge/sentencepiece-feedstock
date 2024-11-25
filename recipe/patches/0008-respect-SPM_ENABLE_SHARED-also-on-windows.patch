@@ -1,7 +1,7 @@
 From e47541162286cbb8174c5eafbb555307f858f627 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 11:49:46 +1100
-Subject: [PATCH 08/10] respect SPM_ENABLE_SHARED also on windows
+Subject: [PATCH 08/12] respect SPM_ENABLE_SHARED also on windows
 
 ---
  CMakeLists.txt | 5 -----
