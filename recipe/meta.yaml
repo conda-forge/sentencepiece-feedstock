@@ -29,6 +29,7 @@ source:
     - patches/0010-use-custom-protoc-plugin-to-insert-include-common.h.patch    # [win]
     - patches/0011-avoid-spuriously-inclusing-vendored-abseil.patch
     - patches/0012-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
+    - patches/0013-adapt-to-names-for-import_library.patch
 
 build:
   number: 7
@@ -101,10 +102,11 @@ outputs:
         - test -f $PREFIX/lib/lib{{ each_lib }}.so              # [linux]
         - test -f $PREFIX/lib/lib{{ each_lib }}.dylib           # [osx]
         - if not exist %LIBRARY_BIN%\{{ each_lib }}.dll exit 1  # [win]
-        - if not exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1  # [win]
+        - if not exist %LIBRARY_LIB%\{{ each_lib }}_import.lib exit 1  # [win]
 
-        # absence of static libraries (on unix)
+        # absence of static libraries
         - test ! -f $PREFIX/lib/lib{{ each_lib }}.a             # [unix]
+        - if exist %LIBRARY_LIB%\{{ each_lib }}.lib exit 1      # [win]
         {% endfor %}
 
         # headers
