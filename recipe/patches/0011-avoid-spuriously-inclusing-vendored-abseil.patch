@@ -1,4 +1,4 @@
-From 644f4a4614c9b3c5e0f57363a5f433f9a77c1943 Mon Sep 17 00:00:00 2001
+From ec4ffbda2db7f50a9063c7b7faef0edb79d4612b Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:29:08 +1100
 Subject: [PATCH 11/13] avoid spuriously inclusing vendored abseil
