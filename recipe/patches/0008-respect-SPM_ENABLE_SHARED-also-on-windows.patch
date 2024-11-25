@@ -1,0 +1,25 @@
+From e47541162286cbb8174c5eafbb555307f858f627 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 25 Nov 2024 11:49:46 +1100
+Subject: [PATCH 8/8] respect SPM_ENABLE_SHARED also on windows
+
+---
+ CMakeLists.txt | 5 -----
+ 1 file changed, 5 deletions(-)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 03f1589..7b60f3b 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -42,11 +42,6 @@ if (SPM_CROSS_SYSTEM_PROCESSOR)
+  set(CMAKE_SYSTEM_PROCESSOR ${SPM_CROSS_SYSTEM_PROCESSOR})
+ endif()
+ 
+-# Disable shared build on windows
+-if(WIN32)
+-  set(SPM_ENABLE_SHARED OFF)
+-endif()
+-
+ set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ 
