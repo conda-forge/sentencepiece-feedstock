@@ -1,4 +1,4 @@
-From 072493dfd39f3d71cb6b022e06f76e24512943a1 Mon Sep 17 00:00:00 2001
+From ccd4b762c899dc2ced8bc9cdf095b7890ed07e66 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:59:56 +1100
 Subject: [PATCH 13/13] adapt to names for import_library
