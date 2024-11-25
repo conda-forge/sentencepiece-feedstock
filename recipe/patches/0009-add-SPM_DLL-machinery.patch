@@ -1,24 +1,14 @@
-From c357d46c23dc5d523e0d5fd716e5f621afc22535 Mon Sep 17 00:00:00 2001
+From 66448eb6817fa23f799cea6e9718297ba32b0c3c Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 12:33:34 +1100
-Subject: [PATCH 9/9] add SPM_DLL machinery
+Subject: [PATCH 09/10] add SPM_DLL machinery
 
 ---
- src/CMakeLists.txt          | 10 ++++++++--
- src/bpe_model.h             |  1 +
- src/bpe_model_trainer.h     |  1 +
- src/char_model.h            |  1 +
- src/char_model_trainer.h    |  1 +
- src/common.h                | 18 ++++++++++++++++++
- src/model_factory.h         |  1 +
- src/trainer_factory.h       |  1 +
- src/unigram_model_trainer.h |  1 +
- src/word_model.h            |  1 +
- src/word_model_trainer.h    |  1 +
- 11 files changed, 35 insertions(+), 2 deletions(-)
+ src/CMakeLists.txt | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index a612357..e1a7a87 100644
+index a612357..6203c31 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
 @@ -77,8 +77,10 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
@@ -34,151 +24,12 @@ index a612357..e1a7a87 100644
    set(PROTOBUF_LITE_SRCS "")
    include_directories(${PROTOBUF_INCLUDE_DIR})
    if (MSVC)
-@@ -255,6 +257,10 @@ if (SPM_ENABLE_SHARED)
+@@ -255,6 +257,8 @@ if (SPM_ENABLE_SHARED)
      set_target_properties(sentencepiece PROPERTIES IMPORT_SUFFIX ".dll.a")
      set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX ".dll.a")
    endif()
 +  set_target_properties(sentencepiece PROPERTIES DEFINE_SYMBOL "SPM_DLL_EXPORTS")
 +  target_compile_definitions(sentencepiece INTERFACE SPM_DLL_IMPORTS)
-+  set_target_properties(sentencepiece_train PROPERTIES DEFINE_SYMBOL "SPM_DLL_EXPORTS")
-+  target_compile_definitions(sentencepiece_train INTERFACE SPM_DLL_IMPORTS)
  else()
    add_library(sentencepiece ALIAS sentencepiece-static)
    add_library(sentencepiece_train ALIAS sentencepiece_train-static)
-diff --git a/src/bpe_model.h b/src/bpe_model.h
-index 428b8a0..05c43a2 100644
---- a/src/bpe_model.h
-+++ b/src/bpe_model.h
-@@ -15,6 +15,7 @@
- #ifndef BPE_MODEL_H_
- #define BPE_MODEL_H_
- 
-+#include "common.h"
- #include "model_interface.h"
- #include "sentencepiece_model.pb.h"
- 
-diff --git a/src/bpe_model_trainer.h b/src/bpe_model_trainer.h
-index 15ca479..4c8e975 100644
---- a/src/bpe_model_trainer.h
-+++ b/src/bpe_model_trainer.h
-@@ -20,6 +20,7 @@
- #include <string>
- #include <vector>
- 
-+#include "common.h"
- #include "sentencepiece_model.pb.h"
- #include "third_party/absl/container/btree_set.h"
- #include "third_party/absl/container/flat_hash_map.h"
-diff --git a/src/char_model.h b/src/char_model.h
-index cd32875..992317c 100644
---- a/src/char_model.h
-+++ b/src/char_model.h
-@@ -15,6 +15,7 @@
- #ifndef CHAR_MODEL_H_
- #define CHAR_MODEL_H_
- 
-+#include "common.h"
- #include "model_interface.h"
- #include "sentencepiece_model.pb.h"
- 
-diff --git a/src/char_model_trainer.h b/src/char_model_trainer.h
-index e563819..188480c 100644
---- a/src/char_model_trainer.h
-+++ b/src/char_model_trainer.h
-@@ -15,6 +15,7 @@
- #ifndef CHAR_MODEL_TRAINER_H_
- #define CHAR_MODEL_TRAINER_H_
- 
-+#include "common.h"
- #include "sentencepiece_model.pb.h"
- #include "trainer_interface.h"
- 
-diff --git a/src/common.h b/src/common.h
-index d7e6186..b2bcb64 100644
---- a/src/common.h
-+++ b/src/common.h
-@@ -41,6 +41,24 @@
- #include <windows.h>
- #endif
- 
-+// SPM_DLL
-+// inspired by https://github.com/abseil/abseil-cpp/blob/20220623.1/absl/base/config.h#L730-L747
-+//
-+// When building sentencepiece as a DLL, this macro expands to `__declspec(dllexport)`
-+// so we can annotate symbols appropriately as being exported. When used in
-+// headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
-+// that consumers know the symbol is defined inside the DLL. In all other cases,
-+// the macro expands to nothing.
-+// Note: SPM_DLL_EXPORTS is set in CMakeLists.txt when building shared grpc{,_unsecure}
-+//       SPM_DLL_IMPORTS is set by us as part of the interface for consumers of the DLL
-+#if defined(SPM_DLL_EXPORTS)
-+#  define SPM_DLL __declspec(dllexport)
-+#elif defined(SPM_DLL_IMPORTS)
-+#  define SPM_DLL __declspec(dllimport)
-+#else
-+#  define SPM_DLL
-+#endif
-+
- typedef int8_t int8;
- typedef int16_t int16;
- typedef int32_t int32;
-diff --git a/src/model_factory.h b/src/model_factory.h
-index 76abce7..1a15a30 100644
---- a/src/model_factory.h
-+++ b/src/model_factory.h
-@@ -17,6 +17,7 @@
- 
- #include <memory>
- 
-+#include "common.h"
- #include "model_interface.h"
- #include "sentencepiece_model.pb.h"
- 
-diff --git a/src/trainer_factory.h b/src/trainer_factory.h
-index a11cbc0..fd9bbd3 100644
---- a/src/trainer_factory.h
-+++ b/src/trainer_factory.h
-@@ -17,6 +17,7 @@
- 
- #include <memory>
- 
-+#include "common.h"
- #include "sentencepiece_model.pb.h"
- #include "trainer_interface.h"
- 
-diff --git a/src/unigram_model_trainer.h b/src/unigram_model_trainer.h
-index c6562e6..ee9de4c 100644
---- a/src/unigram_model_trainer.h
-+++ b/src/unigram_model_trainer.h
-@@ -20,6 +20,7 @@
- #include <utility>
- #include <vector>
- 
-+#include "common.h"
- #include "sentencepiece_model.pb.h"
- #include "third_party/absl/strings/string_view.h"
- #include "trainer_interface.h"
-diff --git a/src/word_model.h b/src/word_model.h
-index 34470f9..7234dea 100644
---- a/src/word_model.h
-+++ b/src/word_model.h
-@@ -15,6 +15,7 @@
- #ifndef WORD_MODEL_H_
- #define WORD_MODEL_H_
- 
-+#include "common.h"
- #include "model_interface.h"
- #include "sentencepiece_model.pb.h"
- 
-diff --git a/src/word_model_trainer.h b/src/word_model_trainer.h
-index 76f8f32..a00bcb3 100644
---- a/src/word_model_trainer.h
-+++ b/src/word_model_trainer.h
-@@ -15,6 +15,7 @@
- #ifndef WORD_MODEL_TRAINER_H_
- #define WORD_MODEL_TRAINER_H_
- 
-+#include "common.h"
- #include "sentencepiece_model.pb.h"
- #include "trainer_interface.h"
- 

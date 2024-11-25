@@ -25,7 +25,8 @@ source:
     - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
     - patches/0008-respect-SPM_ENABLE_SHARED-also-on-windows.patch
     # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
-    - patches/0009-add-SPM_DLL-machinery.patch  # [win]
+    - patches/0009-add-SPM_DLL-machinery.patch                                  # [win]
+    - patches/0010-use-custom-protoc-plugin-to-insert-include-common.h.patch    # [win]
 
 build:
   number: 7
@@ -71,6 +72,7 @@ outputs:
       host:
         - libabseil
         - libprotobuf
+        - protobuf
         - pthreads-win32  # [win]
       run:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
@@ -130,6 +132,7 @@ outputs:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
         - libabseil
         - libprotobuf
+        - protobuf
         - pthreads-win32  # [win]
       run:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}

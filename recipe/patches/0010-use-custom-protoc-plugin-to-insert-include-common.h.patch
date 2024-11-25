@@ -1,0 +1,147 @@
+From 3bc920f488d9baea4d1a44c3f57119d6e915cc74 Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 25 Nov 2024 14:42:12 +1100
+Subject: [PATCH 10/10] use custom protoc plugin to insert `$include
+ "common.h"`
+
+---
+ src/CMakeLists.txt            | 32 ++++++++++++++++++++++----------
+ src/common.h                  | 18 ++++++++++++++++++
+ src/protoc_plugin_common.py   | 32 ++++++++++++++++++++++++++++++++
+ src/protoc_plugin_wrapper.bat |  2 ++
+ 4 files changed, 74 insertions(+), 10 deletions(-)
+ create mode 100644 src/protoc_plugin_common.py
+ create mode 100644 src/protoc_plugin_wrapper.bat
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 6203c31..125bbdf 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -77,10 +77,22 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+    add_definitions("-DPROTOBUF_USE_DLLS")
+   endif()
+   include_directories(${Protobuf_INCLUDE_DIRS})
+-  protobuf_generate_cpp(SPM_PROTO_SRCS SPM_PROTO_HDRS
+-    EXPORT_MACRO SPM_DLL sentencepiece.proto)
+-  protobuf_generate_cpp(SPM_MODEL_PROTO_SRCS SPM_MODEL_PROTO_HDRS
+-    EXPORT_MACRO SPM_DLL sentencepiece_model.proto)
++  # Command to add `#include "common.h"` to generated protos
++  add_custom_command(
++    OUTPUT
++        ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece.pb.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece.pb.cc
++        ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.pb.h
++        ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.pb.cc
++    COMMAND ${Protobuf_PROTOC_EXECUTABLE}
++    ARGS --plugin=protoc-gen-custom=${CMAKE_CURRENT_SOURCE_DIR}/protoc_plugin_wrapper.bat
++         --cpp_out=dllexport_decl=SPM_DLL:${CMAKE_CURRENT_SOURCE_DIR}
++         --custom_out=${CMAKE_CURRENT_SOURCE_DIR}  # ensure the plugin is actually called
++         --proto_path=${CMAKE_CURRENT_SOURCE_DIR}
++         ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece.proto
++         ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.proto
++    COMMENT "Running protoc with custom plugin"
++  )
+   set(PROTOBUF_LITE_SRCS "")
+   include_directories(${PROTOBUF_INCLUDE_DIR})
+   if (MSVC)
+@@ -101,10 +113,10 @@ endif()
+ 
+ set(SPM_SRCS
+   ${PROTOBUF_LITE_SRCS}
+-  ${SPM_PROTO_HDRS}
+-  ${SPM_PROTO_SRCS}
+-  ${SPM_MODEL_PROTO_HDRS}
+-  ${SPM_MODEL_PROTO_SRCS}
++  sentencepiece.pb.h
++  sentencepiece.pb.cc
++  sentencepiece_model.pb.h
++  sentencepiece_model.pb.cc
+   bpe_model.h
+   common.h
+   normalizer.h
+@@ -134,8 +146,8 @@ set(SPM_SRCS
+   ${ABSL_FLAGS_SRCS})
+ 
+ set(SPM_TRAIN_SRCS
+-  ${SPM_PROTO_HDRS}
+-  ${SPM_MODEL_PROTO_HDRS}
++  sentencepiece.pb.h
++  sentencepiece_model.pb.h
+   builder.h
+   normalization_rule.h
+   unicode_script.h
+diff --git a/src/common.h b/src/common.h
+index d7e6186..b2bcb64 100644
+--- a/src/common.h
++++ b/src/common.h
+@@ -41,6 +41,24 @@
+ #include <windows.h>
+ #endif
+ 
++// SPM_DLL
++// inspired by https://github.com/abseil/abseil-cpp/blob/20220623.1/absl/base/config.h#L730-L747
++//
++// When building sentencepiece as a DLL, this macro expands to `__declspec(dllexport)`
++// so we can annotate symbols appropriately as being exported. When used in
++// headers consuming a DLL, this macro expands to `__declspec(dllimport)` so
++// that consumers know the symbol is defined inside the DLL. In all other cases,
++// the macro expands to nothing.
++// Note: SPM_DLL_EXPORTS is set in CMakeLists.txt when building shared grpc{,_unsecure}
++//       SPM_DLL_IMPORTS is set by us as part of the interface for consumers of the DLL
++#if defined(SPM_DLL_EXPORTS)
++#  define SPM_DLL __declspec(dllexport)
++#elif defined(SPM_DLL_IMPORTS)
++#  define SPM_DLL __declspec(dllimport)
++#else
++#  define SPM_DLL
++#endif
++
+ typedef int8_t int8;
+ typedef int16_t int16;
+ typedef int32_t int32;
+diff --git a/src/protoc_plugin_common.py b/src/protoc_plugin_common.py
+new file mode 100644
+index 0000000..94f078b
+--- /dev/null
++++ b/src/protoc_plugin_common.py
+@@ -0,0 +1,32 @@
++import sys
++from google.protobuf.compiler import plugin_pb2 as plugin
++
++def main():
++    # Read CodeGeneratorRequest from stdin
++    data = sys.stdin.buffer.read()
++    request = plugin.CodeGeneratorRequest()
++    request.ParseFromString(data)
++
++    # Prepare CodeGeneratorResponse
++    response = plugin.CodeGeneratorResponse()
++
++    for proto_file in request.proto_file:
++        # Example: Always include a custom header for all files
++        custom_header = "#include \"common.h\"\n"
++
++        # Determine the name of the generated .pb.h file
++        pb_h_file = proto_file.name.replace(".proto", ".pb.h")
++
++        # Target the generated .pb.h with the plugin
++        file_response = response.file.add()
++        file_response.name = pb_h_file
++        # Insert our custom header, see
++        # https://protobuf.dev/reference/cpp/cpp-generated/#plugins
++        file_response.insertion_point = "includes"
++        file_response.content = custom_header
++
++    # Write CodeGeneratorResponse to stdout
++    sys.stdout.buffer.write(response.SerializeToString())
++
++if __name__ == "__main__":
++    main()
+diff --git a/src/protoc_plugin_wrapper.bat b/src/protoc_plugin_wrapper.bat
+new file mode 100644
+index 0000000..e050c79
+--- /dev/null
++++ b/src/protoc_plugin_wrapper.bat
+@@ -0,0 +1,2 @@
++@echo off
++python "%~dp0/protoc_plugin_common.py" %*
