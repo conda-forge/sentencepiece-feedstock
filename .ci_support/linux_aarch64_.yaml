@@ -1,11 +1,7 @@
-BUILD:
-- aarch64-conda_cos7-linux-gnu
 c_stdlib:
 - sysroot
 c_stdlib_version:
 - '2.17'
-cdt_arch:
-- aarch64
 cdt_name:
 - conda
 channel_sources:
@@ -21,7 +17,9 @@ docker_image:
 libabseil:
 - '20240722'
 libprotobuf:
-- 5.28.2
+- 5.28.3
+libsentencepiece:
+- 0.2.0
 pin_run_as_build:
   python:
     min_pin: x.x
