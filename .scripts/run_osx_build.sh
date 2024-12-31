@@ -94,6 +94,7 @@ else
     fi
 
     conda-build ./recipe -m ./.ci_support/${CONFIG}.yaml \
+        --log-level DEBUG \
         --suppress-variables ${EXTRA_CB_OPTIONS:-} \
         --clobber-file ./.ci_support/clobber_${CONFIG}.yaml \
         --extra-meta flow_run_id="$flow_run_id" remote_url="$remote_url" sha="$sha"
