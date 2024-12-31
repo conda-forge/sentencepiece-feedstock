@@ -33,6 +33,8 @@ source:
 
 build:
   number: 10
+  # debug
+  skip: true  # [not osx]
 
 outputs:
   - name: sentencepiece
