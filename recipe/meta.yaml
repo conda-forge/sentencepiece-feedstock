@@ -32,7 +32,7 @@ source:
     - patches/0013-adapt-to-names-for-import_library.patch
 
 build:
-  number: 10
+  number: 11
 
 outputs:
   - name: sentencepiece
