@@ -70,7 +70,7 @@ outputs:
         - libprotobuf     # [build_platform != target_platform]
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
-        - cmake
+        - cmake <4
         - ninja
       host:
         - libabseil
@@ -86,7 +86,7 @@ outputs:
         # cmake needs compiler to be able to run package detection, see
         # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
         - {{ compiler('cxx') }}
-        - cmake
+        - cmake <4
         - ninja
         - pkg-config
       source_files:
@@ -131,7 +131,7 @@ outputs:
         - libprotobuf     # [build_platform != target_platform]
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
-        - cmake
+        - cmake <4
         - ninja
       host:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
