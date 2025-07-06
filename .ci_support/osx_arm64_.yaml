@@ -15,9 +15,9 @@ cxx_compiler:
 cxx_compiler_version:
 - '18'
 libabseil:
-- '20250127'
+- '20250512'
 libprotobuf:
-- 5.29.3
+- 6.31.1
 libsentencepiece:
 - 0.2.0
 macos_machine:
