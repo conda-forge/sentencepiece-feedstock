@@ -76,7 +76,6 @@ outputs:
         - libabseil
         - libprotobuf
         - protobuf
-        - pthreads-win32  # [win]
       run:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
         # (unfortunately) because it contains abseil types in its API
@@ -139,7 +138,6 @@ outputs:
         - libabseil
         - libprotobuf
         - protobuf
-        - pthreads-win32  # [win]
       run:
         - {{ pin_subpackage('libsentencepiece', exact=True) }}
 
