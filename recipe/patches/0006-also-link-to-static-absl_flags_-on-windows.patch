@@ -1,17 +1,17 @@
-From d830e3c7a9a395f7db04c737dffa6771add78eb7 Mon Sep 17 00:00:00 2001
+From 0f5b8e8ad0da875834448d373e225682c9ccd369 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Tue, 20 Feb 2024 17:43:23 +1100
-Subject: [PATCH 06/13] also link to static absl_flags_* on windows
+Subject: [PATCH 06/12] also link to static absl_flags_* on windows
 
 ---
  python/setup.py | 10 +++++++++-
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index 36ed833..1316df3 100755
+index d04f26f..6c4e2f8 100755
 --- a/python/setup.py
 +++ b/python/setup.py
-@@ -117,13 +117,21 @@ if os.name == 'nt':
+@@ -173,13 +173,21 @@ if os.name == 'nt':
      ]
    elif True:
      cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
