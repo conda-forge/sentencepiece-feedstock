@@ -20,16 +20,13 @@ source:
     - patches/0005-create-and-install-CMake-metadata.patch
     # fix abseil setup on windows
     - patches/0006-also-link-to-static-absl_flags_-on-windows.patch
-    # backport of https://github.com/google/sentencepiece/pull/979:
-    # avoid having to specify CMAKE_INSTALL_{LIB,INCLUDE}DIR due to wrong order
-    - patches/0007-move-setting-of-default-CMAKE_INSTALL_-BIN-INCLUDE-L.patch
-    - patches/0008-respect-SPM_ENABLE_SHARED-also-on-windows.patch
+    - patches/0007-respect-SPM_ENABLE_SHARED-also-on-windows.patch
     # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
-    - patches/0009-add-SPM_DLL-machinery.patch                                  # [win]
-    - patches/0010-use-custom-protoc-plugin-to-insert-SPM_DLL-macro.patch       # [win]
-    - patches/0011-avoid-spuriously-inclusing-vendored-abseil.patch
-    - patches/0012-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
-    - patches/0013-adapt-to-names-for-import_library.patch
+    - patches/0008-add-SPM_DLL-machinery.patch                                  # [win]
+    - patches/0009-use-custom-protoc-plugin-to-insert-SPM_DLL-macro.patch       # [win]
+    - patches/0010-avoid-spuriously-inclusing-vendored-abseil.patch
+    - patches/0011-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
+    - patches/0012-adapt-to-names-for-import_library.patch
 
 build:
   number: 0

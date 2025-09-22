@@ -1,7 +1,7 @@
-From fec0f2f37c4c35057c31757de3ff0704afcb37d3 Mon Sep 17 00:00:00 2001
+From 52b3127a3edc28d199d09f6e22c011314ce80902 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
-Subject: [PATCH 03/13] point to our libs / headers for windows in setup.py
+Subject: [PATCH 03/12] point to our libs / headers for windows in setup.py
 
 also do not risk building against bundled libs, nor
 setting /MT for the MSVC static runtime libs
@@ -10,10 +10,10 @@ setting /MT for the MSVC static runtime libs
  1 file changed, 13 insertions(+), 8 deletions(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index d600321..36ed833 100755
+index da68e71..d04f26f 100755
 --- a/python/setup.py
 +++ b/python/setup.py
-@@ -77,10 +77,11 @@ class build_ext(_build_ext):
+@@ -85,10 +85,11 @@ class build_ext(_build_ext):
    """Override build_extension to run cmake."""
  
    def build_extension(self, ext):
@@ -28,10 +28,10 @@ index d600321..36ed833 100755
          cflags = cflags + run_pkg_config('cflags')
          libs = run_pkg_config('libs')
        else:
-@@ -108,17 +109,21 @@ if os.name == 'nt':
-   arch = 'win32'
-   if sys.maxsize > 2**32:
-     arch = 'amd64'
+@@ -164,17 +165,21 @@ def get_win_arch():
+ if os.name == 'nt':
+   # Must pre-install sentencepice into build directory.
+   arch = get_win_arch()
 -  if os.path.exists('..\\build\\root_{}\\lib'.format(arch)):
 +  if False:
      cflags = ['/std:c++17', '/I..\\build\\root_{}\\include'.format(arch)]
