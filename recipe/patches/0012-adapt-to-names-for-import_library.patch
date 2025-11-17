@@ -1,7 +1,7 @@
 From 3af20af33e1b85f6c7791b7b2746acb4ad2b3175 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:59:56 +1100
-Subject: [PATCH 12/12] adapt to names for import_library
+Subject: [PATCH 12/13] adapt to names for import_library
 
 ---
  python/setup.py | 2 +-

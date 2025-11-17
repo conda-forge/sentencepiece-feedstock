@@ -1,7 +1,7 @@
 From f3695dc9ed1db5bd980407ad0aacd920a29bc9f8 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 14:42:12 +1100
-Subject: [PATCH 09/12] use custom protoc plugin to insert SPM_DLL macro
+Subject: [PATCH 09/13] use custom protoc plugin to insert SPM_DLL macro
 
 ---
  src/CMakeLists.txt            | 24 ++++++++++++++---

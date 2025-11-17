@@ -1,7 +1,7 @@
 From 0b6837ff13fbf86b97b978d5f2036d2c6e51cb17 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 18 Jan 2023 19:44:15 +1100
-Subject: [PATCH 05/12] create and install CMake metadata
+Subject: [PATCH 05/13] create and install CMake metadata
 
 ---
  CMakeLists.txt               | 10 ++++++++++

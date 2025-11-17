@@ -1,7 +1,7 @@
 From 4f262becfff43be0c8847cd3f9d3c2d4a1121c14 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:29:08 +1100
-Subject: [PATCH 11/12] fix minloglevel situation; avoid _USE_EXTERNAL_ABSL
+Subject: [PATCH 11/13] fix minloglevel situation; avoid _USE_EXTERNAL_ABSL
 
 ---
  src/CMakeLists.txt | 5 -----

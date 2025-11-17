@@ -1,7 +1,7 @@
 From 22064729a2dc0dd519600c28929812bc3dd7f0a8 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 20:29:08 +1100
-Subject: [PATCH 10/12] avoid spuriously inclusing vendored abseil
+Subject: [PATCH 10/13] avoid spuriously inclusing vendored abseil
 
 ---
  src/CMakeLists.txt | 1 -

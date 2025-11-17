@@ -27,9 +27,10 @@ source:
     - patches/0010-avoid-spuriously-inclusing-vendored-abseil.patch
     - patches/0011-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
     - patches/0012-adapt-to-names-for-import_library.patch
+    - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
 
 build:
-  number: 0
+  number: 1
 
 outputs:
   - name: sentencepiece
@@ -108,7 +109,7 @@ outputs:
 
         # headers
         {% for each_header in [
-            "sentencepiece.pb.h", "sentencepiece_processor.h", "sentencepiece_trainer.h"
+            "sentencepiece.pb.h", "sentencepiece_model.pb.h", "sentencepiece_processor.h", "sentencepiece_trainer.h"
         ] %}
         - test -f $PREFIX/include//{{ each_header }} || (echo "{{ each_header }} not found" && exit 1)  # [unix]
         - if not exist %LIBRARY_INC%\\{{ each_header }} exit 1                                          # [win]
