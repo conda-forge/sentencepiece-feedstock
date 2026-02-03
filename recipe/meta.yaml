@@ -30,7 +30,7 @@ source:
     - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
 
 build:
-  number: 2
+  number: 3
 
 outputs:
   - name: sentencepiece
@@ -65,7 +65,7 @@ outputs:
         - {{ pin_subpackage("libsentencepiece", max_pin="x.x.x") }}
     requirements:
       build:
-        - libprotobuf     # [build_platform != target_platform]
+        - libprotobuf > 6.33.5    # [build_platform != target_platform]
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
         - cmake <4
