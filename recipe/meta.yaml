@@ -65,7 +65,7 @@ outputs:
         - {{ pin_subpackage("libsentencepiece", max_pin="x.x.x") }}
     requirements:
       build:
-        - libprotobuf >=6.33.5    # [build_platform != target_platform]
+        - libprotobuf     # [build_platform != target_platform]
         - {{ compiler('cxx') }}
         - {{ stdlib('c') }}
         - cmake <4
