@@ -1,4 +1,4 @@
-{% set version = "0.2.1" %}
+{% set version = "0.2.2" %}
 
 package:
   name: sentencepiece-split
@@ -6,7 +6,7 @@ package:
 
 source:
   url: https://github.com/google/sentencepiece/archive/refs/tags/v{{ version }}.tar.gz
-  sha256: c1a59e9259c9653ad0ade653dadff074cd31f0a6ff2a11316f67bee4189a8f1b
+  sha256: 92381f713e094a15a1ccff1ac4a5315a4c4b82a99ac1332d6ac53c9dc8e1bcf1
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
@@ -30,7 +30,7 @@ source:
     - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
 
 build:
-  number: 4
+  number: 0
 
 outputs:
   - name: sentencepiece
@@ -56,7 +56,7 @@ outputs:
         - exit 0
 
   - name: libsentencepiece
-    script: build-lib.sh   # [unix]
+    script: build-lib.sh  # [unix]
     script: build-lib.bat  # [win]
     build:
       run_exports:
@@ -123,7 +123,7 @@ outputs:
         - ./test_sentencepiece.bat  # [win]
 
   - name: sentencepiece-spm
-    script: build-lib.sh   # [unix]
+    script: build-lib.sh  # [unix]
     script: build-lib.bat  # [win]
     requirements:
       build:
@@ -155,7 +155,7 @@ outputs:
         {% endfor %}
 
   - name: sentencepiece-python
-    script: build-pkg.sh   # [unix]
+    script: build-pkg.sh  # [unix]
     script: build-pkg.bat  # [win]
     requirements:
       build:
