@@ -38,28 +38,6 @@ build:
   number: 5
 
 outputs:
-  - package:
-      # metapackage that holds everything together
-      name: sentencepiece
-    requirements:
-      host:
-        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
-        # needs python host dep to avoid creating the same wrapper for
-        # different sentencepiece-python builds due to coinciding hashes
-        - python
-      run:
-        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
-        - ${{ pin_subpackage('sentencepiece-spm', exact=True) }}
-        - ${{ pin_subpackage('sentencepiece-python', exact=True) }}
-      run_exports:
-        # not clear what ABI-compatibility of sentencepiece versions are;
-        # for now, use same version at run & build time
-        - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
-    tests:
-      # tested in other outputs
-      - script:
-          - exit 0
-
   - staging:
       name: sentencepiece-build
     build:
@@ -216,6 +194,28 @@ outputs:
             - pytest
         script:
           - cd python && pytest test
+
+  - package:
+      # metapackage that holds everything together
+      name: sentencepiece
+    requirements:
+      host:
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+        # needs python host dep to avoid creating the same wrapper for
+        # different sentencepiece-python builds due to coinciding hashes
+        - python
+      run:
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+        - ${{ pin_subpackage('sentencepiece-spm', exact=True) }}
+        - ${{ pin_subpackage('sentencepiece-python', exact=True) }}
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
+    tests:
+      # tested in other outputs
+      - script:
+          - exit 0
 
 about:
   license: Apache-2.0
