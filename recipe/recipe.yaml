@@ -237,4 +237,5 @@ extra:
     - ndmaxar
     - oblute
     - h-vetinari
+    - mgorny
   feedstock-name: sentencepiece
