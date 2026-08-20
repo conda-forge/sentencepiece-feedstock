@@ -56,8 +56,8 @@ outputs:
         # for now, use same version at run & build time
         - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
 
-  - package:
-      name: libsentencepiece
+  - staging:
+      name: sentencepiece-build
     build:
       script:
         file: build-lib
@@ -75,6 +75,18 @@ outputs:
         - protobuf
         - if: win
           then: pthreads-win32
+
+  - package:
+      name: libsentencepiece
+    inherit: sentencepiece-build
+    build:
+      files:
+        - include/**
+        - lib/**
+        - Library/bin/*.dll
+        - Library/include/**
+        - Library/lib/**
+    requirements:
       run:
         # sentencepiece uses PUBLIC linkage for abseil, which is correct
         # (unfortunately) because it contains abseil types in its API
@@ -133,24 +145,12 @@ outputs:
 
   - package:
       name: sentencepiece-spm
+    inherit: sentencepiece-build
     build:
-      script:
-        file: build-lib
+      files:
+        - bin/*
+        - Library/bin/*.exe
     requirements:
-      build:
-        - if: build_platform != target_platform
-          then: libprotobuf
-        - ${{ compiler('cxx') }}
-        - ${{ stdlib('c') }}
-        - cmake <4
-        - ninja
-      host:
-        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
-        - libabseil
-        - libprotobuf
-        - protobuf
-        - if: win
-          then: pthreads-win32
       run:
         - ${{ pin_subpackage('libsentencepiece', exact=True) }}
     tests:

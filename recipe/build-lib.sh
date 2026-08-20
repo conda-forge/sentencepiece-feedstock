@@ -21,10 +21,6 @@ cmake -G "Ninja" \
 
 cmake --build . --target install
 
-if [[ "$PKG_NAME" == "libsentencepiece" ]]; then
-    rm ${PREFIX}/bin/spm_*
-fi
-
 # clean up for rerun
 cd ..
 rm -rf build
