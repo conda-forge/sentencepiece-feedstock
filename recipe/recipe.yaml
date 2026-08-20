@@ -55,6 +55,10 @@ outputs:
         # not clear what ABI-compatibility of sentencepiece versions are;
         # for now, use same version at run & build time
         - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
+    tests:
+      # tested in other outputs
+      - script:
+          - exit 0
 
   - staging:
       name: sentencepiece-build
