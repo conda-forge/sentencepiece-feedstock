@@ -1,0 +1,245 @@
+schema_version: 1
+
+context:
+  version: "0.2.1"
+
+recipe:
+  name: sentencepiece-split
+  version: ${{ version }}
+
+source:
+  url: https://github.com/google/sentencepiece/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: c1a59e9259c9653ad0ade653dadff074cd31f0a6ff2a11316f67bee4189a8f1b
+  patches:
+    # trying to build both static & shared build seems to break on OSX
+    - patches/0001-do-not-mix-static-shared-builds.patch
+    # set PROTOBUF_USE_DLLS
+    - patches/0002-ensure-we-set-PROTOBUF_USE_DLLS-when-using-our-own-p.patch
+    # ensure python bindings link to correct libs on windows
+    - patches/0003-point-to-our-libs-headers-for-windows-in-setup.py.patch
+    # install pkg-config metadata also on windows
+    - patches/0004-also-install-pkg-config-files-on-windows.patch
+    # install CMake metadata
+    - patches/0005-create-and-install-CMake-metadata.patch
+    # fix abseil setup on windows
+    - patches/0006-also-link-to-static-absl_flags_-on-windows.patch
+    - patches/0007-respect-SPM_ENABLE_SHARED-also-on-windows.patch
+    # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
+    - if: win
+      then: patches/0008-add-SPM_DLL-machinery.patch
+    - if: win
+      then: patches/0009-use-custom-protoc-plugin-to-insert-SPM_DLL-macro.patch
+    - patches/0010-avoid-spuriously-inclusing-vendored-abseil.patch
+    - patches/0011-fix-minloglevel-situation-avoid-_USE_EXTERNAL_ABSL.patch
+    - patches/0012-adapt-to-names-for-import_library.patch
+    - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
+
+build:
+  number: 5
+
+outputs:
+  - staging:
+      name: sentencepiece-build
+    build:
+      script:
+        file: build-lib
+    requirements:
+      build:
+        - if: build_platform != target_platform
+          then: libprotobuf
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - cmake <4
+        - ninja
+      host:
+        - libabseil
+        - libprotobuf
+        - protobuf
+        - if: win
+          then: pthreads-win32
+
+  - package:
+      name: libsentencepiece
+    inherit: sentencepiece-build
+    build:
+      files:
+        - include/**
+        - lib/**
+        - Library/bin/*.dll
+        - Library/include/**
+        - Library/lib/**
+    requirements:
+      run:
+        # sentencepiece uses PUBLIC linkage for abseil, which is correct
+        # (unfortunately) because it contains abseil types in its API
+        - libabseil
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
+    tests:
+      - package_contents:
+          include:
+            - sentencepiece.pb.h
+            - sentencepiece_model.pb.h
+            - sentencepiece_processor.h
+            - sentencepiece_trainer.h
+          lib:
+            - if: unix
+              then:
+                - sentencepiece
+                - sentencepiece_train
+          files:
+            exists:
+              - if: win
+                then:
+                  - Library/bin/sentencepiece.dll
+                  - Library/bin/sentencepiece_train.dll
+                  - Library/lib/sentencepiece_import.lib
+                  - Library/lib/sentencepiece_train_import.lib
+            not_exists:
+              - lib/libsentencepiece.a
+              - lib/libsentencepiece_train.a
+              - Library/lib/sentencepiece.lib
+              - Library/lib/sentencepiece_train.lib
+      - requirements:
+          run:
+            # cmake needs compiler to be able to run package detection, see
+            # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
+            - ${{ compiler('cxx') }}
+            - cmake <4
+            - ninja
+            - pkg-config
+        files:
+          recipe:
+            - cmake_test/
+            - test_sentencepiece.sh
+            - test_sentencepiece.bat
+          source:
+            - data/botchan.txt
+        script:
+          # pkg-config
+          - pkg-config --print-errors --exact-version "${{ version }}" sentencepiece
+          # minimal CMake test (using find_package)
+          - if: unix
+            then: ./test_sentencepiece.sh
+            else: ./test_sentencepiece.bat
+
+  - package:
+      name: sentencepiece-spm
+    inherit: sentencepiece-build
+    build:
+      files:
+        - bin/*
+        - Library/bin/*.exe
+    requirements:
+      run:
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+    tests:
+      - script:
+          - if: unix
+            then:
+              # expect exit code 1, see https://github.com/google/sentencepiece/issues/978
+              - spm_decode --help >/dev/null || [[ $? == 1 ]]
+              - spm_encode --help >/dev/null || [[ $? == 1 ]]
+              - spm_export_vocab --help >/dev/null || [[ $? == 1 ]]
+              - spm_normalize --help >/dev/null || [[ $? == 1 ]]
+              - spm_train --help >/dev/null || [[ $? == 1 ]]
+            else:
+              # do not use %ERRORLEVEL% or !ERRORLEVEL!, but ERRORLEVEL, c.f.
+              # https://devblogs.microsoft.com/oldnewthing/20080926-00/?p=20743;
+              # while `if ... NEQ 1 exit 1` would be nicer, NEQ is incompatible with
+              # using bare ERRORLEVEL, see https://stackoverflow.com/a/74148543
+              - spm_decode --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)
+              - spm_encode --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)
+              - spm_export_vocab --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)
+              - spm_normalize --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)
+              - spm_train --help & if ERRORLEVEL ==1 (exit 0) else (exit 1)
+
+  - package:
+      name: sentencepiece-python
+    build:
+      script:
+        file: build-pkg
+    requirements:
+      build:
+        - if: build_platform != target_platform
+          then:
+            - python
+            - cross-python_${{ target_platform }}
+        - ${{ compiler('cxx') }}
+        - ${{ stdlib('c') }}
+        - if: unix
+          then: pkg-config
+      host:
+        - pip
+        - python
+        - setuptools
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+        - libprotobuf
+      run:
+        - python
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+    tests:
+      - python:
+          imports:
+            - sentencepiece
+          pip_check: true
+      - requirements:
+          run:
+            - pytest
+        files:
+          source:
+            - python/test
+            - data
+        script:
+          - cd python && pytest test
+
+  - package:
+      # metapackage that holds everything together
+      name: sentencepiece
+    requirements:
+      host:
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+        # needs python host dep to avoid creating the same wrapper for
+        # different sentencepiece-python builds due to coinciding hashes
+        - python
+      run:
+        - ${{ pin_subpackage('libsentencepiece', exact=True) }}
+        - ${{ pin_subpackage('sentencepiece-spm', exact=True) }}
+        - ${{ pin_subpackage('sentencepiece-python', exact=True) }}
+      run_exports:
+        # not clear what ABI-compatibility of sentencepiece versions are;
+        # for now, use same version at run & build time
+        - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
+    tests:
+      # tested in other outputs
+      - script:
+          - exit 0
+
+about:
+  license: Apache-2.0
+  license_file: LICENSE
+  summary: Unsupervised text tokenizer for Neural Network-based text generation.
+  description: |
+    SentencePiece is an unsupervised text tokenizer and detokenizer mainly for
+    Neural Network-based text generation systems where the vocabulary size is
+    predetermined prior to the neural model training.
+
+    SentencePiece implements subword units (e.g., byte-pair-encoding (BPE)
+    [[Sennrich et al.](http://www.aclweb.org/anthology/P16-1162)]) and unigram
+    language model [[Kudo](https://arxiv.org/abs/1804.109590)]) with the
+    extension of direct training from raw sentences. SentencePiece allows us to
+    make a purely end-to-end system that does not depend on language-specific
+    pre/postprocessing.
+  homepage: https://github.com/google/sentencepiece/
+
+extra:
+  recipe-maintainers:
+    - setu4993
+    - rluria14
+    - ndmaxar
+    - oblute
+    - h-vetinari
+    - mgorny
+  feedstock-name: sentencepiece
