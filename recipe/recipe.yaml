@@ -79,6 +79,16 @@ outputs:
         - ${{ pin_subpackage("libsentencepiece", upper_bound="x.x.x") }}
     tests:
       - package_contents:
+          include:
+            - sentencepiece.pb.h
+            - sentencepiece_model.pb.h
+            - sentencepiece_processor.h
+            - sentencepiece_trainer.h
+          lib:
+            - if: unix
+              then:
+                - sentencepiece
+                - sentencepiece_train
           files:
             exists:
               - if: win
@@ -92,24 +102,7 @@ outputs:
               - lib/libsentencepiece_train.a
               - Library/lib/sentencepiece.lib
               - Library/lib/sentencepiece_train.lib
-          lib:
-            - if: unix
-              then:
-                - sentencepiece
-                - sentencepiece_train
-          include:
-            - sentencepiece.pb.h
-            - sentencepiece_model.pb.h
-            - sentencepiece_processor.h
-            - sentencepiece_trainer.h
-      - files:
-          recipe:
-            - cmake_test/
-            - test_sentencepiece.sh
-            - test_sentencepiece.bat
-          source:
-            - data/botchan.txt
-        requirements:
+      - requirements:
           run:
             # cmake needs compiler to be able to run package detection, see
             # https://discourse.cmake.org/t/questions-about-find-package-cli-msvc/6194
@@ -117,6 +110,13 @@ outputs:
             - cmake <4
             - ninja
             - pkg-config
+        files:
+          recipe:
+            - cmake_test/
+            - test_sentencepiece.sh
+            - test_sentencepiece.bat
+          source:
+            - data/botchan.txt
         script:
           # pkg-config
           - pkg-config --print-errors --exact-version "${{ version }}" sentencepiece
@@ -185,13 +185,13 @@ outputs:
           imports:
             - sentencepiece
           pip_check: true
-      - files:
+      - requirements:
+          run:
+            - pytest
+        files:
           source:
             - python/test
             - data
-        requirements:
-          run:
-            - pytest
         script:
           - cd python && pytest test
 
