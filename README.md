@@ -235,6 +235,7 @@ Feedstock Maintainers
 =====================
 
 * [@h-vetinari](https://github.com/h-vetinari/)
+* [@mgorny](https://github.com/mgorny/)
 * [@ndmaxar](https://github.com/ndmaxar/)
 * [@oblute](https://github.com/oblute/)
 * [@rluria14](https://github.com/rluria14/)
