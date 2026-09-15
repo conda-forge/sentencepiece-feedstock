@@ -1,17 +1,17 @@
-From c501ecf1392b5c0e70dc3735ebf38a70bb4ebf23 Mon Sep 17 00:00:00 2001
+From 2787c4726ef7987ae097ce437a81e82d9f0d652f Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 12 Dec 2022 14:36:45 +1100
-Subject: [PATCH 04/13] also install pkg-config files on windows
+Subject: [PATCH 04/12] also install pkg-config files on windows
 
 ---
  CMakeLists.txt | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 5795fb5..3a8e03b 100644
+index 200e394..61f871c 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -149,7 +149,7 @@ set(INSTALL_DATADIR ${datadir_for_config_file})
+@@ -168,7 +168,7 @@ set(INSTALL_DATADIR ${datadir_for_config_file})
  configure_file("${PROJECT_SOURCE_DIR}/config.h.in" "config.h")
  configure_file("${PROJECT_SOURCE_DIR}/sentencepiece.pc.in" "sentencepiece.pc" @ONLY)
  

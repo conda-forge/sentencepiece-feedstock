@@ -1,17 +1,17 @@
-From 635d1bb569d8ecf94f802ea73ce15a0f06613f28 Mon Sep 17 00:00:00 2001
+From 6505b729e8678d7f58fc73f4adb821586792226d Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 11:49:46 +1100
-Subject: [PATCH 07/13] respect SPM_ENABLE_SHARED also on windows
+Subject: [PATCH 07/12] respect SPM_ENABLE_SHARED also on windows
 
 ---
  CMakeLists.txt | 5 -----
  1 file changed, 5 deletions(-)
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 1690056..b10b379 100644
+index 93fbac9..6f3987f 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -45,11 +45,6 @@ if (SPM_CROSS_SYSTEM_PROCESSOR)
+@@ -58,11 +58,6 @@ if (SPM_CROSS_SYSTEM_PROCESSOR)
   set(CMAKE_SYSTEM_PROCESSOR ${SPM_CROSS_SYSTEM_PROCESSOR})
  endif()
  

@@ -1,0 +1,22 @@
+From 288236c94393253d2607b0631401754b23fbac2f Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 25 Nov 2024 20:59:56 +1100
+Subject: [PATCH 11/12] adapt to names for import_library
+
+---
+ python/setup.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/python/setup.py b/python/setup.py
+index d366e4a..b81bbee 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -163,7 +163,7 @@ class build_ext_win(_build_ext):
+         # protobuf actually has the lib-prefix in the name also on windows;
+         # since libsentencepiece is static on windows, we also need _its_
+         # host dependencies for the link interface, i.e. also abseil
+-        for x in ["sentencepiece", "sentencepiece_train", "libprotobuf"] + absl_libs
++        for x in ["sentencepiece_import", "sentencepiece_train_import", "libprotobuf"] + absl_libs
+       ]
+ 
+     elif os.path.exists('..\\build_{}\\root\\lib'.format(arch)):

@@ -1,57 +1,77 @@
-From 52b3127a3edc28d199d09f6e22c011314ce80902 Mon Sep 17 00:00:00 2001
+From ef6a4084089ae7e3bf730b1a970b1280f4b01b64 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Sun, 11 Dec 2022 01:09:03 +1100
-Subject: [PATCH 03/13] point to our libs / headers for windows in setup.py
+Subject: [PATCH 03/12] point to our libs / headers for windows in setup.py
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
 also do not risk building against bundled libs, nor
 setting /MT for the MSVC static runtime libs
+
+Signed-off-by: Michał Górny <mgorny@gentoo.org>
 ---
- python/setup.py | 21 +++++++++++++--------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ python/setup.py | 33 ++++++++++++++-------------------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
 
 diff --git a/python/setup.py b/python/setup.py
-index da68e71..d04f26f 100755
+index 60e0811..15f8fa9 100755
 --- a/python/setup.py
 +++ b/python/setup.py
-@@ -85,10 +85,11 @@ class build_ext(_build_ext):
+@@ -104,34 +104,18 @@ class build_ext_unix(_build_ext):
    """Override build_extension to run cmake."""
  
    def build_extension(self, ext):
 -    cflags, libs = get_cflags_and_libs('../build/root')
-+    # cflags, libs = get_cflags_and_libs('./bundled/root')
-+    cflags = ['-std=c++17']
- 
+-    abseil_libs = find_abseil_lib('../build/third_party')
+-    cflags.extend(find_absl_include(is_msvc=False))
+-
 -    if len(libs) == 0:
--      if is_sentencepiece_installed():
+-      subprocess.check_call(['./build_bundled.sh', __version__])
+-      cflags, libs = get_cflags_and_libs('./build/root')
+-      abseil_libs = find_abseil_lib('./build/third_party')
+-      cflags.extend(find_absl_include(is_msvc=False))
++    cflags = ['-std=c++17', *subprocess.check_output(["pkg-config", "sentencepiece", "--cflags"]).decode("utf-8").split()]
++    libs = subprocess.check_output(["pkg-config", "sentencepiece", "--libs"]).decode("utf-8").split()
+ 
+     # Fix compile on some versions of Mac OSX
+     # See: https://github.com/neulab/xnmt/issues/199
+     if sys.platform == 'darwin':
+       #  non GNU linker
+       cflags.append('-mmacosx-version-min=10.9')
+-      # get correct SDK path by xcrun
+-      sdk_path = (
+-          subprocess.check_output(['xcrun', '--show-sdk-path']).decode().strip()
+-      )
+-      libs.extend(['-stdlib=libc++', f'-isysroot{sdk_path}'])
+-      libs.extend(abseil_libs)
+       libs.append('-Wl,-dead_strip')
+       libs.append('-Wl,-exported_symbols_list,exports_mac.txt')
+     else:
+       # GNU linker
+-      libs.append('-Wl,--start-group')
+-      libs.extend(abseil_libs)
+-      libs.append('-Wl,--end-group')
+       libs.append('-Wl,--gc-sections')
+       libs.append('-Wl,--version-script=exports.txt')
+       if sys.platform == 'aix':
+@@ -163,7 +147,18 @@ class build_ext_win(_build_ext):
+     # Must pre-install sentencepice into build directory.
+     arch = get_win_arch()
+ 
+-    if os.path.exists('..\\build_{}\\root\\lib'.format(arch)):
 +    if True:
-+      if True:
-         cflags = cflags + run_pkg_config('cflags')
-         libs = run_pkg_config('libs')
-       else:
-@@ -164,17 +165,21 @@ def get_win_arch():
- if os.name == 'nt':
-   # Must pre-install sentencepice into build directory.
-   arch = get_win_arch()
--  if os.path.exists('..\\build\\root_{}\\lib'.format(arch)):
-+  if False:
-     cflags = ['/std:c++17', '/I..\\build\\root_{}\\include'.format(arch)]
-     libs = [
-         '..\\build\\root_{}\\lib\\sentencepiece.lib'.format(arch),
-         '..\\build\\root_{}\\lib\\sentencepiece_train.lib'.format(arch),
-     ]
--  elif os.path.exists('..\\build\\root\\lib'):
--    cflags = ['/std:c++17', '/I..\\build\\root\\include']
-+  elif True:
-+    cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
-     libs = [
--        '..\\build\\root\\lib\\sentencepiece.lib',
--        '..\\build\\root\\lib\\sentencepiece_train.lib',
-+      # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
-+      os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
-+      # protobuf actually has the lib-prefix in the name also on windows;
-+      # since libsentencepiece is static on windows, we also need _its_
-+      # host dependencies for the link interface, i.e. also abseil
-+      for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
-     ]
-   else:
-     # build library locally with cmake and vc++.
++      cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
++      libs = [
++        # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
++        os.environ["LIBRARY_LIB"] + f"\\{x}.lib"
++        # protobuf actually has the lib-prefix in the name also on windows;
++        # since libsentencepiece is static on windows, we also need _its_
++        # host dependencies for the link interface, i.e. also abseil
++        for x in ["sentencepiece", "sentencepiece_train", "libprotobuf", "abseil_dll"]
++      ]
++
++    elif os.path.exists('..\\build_{}\\root\\lib'.format(arch)):
+       cflags = [
+           '/std:c++17',
+           '/I' + os.path.normpath('..\\build_{}\\root\\include'.format(arch)),

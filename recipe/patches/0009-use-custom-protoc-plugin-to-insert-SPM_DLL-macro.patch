@@ -1,7 +1,7 @@
-From f3695dc9ed1db5bd980407ad0aacd920a29bc9f8 Mon Sep 17 00:00:00 2001
+From edcbf12e50a791721670bb81c5b055f114a68201 Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Mon, 25 Nov 2024 14:42:12 +1100
-Subject: [PATCH 09/13] use custom protoc plugin to insert SPM_DLL macro
+Subject: [PATCH 09/12] use custom protoc plugin to insert SPM_DLL macro
 
 ---
  src/CMakeLists.txt            | 24 ++++++++++++++---
@@ -12,10 +12,10 @@ Subject: [PATCH 09/13] use custom protoc plugin to insert SPM_DLL macro
  create mode 100644 src/protoc_plugin_wrapper.bat
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 6f8d84c..91ee1e8 100644
+index 23cf9d9..90276fc 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -77,10 +77,26 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+@@ -74,10 +74,26 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
     add_definitions("-DPROTOBUF_USE_DLLS")
    endif()
    include_directories(${Protobuf_INCLUDE_DIRS})
@@ -45,7 +45,7 @@ index 6f8d84c..91ee1e8 100644
 +  set(SPM_MODEL_PROTO_SRCS ${CMAKE_CURRENT_SOURCE_DIR}/sentencepiece_model.pb.cc)
    set(PROTOBUF_LITE_SRCS "")
    include_directories(${PROTOBUF_INCLUDE_DIR})
-   if (MSVC)
+   add_compile_definitions(_USE_EXTERNAL_PROTOBUF)
 diff --git a/src/protoc_plugin_common.py b/src/protoc_plugin_common.py
 new file mode 100644
 index 0000000..df46fc6

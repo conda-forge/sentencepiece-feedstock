@@ -1,0 +1,22 @@
+From 0b8e06f36bd2fb6effbe893f3abd78e4de9b9d4a Mon Sep 17 00:00:00 2001
+From: "H. Vetinari" <h.vetinari@gmx.com>
+Date: Mon, 17 Nov 2025 22:52:43 +1100
+Subject: [PATCH 12/12] also install SPM_MODEL_PROTO_HDRS
+
+---
+ src/CMakeLists.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index c252bd1..d684527 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -367,7 +367,7 @@ install(EXPORT sentencepieceTargets
+ install(FILES "${GENERATED_HEADERS_DIR}/sentencepiece_trainer.h" "${GENERATED_HEADERS_DIR}/sentencepiece_processor.h"
+   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ if (NOT SPM_PROTOBUF_PROVIDER STREQUAL "internal")
+-  install(FILES ${SPM_PROTO_HDRS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
++  install(FILES ${SPM_PROTO_HDRS} ${SPM_MODEL_PROTO_HDRS} DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+ endif()
+ 
+ file(TO_NATIVE_PATH "${PROJECT_SOURCE_DIR}/data" data_dir)

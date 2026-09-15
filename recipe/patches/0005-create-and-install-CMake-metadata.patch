@@ -1,8 +1,12 @@
-From 0b6837ff13fbf86b97b978d5f2036d2c6e51cb17 Mon Sep 17 00:00:00 2001
+From 3a2a51a9805bb00159d5c7f9d1facc2fb3cf1d8e Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Wed, 18 Jan 2023 19:44:15 +1100
-Subject: [PATCH 05/13] create and install CMake metadata
+Subject: [PATCH 05/12] create and install CMake metadata
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Signed-off-by: Michał Górny <mgorny@gentoo.org>
 ---
  CMakeLists.txt               | 10 ++++++++++
  sentencepieceConfig.cmake.in |  8 ++++++++
@@ -11,10 +15,10 @@ Subject: [PATCH 05/13] create and install CMake metadata
  create mode 100644 sentencepieceConfig.cmake.in
 
 diff --git a/CMakeLists.txt b/CMakeLists.txt
-index 3a8e03b..1690056 100644
+index 61f871c..93fbac9 100644
 --- a/CMakeLists.txt
 +++ b/CMakeLists.txt
-@@ -155,6 +155,16 @@ if (TRUE)
+@@ -174,6 +174,16 @@ if (TRUE)
    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sentencepiece.pc" DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
  endif()
  
@@ -46,19 +50,19 @@ index 0000000..b4c0474
 +# Targets
 +include(${CMAKE_CURRENT_LIST_DIR}/sentencepieceTargets.cmake)
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 15e4602..bc28c06 100644
+index ebba293..fe6cc6b 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -248,7 +248,7 @@ endif()
+@@ -243,7 +243,7 @@ endif()
  if (SPM_ENABLE_SHARED)
-   target_link_libraries(sentencepiece ${SPM_LIBS})
-   target_link_libraries(sentencepiece_train ${SPM_LIBS} sentencepiece)
+   target_link_libraries(sentencepiece PUBLIC ${SPM_LIBS})
+   target_link_libraries(sentencepiece_train PUBLIC ${SPM_LIBS} sentencepiece)
 -  set(SPM_INSTALLTARGETS sentencepiece sentencepiece_train)
 +  set(SPM_LIBTARGETS sentencepiece sentencepiece_train)
    set_target_properties(sentencepiece sentencepiece_train PROPERTIES SOVERSION 0 VERSION 0.0.0)
    set_target_properties(sentencepiece PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
    set_target_properties(sentencepiece_train PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
-@@ -262,7 +262,7 @@ if (SPM_ENABLE_SHARED)
+@@ -257,7 +257,7 @@ if (SPM_ENABLE_SHARED)
  else()
    add_library(sentencepiece ALIAS sentencepiece-static)
    add_library(sentencepiece_train ALIAS sentencepiece_train-static)
@@ -67,7 +71,7 @@ index 15e4602..bc28c06 100644
  
    set_target_properties(sentencepiece-static PROPERTIES OUTPUT_NAME "sentencepiece")
    set_target_properties(sentencepiece_train-static PROPERTIES OUTPUT_NAME "sentencepiece_train")
-@@ -302,7 +302,7 @@ if (SPM_ENABLE_NFKC_COMPILE)
+@@ -293,7 +293,7 @@ if (SPM_ENABLE_NFKC_COMPILE)
    target_link_libraries(compile_charsmap sentencepiece sentencepiece_train)
  endif()
  
@@ -76,7 +80,7 @@ index 15e4602..bc28c06 100644
    spm_encode spm_decode spm_normalize spm_train spm_export_vocab)
  
  if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
-@@ -312,12 +312,21 @@ if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
+@@ -303,7 +303,7 @@ if (CMAKE_SYSTEM_NAME STREQUAL "iOS")
      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
      ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
  else()
@@ -85,7 +89,9 @@ index 15e4602..bc28c06 100644
    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})
- endif()
+@@ -336,6 +336,15 @@ add_custom_target(generate_installed_headers ALL
+           "${GENERATED_HEADERS_DIR}/sentencepiece_trainer.h"
+ )
  
 +install(TARGETS ${SPM_LIBTARGETS}
 +  EXPORT sentencepieceTargets
@@ -96,6 +102,6 @@ index 15e4602..bc28c06 100644
 +  FILE sentencepieceTargets.cmake
 +  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/sentencepiece")
 +
- install(FILES sentencepiece_trainer.h sentencepiece_processor.h
+ install(FILES "${GENERATED_HEADERS_DIR}/sentencepiece_trainer.h" "${GENERATED_HEADERS_DIR}/sentencepiece_processor.h"
    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
  if (NOT SPM_PROTOBUF_PROVIDER STREQUAL "internal")
