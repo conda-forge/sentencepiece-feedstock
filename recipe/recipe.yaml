@@ -35,7 +35,7 @@ source:
     - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
 
 build:
-  number: 6
+  number: 7
 
 outputs:
   - staging:
