@@ -1,7 +1,7 @@
 schema_version: 1
 
 context:
-  version: "0.2.1"
+  version: "0.2.3"
 
 recipe:
   name: sentencepiece-split
@@ -9,7 +9,7 @@ recipe:
 
 source:
   url: https://github.com/google/sentencepiece/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: c1a59e9259c9653ad0ade653dadff074cd31f0a6ff2a11316f67bee4189a8f1b
+  sha256: aeabf9b2ae1a77cda6e721ab1fb9f6e44b8ba4ddb8d7343dc5b02aec70fab324
   patches:
     # trying to build both static & shared build seems to break on OSX
     - patches/0001-do-not-mix-static-shared-builds.patch
@@ -35,7 +35,7 @@ source:
     - patches/0013-also-install-SPM_MODEL_PROTO_HDRS.patch
 
 build:
-  number: 7
+  number: 0
 
 outputs:
   - staging:
