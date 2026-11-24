@@ -1,7 +1,7 @@
-From 3ac0c5f8827288960b6d9edcbafab821762da732 Mon Sep 17 00:00:00 2001
+From ea52f21dfd8eb0022911483412cc9e73d4365dcf Mon Sep 17 00:00:00 2001
 From: "H. Vetinari" <h.vetinari@gmx.com>
 Date: Thu, 2 Dec 2021 10:05:12 +1100
-Subject: [PATCH 02/13] ensure we set PROTOBUF_USE_DLLS when using our own
+Subject: [PATCH 02/12] ensure we set PROTOBUF_USE_DLLS when using our own
  protobuf
 
 ---
@@ -9,10 +9,10 @@ Subject: [PATCH 02/13] ensure we set PROTOBUF_USE_DLLS when using our own
  1 file changed, 5 insertions(+)
 
 diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
-index 1ff431c..15e4602 100644
+index 7156b3f..ebba293 100644
 --- a/src/CMakeLists.txt
 +++ b/src/CMakeLists.txt
-@@ -71,6 +71,11 @@ if (SPM_PROTOBUF_PROVIDER STREQUAL "internal")
+@@ -68,6 +68,11 @@ if (SPM_PROTOBUF_PROVIDER STREQUAL "internal")
    include_directories(builtin_pb)
  elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
    find_package(Protobuf REQUIRED)
