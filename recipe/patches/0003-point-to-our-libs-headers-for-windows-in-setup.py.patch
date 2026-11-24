@@ -61,7 +61,7 @@ index 60e0811..15f8fa9 100755
  
 -    if os.path.exists('..\\build_{}\\root\\lib'.format(arch)):
 +    if True:
-+      cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
++      cflags = ['/std:c++17', '/MD', '/DSPM_DLL_IMPORTS', '/DPROTOBUF_USE_DLLS', '/I' + os.environ["LIBRARY_INC"]]
 +      libs = [
 +        # equivalent of -L$PREFIX/lib -lsentencepiece -lsentencepiece_train -lprotobuf
 +        os.environ["LIBRARY_LIB"] + f"\\{x}.lib"

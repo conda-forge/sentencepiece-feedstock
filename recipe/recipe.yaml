@@ -189,7 +189,6 @@ outputs:
           run:
             - pytest
             - numpy
-            - pytest-xdist
             # no protobuf on freethreading
             - if: python != "3.14.* *_cp314t"
               then: protobuf
@@ -201,7 +200,7 @@ outputs:
         script:
           - cd python
           - if: python != "3.14.* *_cp314t"
-            then: pytest -nauto test
+            then: pytest test
             else: |
               pytest test \
                 --deselect test/sentencepiece_test.py::TestSentencepieceProcessor::test_decode_offset_mapping \

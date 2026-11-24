@@ -14,7 +14,7 @@ index 15f8fa9..d366e4a 100755
 @@ -149,13 +149,21 @@ class build_ext_win(_build_ext):
  
      if True:
-       cflags = ['/std:c++17', '/MD', '/I' + os.environ["LIBRARY_INC"]]
+       cflags = ['/std:c++17', '/MD', '/DSPM_DLL_IMPORTS', '/DPROTOBUF_USE_DLLS', '/I' + os.environ["LIBRARY_INC"]]
 +      # most of abseil can be built as shared, which ends up in one giant library
 +      # called abseil_dll; the absl_flags_* libraries always stay static
 +      absl_libs = [
