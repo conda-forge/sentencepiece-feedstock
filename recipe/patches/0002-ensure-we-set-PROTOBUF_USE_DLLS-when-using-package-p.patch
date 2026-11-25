@@ -1,0 +1,26 @@
+From 314c3d5adbd4e58e11b28b04fecd46dcea66915d Mon Sep 17 00:00:00 2001
+From: Setu Shah <setu4993@yahoo.co.in>
+Date: Tue, 24 Nov 2026 21:29:03 -0800
+Subject: [PATCH 2/6] ensure we set PROTOBUF_USE_DLLS when using package
+ protobuf
+
+---
+ CMakeLists.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 81cd46d..29b4369 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -252,6 +252,11 @@ if (SPM_PROTOBUF_PROVIDER STREQUAL "module")
+   set(PROTOBUF_LITE_LIBRARY protobuf::libprotobuf-lite)
+ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+   find_package(Protobuf REQUIRED)
++  if (MSVC)
++    add_definitions("/DPROTOBUF_USE_DLLS")
++  else()
++    add_definitions("-DPROTOBUF_USE_DLLS")
++  endif()
+   set(PROTOBUF_LITE_LIBRARY protobuf::libprotobuf-lite)
+ endif()
+ 

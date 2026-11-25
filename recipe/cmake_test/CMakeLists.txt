@@ -3,11 +3,11 @@ cmake_minimum_required(VERSION 3.12)
 find_package(sentencepiece REQUIRED)
 
 add_executable(test_me test_me.cxx)
-target_link_libraries(test_me sentencepiece sentencepiece_train)
+target_link_libraries(test_me sentencepiece::sentencepiece sentencepiece::sentencepiece_train)
 if(MSVC)
   # static libsentencepiece leaks its host dependencies;
   # need to link them as well
-  target_link_libraries(test_me libprotobuf abseil_dll)
+  target_link_libraries(test_me libprotobuf-lite abseil_dll)
   # absl_flag* are always static on windows
   target_link_libraries(test_me absl_log_flags absl_flags_commandlineflag
     absl_flags_commandlineflag_internal absl_flags_config absl_flags_internal

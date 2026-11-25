@@ -10,6 +10,7 @@ cmake -G "Ninja" ^
     -DCMAKE_INSTALL_PREFIX=%LIBRARY_PREFIX% ^
     -Dprotobuf_BUILD_SHARED_LIBS=ON ^
     -DSPM_ENABLE_SHARED=ON ^
+    -DSPM_ENABLE_LITE=OFF ^
     -DSPM_ABSL_PROVIDER="package" ^
     -DSPM_PROTOBUF_PROVIDER="package" ^
     ..

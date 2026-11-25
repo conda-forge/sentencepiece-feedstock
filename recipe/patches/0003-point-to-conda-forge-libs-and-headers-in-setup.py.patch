@@ -1,0 +1,178 @@
+From 611c55cb48d287043ec25ebbd36bb5179fe431a4 Mon Sep 17 00:00:00 2001
+From: Setu Shah <setu4993@yahoo.co.in>
+Date: Tue, 24 Nov 2026 21:29:03 -0800
+Subject: [PATCH 3/6] point to conda-forge libs and headers in setup.py
+
+---
+ python/setup.py | 131 +++++++++++++++++++-----------------------------
+ 1 file changed, 51 insertions(+), 80 deletions(-)
+
+diff --git a/python/setup.py b/python/setup.py
+index f1d0b29..14d8785 100755
+--- a/python/setup.py
++++ b/python/setup.py
+@@ -99,56 +99,41 @@ class build_ext_unix(_build_ext):
+   """Override build_extension to run cmake."""
+ 
+   def build_extension(self, ext):
+-    cflags, libs = get_cflags_and_libs('../build')
+-    abseil_libs = find_abseil_lib('../build')
+-
+-    if len(libs) == 0:
+-      cflags, libs = get_cflags_and_libs('./build')
+-      abseil_libs = find_abseil_lib('./build')
+-
+-    if len(libs) == 0:
+-      subprocess.check_call(['./build_bundled.sh'])
+-      cflags, libs = get_cflags_and_libs('./build')
+-      abseil_libs = find_abseil_lib('./build')
++    cflags = [
++        '-std=c++20',
++        '-I../src',
++        '-I../lite',
++        '-I..',
++        *subprocess.check_output(
++            ['pkg-config', 'sentencepiece', '--cflags']
++        ).decode('utf-8').split(),
++    ]
++    libs = subprocess.check_output([
++        'pkg-config',
++        'sentencepiece',
++        'protobuf-lite',
++        'absl_status',
++        'absl_synchronization',
++        '--libs',
++    ]).decode('utf-8').split()
+ 
+     # Fix compile on some versions of Mac OSX
+     # See: https://github.com/neulab/xnmt/issues/199
+     if sys.platform == 'darwin':
+       #  non GNU linker
+       cflags.append('-mmacosx-version-min=10.9')
+-      # get correct SDK path by xcrun
+-      sdk_path = (
+-          subprocess.check_output(['xcrun', '--show-sdk-path']).decode().strip()
+-      )
+-      libs.extend(['-stdlib=libc++', f'-isysroot{sdk_path}'])
+-      libs.extend(abseil_libs)
+       libs.append('-Wl,-dead_strip')
+       libs.append('-Wl,-exported_symbols_list,exports_mac.txt')
+     elif sys.platform == 'aix':
+       #  non GNU linker
+-      libs.extend(abseil_libs)
+       libs.append('-Wl,-bE:exports_aix.txt')
+-      cflags.append('-Wl,-s')
+-      libs.append('-Wl,-s')
+-      libs.append('-fopenmp')
+-      cflags.append('-fopenmp')
+     else:
+       # GNU linker
+-      libs = (
+-          ['-Wl,--start-group']
+-          + libs
+-          + abseil_libs
+-          + ['-lgomp', '-Wl,--end-group']
+-      )
+       libs.append('-Wl,--gc-sections')
+       libs.append('-Wl,--version-script=exports.txt')
+-      cflags.append('-Wl,-strip-all')
+-      libs.append('-Wl,-strip-all')
+ 
+     if sys.platform == 'linux':
+       libs.append('-Wl,-Bsymbolic')
+-      libs.append('-fopenmp')
+-      cflags.append('-fopenmp')
+ 
+     if is_gil_disabled():
+       cflags.append('-DPy_GIL_DISABLED')
+@@ -166,56 +151,42 @@ class build_ext_win(_build_ext):
+   """Override build_extension to run cmake."""
+ 
+   def build_extension(self, ext):
+-    # Must pre-install sentencepice into build directory.
+-    arch = get_win_arch()
+-
+-    if os.path.exists('..\\build_{}\\root\\lib'.format(arch)):
+-      build_dir = '..\\build_{}'.format(arch)
+-    elif os.path.exists('..\\build\\root\\lib'):
+-      build_dir = '..\\build'
+-    elif os.path.exists('.\\build\\root\\lib'):
+-      build_dir = '.\\build'
+-    else:
+-      # build library locally with cmake and vc++.
+-      if arch == 'amd64':
+-        cmake_arch = 'x64'
+-      elif arch == 'arm64':
+-        cmake_arch = 'ARM64'
+-      else:
+-        raise RuntimeError(f"Unsupported architecture: {arch}")
+-
+-      cmake_src = 'sentencepiece' if os.path.exists('sentencepiece') else '..'
+-      subprocess.check_call([
+-          'cmake',
+-          cmake_src,
+-          '-A',
+-          cmake_arch,
+-          '-B',
+-          'build',
+-          '-DSPM_ENABLE_SHARED=OFF',
+-          '-DSPM_ENABLE_LITE=OFF',
+-          '-DSPM_DISABLE_EMBEDDED_DATA=ON',
+-          '-DCMAKE_INSTALL_PREFIX=build\\root',
+-      ])
+-      subprocess.check_call([
+-          'cmake',
+-          '--build',
+-          'build',
+-          '--config',
+-          'Release',
+-          '--target',
+-          'install',
+-          '--parallel',
+-          '8',
+-      ])
+-      build_dir = '.\\build'
+-
+-    cflags = ['/std:c++20'] + get_build_includes(build_dir, is_msvc=True)
++    cflags = [
++        '/std:c++20',
++        '/MD',
++        '/DSPM_DLL_IMPORTS',
++        '/DPROTOBUF_USE_DLLS',
++        '/I' + os.environ['LIBRARY_INC'],
++        '/I..\\src',
++        '/I..\\lite',
++        '/I..',
++    ]
++    # most of abseil can be built as shared, which ends up in one giant library
++    # called abseil_dll; the absl_flags_* libraries always stay static
++    absl_libs = [
++        'abseil_dll',
++        'absl_log_flags',
++        'absl_flags_commandlineflag',
++        'absl_flags_commandlineflag_internal',
++        'absl_flags_config',
++        'absl_flags_internal',
++        'absl_flags_marshalling',
++        'absl_flags_parse',
++        'absl_flags_private_handle_accessor',
++        'absl_flags_program_name',
++        'absl_flags_reflection',
++        'absl_flags_usage',
++        'absl_flags_usage_internal',
++    ]
+     libs = [
+-        os.path.join(build_dir, 'root', 'lib', 'sentencepiece.lib'),
+-        os.path.join(build_dir, 'root', 'lib', 'sentencepiece_train.lib'),
++        os.path.join(os.environ['LIBRARY_LIB'], f'{x}.lib')
++        for x in [
++            'sentencepiece_import',
++            'sentencepiece_train_import',
++            'libprotobuf-lite',
++        ]
++        + absl_libs
+     ]
+-    libs.extend(find_abseil_lib(build_dir))
+ 
+     # on Windows, GIL flag is not set automatically.
+     # https://docs.python.org/3/howto/free-threading-python.html
