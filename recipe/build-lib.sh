@@ -5,7 +5,7 @@ mkdir build
 cd build
 
 if [[ "${target_platform}" != "${build_platform}" ]]; then
-    CMAKE_ARGS="${CMAKE_ARGS} -DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc"
+    CMAKE_ARGS="${CMAKE_ARGS} -DProtobuf_PROTOC_EXECUTABLE=$BUILD_PREFIX/bin/protoc -DSPM_FLATC_EXECUTABLE=$BUILD_PREFIX/bin/flatc"
 fi
 
 cmake -G "Ninja" \
@@ -13,6 +13,7 @@ cmake -G "Ninja" \
     -DCMAKE_INSTALL_PREFIX=$PREFIX \
     -DCMAKE_AR="${AR}" \
     -DSPM_ENABLE_SHARED=ON \
+    -DSPM_ENABLE_LITE=OFF \
     -DSPM_ENABLE_TCMALLOC=OFF \
     -DSPM_ABSL_PROVIDER="package" \
     -DSPM_PROTOBUF_PROVIDER="package" \

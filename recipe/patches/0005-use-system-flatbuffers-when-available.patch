@@ -1,0 +1,36 @@
+From ff91b05b3418cae629c6c8c4f7ea8d9f94f0cbb6 Mon Sep 17 00:00:00 2001
+From: Setu Shah <setu4993@yahoo.co.in>
+Date: Tue, 24 Nov 2026 21:29:04 -0800
+Subject: [PATCH 5/6] use system flatbuffers when available
+
+---
+ CMakeLists.txt | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 3500786..4ecca14 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -261,6 +261,22 @@ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package")
+ endif()
+ 
+ # FlatBuffers
++find_package(flatbuffers CONFIG QUIET)
++if (NOT flatbuffers_FOUND)
++  find_package(Flatbuffers CONFIG QUIET)
++endif()
++if (TARGET flatbuffers::flatbuffers)
++  add_library(flatbuffers ALIAS flatbuffers::flatbuffers)
++elseif (TARGET flatbuffers::flatbuffers_shared)
++  add_library(flatbuffers ALIAS flatbuffers::flatbuffers_shared)
++endif()
++if (NOT SPM_FLATC_EXECUTABLE)
++  if (TARGET flatbuffers::flatc)
++    set(SPM_FLATC_EXECUTABLE $<TARGET_FILE:flatbuffers::flatc>)
++  else()
++    find_program(SPM_FLATC_EXECUTABLE flatc)
++  endif()
++endif()
+ if (NOT TARGET flatbuffers)
+   include(FetchContent)
+   set(FLATBUFFERS_BUILD_TESTS OFF CACHE BOOL "Disable flatbuffers tests" FORCE)

@@ -1,7 +1,7 @@
 schema_version: 1
 
 context:
-  version: "0.2.2"
+  version: "0.2.3"
 
 recipe:
   name: sentencepiece-split
@@ -9,29 +9,22 @@ recipe:
 
 source:
   url: https://github.com/google/sentencepiece/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 92381f713e094a15a1ccff1ac4a5315a4c4b82a99ac1332d6ac53c9dc8e1bcf1
+  sha256: aeabf9b2ae1a77cda6e721ab1fb9f6e44b8ba4ddb8d7343dc5b02aec70fab324
   patches:
     # trying to build both static & shared build seems to break on OSX
-    - patches/0001-do-not-mix-static-shared-builds.patch
+    - patches/0001-do-not-mix-static-and-shared-builds.patch
     # set PROTOBUF_USE_DLLS
-    - patches/0002-ensure-we-set-PROTOBUF_USE_DLLS-when-using-our-own-p.patch
-    # ensure python bindings link to correct libs on windows
-    - patches/0003-point-to-our-libs-headers-for-windows-in-setup.py.patch
+    - patches/0002-ensure-we-set-PROTOBUF_USE_DLLS-when-using-package-p.patch
+    # ensure python bindings link to conda-forge libs / headers
+    - patches/0003-point-to-conda-forge-libs-and-headers-in-setup.py.patch
     # install pkg-config metadata also on windows
     - patches/0004-also-install-pkg-config-files-on-windows.patch
-    # install CMake metadata
-    - patches/0005-create-and-install-CMake-metadata.patch
-    # fix abseil setup on windows
-    - patches/0006-also-link-to-static-absl_flags_-on-windows.patch
-    - patches/0007-respect-SPM_ENABLE_SHARED-also-on-windows.patch
-    # handle __declspec(dllimport) / __declspec(dllimport) for generated protobuf
+    # use system flatbuffers instead of FetchContent
+    - patches/0005-use-system-flatbuffers-when-available.patch
+    # handle __declspec(dllexport) / __declspec(dllimport) for generated protobuf
     - if: win
       then:
-        - patches/0008-add-SPM_DLL-machinery.patch
-        - patches/0009-use-custom-protoc-plugin-to-insert-SPM_DLL-macro.patch
-    - patches/0010-avoid-spuriously-inclusing-vendored-abseil.patch
-    - patches/0011-adapt-to-names-for-import_library.patch
-    - patches/0012-also-install-SPM_MODEL_PROTO_HDRS.patch
+        - patches/0006-add-SPM_DLL-machinery-and-custom-protoc-plugin-on-wi.patch
 
 build:
   number: 0
@@ -45,7 +38,10 @@ outputs:
     requirements:
       build:
         - if: build_platform != target_platform
-          then: libprotobuf
+          then:
+            - libprotobuf
+            - flatbuffers
+        - ${{ compiler('c') }}
         - ${{ compiler('cxx') }}
         - ${{ stdlib('c') }}
         - cmake <4
@@ -54,6 +50,7 @@ outputs:
         - libabseil
         - libprotobuf
         - protobuf
+        - flatbuffers
         - if: win
           then: pthreads-win32
 
@@ -174,7 +171,7 @@ outputs:
         - pip
         - python
         - setuptools
-        - pybind11
+        - pybind11 >=2.13,<3.1
         - ${{ pin_subpackage('libsentencepiece', exact=True) }}
         - libprotobuf
       run:

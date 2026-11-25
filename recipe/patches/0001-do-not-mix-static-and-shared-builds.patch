@@ -1,0 +1,108 @@
+From 2e17e6d2db58c44244cc6032a7b2c4cb0c2b09f7 Mon Sep 17 00:00:00 2001
+From: Setu Shah <setu4993@yahoo.co.in>
+Date: Tue, 24 Nov 2026 21:29:03 -0800
+Subject: [PATCH 1/6] do not mix static and shared builds
+
+---
+ src/CMakeLists.txt | 48 ++++++++++++++++++----------------------------
+ 1 file changed, 19 insertions(+), 29 deletions(-)
+
+diff --git a/src/CMakeLists.txt b/src/CMakeLists.txt
+index 295efb5..840bbe9 100644
+--- a/src/CMakeLists.txt
++++ b/src/CMakeLists.txt
+@@ -227,22 +227,6 @@ set(SPM_TEST_SRCS
+ # ==============================================================================
+ # 4. Library Targets (sentencepiece, sentencepiece_train)
+ # ==============================================================================
+-if (SPM_ENABLE_SHARED)
+-  add_library(sentencepiece SHARED ${SPM_SRCS})
+-  add_library(sentencepiece_train SHARED ${SPM_TRAIN_SRCS})
+-  if (ANDROID)
+-    target_link_libraries(sentencepiece PRIVATE log)
+-    target_link_libraries(sentencepiece_train PRIVATE log)
+-  endif()
+-endif()
+-
+-add_library(sentencepiece-static STATIC ${SPM_SRCS})
+-add_library(sentencepiece_train-static STATIC ${SPM_TRAIN_SRCS})
+-
+-target_link_libraries(sentencepiece-static PRIVATE ${SPM_LIBS})
+-target_link_libraries(sentencepiece_train-static PRIVATE sentencepiece-static ${SPM_LIBS})
+-add_dependencies(sentencepiece_train-static sentencepiece-static)
+-
+ set(SPM_TARGET_INCLUDE_DIRS
+   $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
+   $<BUILD_INTERFACE:${PROJECT_BINARY_DIR}>
+@@ -252,26 +236,24 @@ set(SPM_TARGET_INCLUDE_DIRS
+   $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+ )
+ 
+-target_include_directories(sentencepiece-static PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
+-target_include_directories(sentencepiece_train-static PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
+-
+ set(SPM_CXX_STANDARD_FEATURE cxx_std_20)
+ 
+-target_compile_features(sentencepiece-static PUBLIC ${SPM_CXX_STANDARD_FEATURE})
+-target_compile_features(sentencepiece_train-static PUBLIC ${SPM_CXX_STANDARD_FEATURE})
+-
+ if (SPM_ENABLE_SHARED)
++  add_library(sentencepiece SHARED ${SPM_SRCS})
++  add_library(sentencepiece_train SHARED ${SPM_TRAIN_SRCS})
++  if (ANDROID)
++    target_link_libraries(sentencepiece PRIVATE log)
++    target_link_libraries(sentencepiece_train PRIVATE log)
++  endif()
+   target_compile_features(sentencepiece PUBLIC ${SPM_CXX_STANDARD_FEATURE})
+   target_compile_features(sentencepiece_train PUBLIC ${SPM_CXX_STANDARD_FEATURE})
+-  target_link_libraries(sentencepiece PRIVATE ${SPM_LIBS})
++  target_link_libraries(sentencepiece PUBLIC absl::status absl::strings absl::span PRIVATE ${SPM_LIBS})
+   target_link_libraries(sentencepiece_train PRIVATE ${SPM_LIBS} sentencepiece)
+   add_dependencies(sentencepiece_train sentencepiece)
+   target_include_directories(sentencepiece PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
+   target_include_directories(sentencepiece_train PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
+   add_library(sentencepiece::sentencepiece ALIAS sentencepiece)
+   add_library(sentencepiece::sentencepiece_train ALIAS sentencepiece_train)
+-  add_library(sentencepiece::sentencepiece-static ALIAS sentencepiece-static)
+-  add_library(sentencepiece::sentencepiece_train-static ALIAS sentencepiece_train-static)
+   set_target_properties(sentencepiece sentencepiece_train PROPERTIES SOVERSION 0 VERSION 0.0.0)
+   set_target_properties(sentencepiece PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
+   set_target_properties(sentencepiece_train PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS YES)
+@@ -283,17 +265,25 @@ if (SPM_ENABLE_SHARED)
+     set_target_properties(sentencepiece_train PROPERTIES IMPORT_SUFFIX ".dll.a")
+   endif()
+ else()
++  add_library(sentencepiece-static STATIC ${SPM_SRCS})
++  add_library(sentencepiece_train-static STATIC ${SPM_TRAIN_SRCS})
++  target_link_libraries(sentencepiece-static PUBLIC absl::status absl::strings absl::span PRIVATE ${SPM_LIBS})
++  target_link_libraries(sentencepiece_train-static PRIVATE sentencepiece-static ${SPM_LIBS})
++  add_dependencies(sentencepiece_train-static sentencepiece-static)
++  target_include_directories(sentencepiece-static PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
++  target_include_directories(sentencepiece_train-static PUBLIC ${SPM_TARGET_INCLUDE_DIRS})
++  target_compile_features(sentencepiece-static PUBLIC ${SPM_CXX_STANDARD_FEATURE})
++  target_compile_features(sentencepiece_train-static PUBLIC ${SPM_CXX_STANDARD_FEATURE})
+   add_library(sentencepiece ALIAS sentencepiece-static)
+   add_library(sentencepiece_train ALIAS sentencepiece_train-static)
+   add_library(sentencepiece::sentencepiece ALIAS sentencepiece-static)
+   add_library(sentencepiece::sentencepiece_train ALIAS sentencepiece_train-static)
+   add_library(sentencepiece::sentencepiece-static ALIAS sentencepiece-static)
+   add_library(sentencepiece::sentencepiece_train-static ALIAS sentencepiece_train-static)
++  set_target_properties(sentencepiece-static PROPERTIES OUTPUT_NAME "sentencepiece")
++  set_target_properties(sentencepiece_train-static PROPERTIES OUTPUT_NAME "sentencepiece_train")
+ endif()
+ 
+-set_target_properties(sentencepiece-static PROPERTIES OUTPUT_NAME "sentencepiece")
+-set_target_properties(sentencepiece_train-static PROPERTIES OUTPUT_NAME "sentencepiece_train")
+-
+ if (NOT WIN32)
+   set(CMAKE_C_FLAGS "-O3 -Wall -fPIC ${CMAKE_C_FLAGS}")
+   set(CMAKE_CXX_FLAGS "-O3 -Wall -fPIC ${CMAKE_CXX_FLAGS}")
+@@ -335,7 +325,7 @@ endif()
+ # ==============================================================================
+ if (SPM_ENABLE_SHARED)
+   set(SPM_LIB_TARGETS sentencepiece sentencepiece_train)
+-  set(SPM_EXTRA_INSTALL_LIBS sentencepiece-static sentencepiece_train-static)
++  set(SPM_EXTRA_INSTALL_LIBS "")
+ elseif (SPM_PROTOBUF_PROVIDER STREQUAL "package" AND SPM_ABSL_PROVIDER STREQUAL "package")
+   set(SPM_LIB_TARGETS sentencepiece-static sentencepiece_train-static)
+   set(SPM_EXTRA_INSTALL_LIBS "")
