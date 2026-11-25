@@ -1,3 +1,7 @@
+c_compiler:
+- vs
+c_compiler_version:
+- '2022'
 c_stdlib:
 - vs
 channel_sources:
@@ -8,6 +12,8 @@ cxx_compiler:
 - vs
 cxx_compiler_version:
 - '2022'
+flatbuffers:
+- 25.9.23
 libabseil:
 - '20260817'
 libprotobuf:
